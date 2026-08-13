@@ -33,6 +33,12 @@ $ShotNums   = @('01','03','05','06','08','10','12','14','16','18','20')
 # watermarks of any kind on item photos.
 $Watermark  = 'vinylcurator.net'
 
+# Contact address, split so the raw HTML never contains the assembled
+# address (site.js joins the parts at load - keeps scrapers off it).
+# Swap to 'contact' / 'vinylcurator.net' once Porkbun forwarding is set up.
+$MailUser   = 'vinylcurator.net'
+$MailDomain = 'gmail.com'
+
 $Site   = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Albums = Join-Path $Site 'albums'
 
@@ -376,6 +382,7 @@ foreach ($album in $json.albums) {
   $page = $page.Replace('{{CONDITION}}', $condition)
   $page = $page.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
   $page = $page.Replace('{{ROOT}}', '../../')
+  $page = $page.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
   Write-Utf8 (Join-Path $dir 'index.html') $page
   $built++
 
@@ -402,10 +409,12 @@ if ($built -eq 1) { $countLabel = '1 record' }
 $idx = $tplIndex.Replace('{{CARDS}}', $cards.ToString()).Replace('{{COUNTLABEL}}', $countLabel)
 $idx = $idx.Replace('{{CANONICAL}}', "$base/albums/").Replace('{{ROOT}}', '../')
 $idx = $idx.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
+$idx = $idx.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
 Write-Utf8 (Join-Path $Albums 'index.html') $idx
 
 $land = $tplLanding.Replace('{{COUNTLABEL}}', $countLabel).Replace('{{CANONICAL}}', "$base/")
 $land = $land.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
+$land = $land.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
 Write-Utf8 (Join-Path $Site 'index.html') $land
 
 $sm = New-Object System.Text.StringBuilder

@@ -2,6 +2,15 @@
 (function () {
   'use strict';
 
+  // Contact links: the address is assembled here from split parts so it
+  // never appears whole in the raw HTML (keeps scrapers off it). Links on
+  // the landing hero show the full address; footer links keep their label.
+  Array.prototype.forEach.call(document.querySelectorAll('a.mail'), function (a) {
+    var addr = a.getAttribute('data-u') + '@' + a.getAttribute('data-d');
+    a.href = 'mailto:' + addr;
+    if (a.textContent.trim() === 'email') a.textContent = addr;
+  });
+
   // Archive index: filter cards on artist / title / label / year.
   var filter = document.getElementById('filter');
   if (filter) {
