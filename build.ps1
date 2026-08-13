@@ -35,9 +35,9 @@ $Watermark  = 'vinylcurator.net'
 
 # Contact address, split so the raw HTML never contains the assembled
 # address (site.js joins the parts at load - keeps scrapers off it).
-# Swap to 'contact' / 'vinylcurator.net' once Porkbun forwarding is set up.
-$MailUser   = 'vinylcurator.net'
-$MailDomain = 'gmail.com'
+# contact@vinylcurator.net is a Porkbun forward to the owner's Gmail.
+$MailUser   = 'contact'
+$MailDomain = 'vinylcurator.net'
 
 $Site   = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Albums = Join-Path $Site 'albums'
