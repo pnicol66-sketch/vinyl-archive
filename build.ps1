@@ -331,12 +331,11 @@ foreach ($album in $json.albums) {
     $matrix = Section 'matrix' 'Matrix / Runout' ('    <pre>' + (HtmlEnc $mx.ToString().TrimEnd()) + '</pre>')
   }
 
-  $sections = ''
-  $sections += Section 'story' 'The Album' (Prose ([string]$album.albumStory))
-  $sections += Section 'pressing' 'This Pressing' (Prose ([string]$album.lpNotes))
-  $sections += Section 'label' 'The Label' (Prose ([string]$album.labelNotes))
-  $sections += Section 'fidelity' 'Fidelity' (Prose ([string]$album.fidelity))
-  $sections += Section 'notes' 'Notes' (Prose ([string]$album.generalNotes))
+  $secStory = Section 'story' 'The Album' (Prose ([string]$album.albumStory))
+  $secPressing = Section 'pressing' 'This Pressing' (Prose ([string]$album.lpNotes))
+  $secLabel = Section 'label' 'The Label' (Prose ([string]$album.labelNotes))
+  $secFidelity = Section 'fidelity' 'Fidelity' (Prose ([string]$album.fidelity))
+  $secNotes = Section 'notes' 'Notes' (Prose ([string]$album.generalNotes))
 
   $tl = New-Object System.Text.StringBuilder
   for ($i = 0; $i -lt 4; $i++) {
@@ -372,14 +371,18 @@ foreach ($album in $json.albums) {
   $descSrc = $descSrc -replace '\s+', ' '
   if ($descSrc.Length -gt 155) { $descSrc = $descSrc.Substring(0, 152).TrimEnd() + '...' }
 
+  # Section order per the owner's spec (2026-08-13): Matrix/Runout,
+  # Condition, Variant chronology, This Pressing, The Album, Tracklist,
+  # The Label, Fidelity, Notes.
+  $content = $matrix + $condition + $chronology + $secPressing + $secStory +
+    $tracklist + $secLabel + $secFidelity + $secNotes
+
   $page = $tplAlbum.Replace('{{ARTIST}}', $enc.artist).Replace('{{TITLE}}', $enc.title)
   $page = $page.Replace('{{SUBTITLE}}', $subtitle)
   $page = $page.Replace('{{META_DESC}}', (HtmlEnc $descSrc))
   $page = $page.Replace('{{CANONICAL}}', "$base/albums/$slug/")
   $page = $page.Replace('{{GALLERY}}', $gallery).Replace('{{DETAILS}}', $details)
-  $page = $page.Replace('{{MATRIX}}', $matrix).Replace('{{SECTIONS}}', $sections)
-  $page = $page.Replace('{{TRACKLIST}}', $tracklist).Replace('{{CHRONOLOGY}}', $chronology)
-  $page = $page.Replace('{{CONDITION}}', $condition)
+  $page = $page.Replace('{{CONTENT}}', $content)
   $page = $page.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
   $page = $page.Replace('{{ROOT}}', '../../')
   $page = $page.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
