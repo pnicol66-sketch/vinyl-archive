@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-13T20:43:50.344Z",
+ "generated": "2026-08-13T21:21:41.642Z",
  "site": {
   "title": "Vinyl Curator",
   "baseUrl": "https://vinylcurator.net"
@@ -249,6 +249,47 @@
    "folderName": "Jennifer Warnes_Famous Blue Raincoat (The Songs of Leonard Cohen)",
    "folderId": "1e2VR9HrioIblvGNywqbQGfVgC4YE-9Zd",
    "slug": "jennifer-warnes-famous-blue-raincoat-the-songs-of-leonard-cohen",
+   "tab": "For Sale"
+  },
+  {
+   "artist": "Marty Paich, Guest Artist: Art Pepper",
+   "title": "Like Wow! Jazz 1960",
+   "year": "1960",
+   "labelName": "Interlude Records",
+   "labelNumber": "MO-514",
+   "monoStereo": "Mono",
+   "countryOfOrigin": "US",
+   "format": "LP",
+   "genre": "Jazz - West Coast/Cool Jazz",
+   "speed": "33 1/3 RPM",
+   "producer": "Robert Scherman (credited 'Directed by'; no producer credit as such)",
+   "composer": "",
+   "conductor": "",
+   "performerOrchestra": "",
+   "musicians": "Marty Paich (piano), Art Pepper (alto sax, guest - on Art's Opus, All The Things You Are, Pitfall, Marty's Blues, What's Right For You), Larry Bunker (vibraphone, drums), Joe Mondragon (bass); documented but uncredited on the jacket: Howard Roberts (guitar) and Frank Capp (drums) on the ex-'Hot Piano' tracks, Buddy Clark (bass) and Frank Capp (drums) on the Pepper quartet tracks",
+   "coverGrade": "VG+",
+   "vinylGrade": "EX DEEP GROOVE/EX DEEP GROOVE",
+   "matrix": {
+    "a": "134-A\nB-21749",
+    "b": "133-B\nB-21750",
+    "c": "",
+    "d": ""
+   },
+   "sides": [
+    "1. Art's Opus\n2. I'll Remember April\n3. Lullaby Of The Leaves\n4. Jump For Me\n5. All The Things You Are",
+    "1. Marty's Blues\n2. Pitfall\n3. Dool's Blues\n4. Theme From Lighthouse\n5. What's Right For You",
+    "",
+    ""
+   ],
+   "albumStory": "Despite the 'Jazz 1960' banner, every note here was recorded in Hollywood in 1956, at Radio Recorders, during one of the most poignant windows in Art Pepper's life: he had just been released from his first prison term in July 1956 and cut these sides with Marty Paich only weeks later, mere months before his career-defining 'Art Pepper Meets the Rhythm Section' (January 1957). Five tracks feature Pepper's alto in a quartet with Paich - material first issued on the rare Tampa LP 'Marty Paich Quartet Featuring Art Pepper' (TP-28), including Pepper's own 'Art's Opus' - while the other five are Paich-led sides with Larry Bunker's vibes and Howard Roberts' guitar drawn from the Tampa 10-inch 'Hot Piano.' By the time Interlude dressed the masters up with a bachelor-pad 'girly cover' and a 1960 release date, Pepper was behind bars again (1960-64), making the album a bittersweet placeholder for an absent star. Paich, meanwhile, was among the most important arrangers on the West Coast, the man behind the charts for 'Art Pepper + Eleven: Modern Jazz Classics' and key Mel Torme sessions. Pepper's playing here is light, buoyant and irresistibly melodic - a free man breezing through standards - and the set is prized as an essential early document of the defining alto voice of West Coast jazz.",
+   "lpNotes": "Original and only US pressing (mono, 1960) - Interlude MO-514 gray deep-groove Hollywood label; a recompilation of 1956 Tampa masters.",
+   "labelNotes": "This copy carries the gray-silver deep-groove label with the large white lowercase 'i' Interlude logo and 'INTERLUDE RECORDS INC - HOLLYWOOD' rim text, catalog MO-514 with 'int 134-A/B' printed matrix numbers - the original and only documented US pressing configuration. Interlude Records Inc. was a short-lived Hollywood independent (c. 1959-62) directed by Robert Scherman, and its catalog drew heavily on the earlier Tampa Records masters (TP series, 1956-57), which Scherman also controlled; MO-514 is a recompilation of Tampa material rather than a new recording. The deep groove and single mono MO-500 series number place this firmly in the label's original 1960 issue window. No second pressing or label-design change is documented for this title, so all genuine copies share this configuration; the material (not this LP) later resurfaced on Charlie Parker Records (PLP), Archives of Jazz, and V.S.O.P. reissues.",
+   "fidelity": "The source tapes were engineered at Radio Recorders in 1956 by Val Valentin - later Verve's legendary house engineer - which explains the unusually sweet, present mono sound. LondonJazzCollector calls this Interlude pressing 'a sonic joy' and 'musicians in the room,' judging it superior to the reportedly dodgier-sounding Tampa originals (TP-23/TP-28). In the fidelity hierarchy it effectively sits at or near the top for this material: the Tampa originals are rarer but not better-sounding, the later Charlie Parker PLP ('Chile Pepper') and V.S.O.P. reissues are serviceable but a generation removed, and no modern audiophile LP reissue of this album exists.",
+   "generalNotes": "1960 Interlude MO-514 mono - original US pressing, the only variant documented for this title. Gray deep-groove labels with 'INTERLUDE RECORDS INC - HOLLYWOOD' rim text and printed 'int 134-A/B' match the original-issue configuration; typed runouts (134-A/B-21749 and 133-B/B-21750) are consistent, though note the Side 2 transcription reads 133-B where the printed label reads int 134-B - a dead-wax photo would settle whether that is a transcription slip. Original 'Monaural Dimensional Realism' corporate inner sleeve survives, supporting period provenance. Released 1960; all recordings are actually August 1956 Tampa sessions from Radio Recorders.",
+   "variantChronology": "1960 - US Interlude MO-514 mono, gray deep-groove label, Hollywood rim text  <- this copy\n1960 - Interlude 'Dynamic Depth' stereo edition (advertised in back-cover boilerplate; no confirmed copies documented) - n/a",
+   "folderName": "Marty Paich, Guest Artist- Art Pepper_Like Wow! Jazz 1960",
+   "folderId": "1_CFPRDv7xR9gPCCfgQAhR_bFmWCMEW3S",
+   "slug": "marty-paich-guest-artist-art-pepper-like-wow-jazz-1960",
    "tab": "For Sale"
   },
   {
