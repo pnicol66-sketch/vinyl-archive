@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Archive · Vinyl Curator</title>
+<meta name="description" content="A documented vinyl collection: original pressings photographed, transcribed, and researched.">
+<link rel="canonical" href="{{CANONICAL}}">
+<link rel="icon" href="{{ROOT}}favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="{{ROOT}}assets/site.css">
+</head>
+<body>
+<header class="site-head">
+  <nav>
+    <a class="brand" href="{{ROOT}}">Vinyl Curator</a>
+    <a href="{{ROOT}}albums/" aria-current="page">Archive</a>
+  </nav>
+</header>
+<main class="archive">
+  <section class="archive-head">
+    <h1>The Archive</h1>
+    <p class="lede">{{COUNTLABEL}} — photographed, transcribed, and researched.</p>
+    <p class="filter-row"><input id="filter" type="search"
+      placeholder="Filter by artist, title, label, year…" aria-label="Filter the archive"></p>
+  </section>
+  <section class="card-grid" id="cards">
+{{CARDS}}
+  </section>
+  <p class="no-match" id="nomatch" hidden>Nothing matches that filter.</p>
+</main>
+<footer class="site-foot">
+  <p class="colophon">Documented with <a href="{{ROOT}}">Vinyl Curator</a> ·
+  Updated {{GENERATED}} · © {{YEAR}} Vinyl Curator</p>
+</footer>
+<script src="{{ROOT}}assets/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+{
+ "generated": "2026-08-13T20:00:17.481Z",
+ "site": {
+  "title": "Vinyl Curator",
+  "baseUrl": "https://vinylcurator.net"
+ },
+ "albums": [
+  {
+   "artist": "The Gerry Mulligan Sextet",
+   "title": "Presenting The Gerry Mulligan Sextet",
+   "year": "1956",
+   "labelName": "EmArcy",
+   "labelNumber": "MG-36056",
+   "monoStereo": "Mono",
+   "countryOfOrigin": "US",
+   "format": "LP",
+   "genre": "Jazz - Cool Jazz",
+   "speed": "33 1/3 RPM",
+   "producer": "Bob Shad",
+   "composer": "",
+   "conductor": "",
+   "performerOrchestra": "",
+   "musicians": "Gerry Mulligan (baritone saxophone), Zoot Sims (tenor saxophone), Bob Brookmeyer (valve trombone; chorded piano behind Mulligan on 'Everything Happens to Me'), Jon Eardley (trumpet), Peck Morrison (bass), Dave Bailey (drums)",
+   "coverGrade": "VG+",
+   "vinylGrade": "VG+ DEEP GROOVE/VG DEEP GROOVE",
+   "matrix": {
+    "a": "MG36056A MF2 MSII",
+    "b": "MG36056B MF2 MS",
+    "c": "",
+    "d": ""
+   },
+   "sides": [
+    "1. Mud Bug\n2. Sweet And Lovely\n3. Apple Core\n4. Nights Of The Turntable",
+    "1. Broadway\n2. Everything Happens To Me\n3. The Lady Is A Tramp\n4. Bernie's Tune",
+    "",
+    ""
+   ],
+   "albumStory": "Gerry Mulligan was one of the defining figures of cool jazz: arranger on Miles Davis's Birth of the Cool nonet sessions and then leader of the celebrated piano-less quartet with Chet Baker that made him a star on Pacific Jazz in 1952-53. After a drug arrest and the breakup of the quartet, he took a self-imposed sabbatical to rethink his direction, and the sextet he unveiled in 1955 was the result - pairing himself with Zoot Sims' ever-swinging tenor, valve trombonist Bob Brookmeyer (his quartet partner in the interim), and young trumpeter Jon Eardley over a fresh rhythm team of Peck Morrison and Dave Bailey. Presenting The Gerry Mulligan Sextet, recorded in New York in September and October 1955, was both the group's debut album and Mulligan's first LP for EmArcy, Mercury's jazz subsidiary. The program mixes Mulligan originals like 'Apple Core' and 'Nights of the Turntable' with choice standards, showcasing his gift for lean, contrapuntal writing for a four-horn front line that swings in an airy, Kansas City-inflected way rather than with hard bop density. Nat Hentoff awarded the album five stars in Down Beat, praising the flowing ensemble interplay, and the sextet went on to tour widely, including Europe. The album stands as the opening document of the most fully realized small-group phase of Mulligan's career between the quartet and his later Concert Jazz Band.",
+   "lpNotes": "Original-era US mono press (1956-57) - EmArcy blue drum-logo deep-groove label with Mercury Record Corporation rim text; photo back cover = second sleeve state after the blue-back March 1956 debut.",
+   "labelNotes": "The labels are EmArcy's original LP design: royal blue with silver-white print, the oval EmArcy script logo beside the drummer-with-wire-brushes illustration, LONG PLAYING HIGH FIDELITY in large letters around the rim, and 'Mercury Record Corporation Made in U.S.A.' in small rim text, with a deep groove on both sides. This drum-logo blue label with Mercury rim text was EmArcy's first LP label style, used from the launch of the 36000 series around 1954 through roughly 1957; from 1958 the jazz line shifted to the Mercury EmArcy Jazz label design seen on the later US repress of this title, before EmArcy was wound down into Mercury/Fontana in the early 1960s. That places this copy squarely in the original-issue window. The sleeve nuance matters within that window: Discogs distinguishes the March 1956 debut pressing by a blue back cover, whereas this copy carries the photographic back cover with individual musician portraits and liner notes - a slightly later 1956-57 sleeve state, but still the original mono issue on the first label design. The typed runouts (MG36056A MF2 MSII / MG36056B MF2 MS) carry Mercury's etched 'MF' mastering codes, consistent with Mercury's own in-house cutting and pressing operation.",
+   "fidelity": "Cut using Mercury's advertised Fine-Fairchild Margin Control mastering process and pressed in-house by Mercury (the etched 'MF' matrix codes in the runout are Mercury's own), the original deep-groove mono is the preferred way to hear this record: warm, full-bodied mid-50s mono with the four-horn front line nicely separated. Collector and dealer consensus treats the US drum-logo DG pressing as the cut to own; the 1970s Trip Jazz reissue is a flat later generation, and the modern European reissues (Vinyl Lovers, Membran, Jazz Images) are digital-sourced and not sonically competitive. No audiophile reissue from Music Matters, Analogue Productions, or the Tone Poet line exists for this title, so the original mono remains the top of the fidelity hierarchy.",
+   "generalNotes": "Original US mono pressing of EmArcy MG-36056 (recorded Sept-Oct 1955, released early 1956), from the first label era but the second sleeve state. Decisive evidence: blue drum-with-brushes logo labels with LONG PLAYING HIGH FIDELITY rim and 'Mercury Record Corporation Made in U.S.A.' text plus deep groove = EmArcy's 1954-57 first label design; typed runouts MG36056A MF2 / MG36056B MF2 carry Mercury's etched in-house mastering codes. The photographic liner-note back cover distinguishes it from the blue-back March 1956 debut sleeve, dating this copy to 1956-57 rather than the very first run.",
+   "variantChronology": "1956 - US first press, blue drum-logo deep-groove label, blue back cover\n1956-57 - US pressing, blue drum-logo deep-groove label, photo/liner-note back cover  <- this copy\n1958 - US repress, Mercury EmArcy Jazz label (post-drummer-logo design)\n1956 - UK Pye EJL 101 / European EmArcy issues\n1970s - US Trip Jazz TLP-5561 reissue\n2010s - European reissues (Vinyl Lovers, Membran, Jazz Images)",
+   "folderName": "The Gerry Mulligan Sextet_Presenting The Gerry Mulligan Sextet",
+   "folderId": "1USCv7on238cnzW_IhStO2-rCfqocXYJD",
+   "slug": "the-gerry-mulligan-sextet-presenting-the-gerry-mulligan-sextet",
+   "tab": "For Sale"
+  }
+ ]
+}

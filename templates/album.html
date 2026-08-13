@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ARTIST}} — {{TITLE}} · Vinyl Curator</title>
+<meta name="description" content="{{META_DESC}}">
+<link rel="canonical" href="{{CANONICAL}}">
+<link rel="icon" href="{{ROOT}}favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="{{ROOT}}assets/site.css">
+</head>
+<body>
+<header class="site-head">
+  <nav>
+    <a class="brand" href="{{ROOT}}">Vinyl Curator</a>
+    <a href="{{ROOT}}albums/">Archive</a>
+  </nav>
+</header>
+<main class="album">
+  <section class="album-head">
+    <p class="artist">{{ARTIST}}</p>
+    <h1>{{TITLE}}</h1>
+    <p class="subtitle">{{SUBTITLE}}</p>
+  </section>
+{{GALLERY}}
+{{DETAILS}}
+{{MATRIX}}
+{{SECTIONS}}
+{{TRACKLIST}}
+{{CHRONOLOGY}}
+{{CONDITION}}
+</main>
+<footer class="site-foot">
+  <p class="method">Each record in this archive is photographed against a full documentation
+  checklist, its matrix / runout transcribed by hand, and the pressing identified against
+  label discographies, variant records, and sales histories. Every page is reviewed before
+  publication.</p>
+  <p class="colophon">Documented with <a href="{{ROOT}}">Vinyl Curator</a> ·
+  Updated {{GENERATED}} · © {{YEAR}} Vinyl Curator</p>
+</footer>
+<script src="{{ROOT}}assets/site.js"></script>
+</body>
+</html>
