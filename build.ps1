@@ -40,6 +40,22 @@ $Albums = Join-Path $Site 'albums'
 # literal multi-byte character here would mojibake into the output.
 $mid = [string][char]0x00B7
 
+# Optional local config (gitignored - holds machine paths): extra photo roots
+# and per-album folder overrides for albums whose photos don't resolve:
+#   { "photoRoots": ["D:\\More Albums"],
+#     "folderOverrides": { "<album slug>": "C:\\full\\path\\to\\album folder" } }
+$ConfigFile = Join-Path $Site 'build.config.json'
+$FolderOverrides = @{}
+if (Test-Path $ConfigFile) {
+  $cfg = [IO.File]::ReadAllText($ConfigFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
+  if ($cfg.photoRoots) { $PhotoRoots = @($PhotoRoots) + @($cfg.photoRoots) }
+  if ($cfg.folderOverrides) {
+    foreach ($p in $cfg.folderOverrides.PSObject.Properties) {
+      $FolderOverrides[$p.Name] = [string]$p.Value
+    }
+  }
+}
+
 # ---------- helpers ----------
 function HtmlEnc([string]$s) { return [System.Net.WebUtility]::HtmlEncode($s) }
 
@@ -178,13 +194,22 @@ foreach ($album in $json.albums) {
 
   # ----- photos -----
   $srcFolder = $null
-  foreach ($root in $PhotoRoots) {
-    $candidate = Join-Path $root $album.folderName
-    if (Test-Path $candidate) { $srcFolder = $candidate; break }
+  if ($FolderOverrides.ContainsKey($slug)) {
+    if (Test-Path $FolderOverrides[$slug]) {
+      $srcFolder = $FolderOverrides[$slug]
+    } else {
+      $warnings.Add("$($album.artist) - $($album.title): folderOverrides path does not exist: $($FolderOverrides[$slug])")
+    }
+  }
+  if ($null -eq $srcFolder) {
+    foreach ($root in $PhotoRoots) {
+      $candidate = Join-Path $root $album.folderName
+      if (Test-Path $candidate) { $srcFolder = $candidate; break }
+    }
   }
   $shots = @()
   if ($null -eq $srcFolder) {
-    $warnings.Add("$($album.artist) - $($album.title): photo folder '$($album.folderName)' not found under any photo root")
+    $warnings.Add("$($album.artist) - $($album.title): photo folder '$($album.folderName)' not found under any photo root - point to it in build.config.json: ""folderOverrides"": { ""$slug"": ""<full path>"" } (or add its parent folder to ""photoRoots"")")
   } else {
     $files = Get-ChildItem $srcFolder -File | Where-Object {
       $_.Extension -match '(?i)^\.(jpe?g|png)$' -and $_.Name -match ' - (\d\d) (.+)\.[^.]+$'

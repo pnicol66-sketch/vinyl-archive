@@ -41,3 +41,23 @@ templates/  build.ps1  serve.ps1        the generator
 
 Slug rule (must match `websiteSlug_` in the sheet script): Drive folder name,
 lowercased, every run of non-alphanumerics becomes `-`, trimmed.
+
+## When an album's photos don't load
+
+The build looks for each album's photo folder (by its Drive folder name) under
+the photo roots configured at the top of `build.ps1`. If a build warning says a
+folder wasn't found, point to it in `build.config.json` (local only, not
+committed):
+
+```json
+{
+  "photoRoots": ["G:\\My Drive\\Some Other Import Folder"],
+  "folderOverrides": {
+    "artist-name-album-title": "G:\\My Drive\\Wherever\\Artist_Album"
+  }
+}
+```
+
+`folderOverrides` wins for that one album (key = the album's slug);
+`photoRoots` adds extra folders to search for every album.
+
