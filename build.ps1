@@ -26,6 +26,13 @@ $ThumbEdge  = 480    # max long edge, thumbnails
 $JpegQ      = 82
 $ShotNums   = @('01','03','05','06','08','10','12','14','16','18','20')
 
+# Corner ownership watermark, web-size images only (thumbs stay clean).
+# Sized to stay inside eBay's attribution-watermark rule (<=5% of image
+# area, <=50% opacity, corner placement). Discogs listing photo uploads
+# must use the CLEAN full-res originals from Drive - Discogs allows no
+# watermarks of any kind on item photos.
+$Watermark  = 'vinylcurator.net'
+
 $Site   = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Albums = Join-Path $Site 'albums'
 
@@ -48,8 +55,10 @@ function Slugify([string]$s) {
 }
 
 # Resize + re-encode (drops EXIF incl. GPS). Honors the EXIF orientation tag
-# before it is lost so rotated phone shots come out upright.
-function Resize-Jpeg([string]$src, [string]$dst, [int]$maxEdge, [int]$quality) {
+# before it is lost so rotated phone shots come out upright. A non-empty $wm
+# draws the corner watermark (text height ~2.2% of the long edge, white at
+# ~45% opacity over a faint shadow so it reads on light and dark shots).
+function Resize-Jpeg([string]$src, [string]$dst, [int]$maxEdge, [int]$quality, [string]$wm) {
   $img = [System.Drawing.Image]::FromFile($src)
   try {
     if ($img.PropertyIdList -contains 274) {
@@ -67,6 +76,22 @@ function Resize-Jpeg([string]$src, [string]$dst, [int]$maxEdge, [int]$quality) {
     $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
     $g.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
     $g.DrawImage($img, 0, 0, $nw, $nh)
+    if ($wm -ne '') {
+      $fs = [Math]::Max(13, [int][Math]::Round([Math]::Max($nw, $nh) * 0.022))
+      $font = New-Object System.Drawing.Font('Segoe UI', $fs,
+        [System.Drawing.FontStyle]::Regular, [System.Drawing.GraphicsUnit]::Pixel)
+      $g.TextRenderingHint = [System.Drawing.Text.TextRenderingHint]::AntiAlias
+      $sz = $g.MeasureString($wm, $font)
+      $pad = [Math]::Round($fs * 0.8)
+      $x = [float]($nw - $sz.Width - $pad)
+      $y = [float]($nh - $sz.Height - $pad)
+      $off = [Math]::Max(1, [int][Math]::Round($fs / 14))
+      $shadow = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(90, 0, 0, 0))
+      $ink = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(115, 255, 255, 255))
+      $g.DrawString($wm, $font, $shadow, ($x + $off), ($y + $off))
+      $g.DrawString($wm, $font, $ink, $x, $y)
+      $font.Dispose(); $shadow.Dispose(); $ink.Dispose()
+    }
     $g.Dispose()
     $codec = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() |
       Where-Object { $_.MimeType -eq 'image/jpeg' }
@@ -169,13 +194,16 @@ foreach ($album in $json.albums) {
     } | Where-Object { $ShotNums -contains $_.Num } |
       Sort-Object @{ e = { $_.Num } }, @{ e = { $_.Shot } }
 
-    # incremental manifest: "name|length|mtimeticks" per source file
+    # incremental manifest: "name|length|mtimeticks" per source file, plus a
+    # cfg entry - changing sizes/quality/watermark rebuilds every photo.
+    $cfgKey = "cfg|$WebEdge|$ThumbEdge|$JpegQ|$Watermark"
     $maniFile = Join-Path $imgDir 'manifest.json'
     $old = @{}
     if ((Test-Path $maniFile) -and -not $Force) {
       (ConvertFrom-Json ([IO.File]::ReadAllText($maniFile))) | ForEach-Object { $old[$_] = $true }
     }
-    $newMani = @()
+    if (-not $old.ContainsKey($cfgKey)) { $old = @{} }
+    $newMani = @($cfgKey)
     $wanted = @{}
     foreach ($s in $files) {
       $outName = $s.Num + '-' + (Slugify $s.Shot) + '.jpg'
@@ -187,8 +215,8 @@ foreach ($album in $json.albums) {
       if ($old.ContainsKey($key) -and (Test-Path $web) -and (Test-Path $thumb)) {
         $photosSkipped++
       } else {
-        Resize-Jpeg $s.File.FullName $web $WebEdge $JpegQ
-        Resize-Jpeg $s.File.FullName $thumb $ThumbEdge $JpegQ
+        Resize-Jpeg $s.File.FullName $web $WebEdge $JpegQ $Watermark
+        Resize-Jpeg $s.File.FullName $thumb $ThumbEdge $JpegQ ''
         $photosDone++
       }
       $shots += [pscustomobject]@{ Name = $outName; Shot = $s.Shot }
@@ -227,12 +255,14 @@ foreach ($album in $json.albums) {
     $sb = New-Object System.Text.StringBuilder
     [void]$sb.AppendLine('  <section class="gallery">')
     [void]$sb.AppendLine('    <figure class="hero-shot"><img src="img/' + $hero.Name +
-      '" alt="' + (HtmlEnc ($album.artist + ' - ' + $album.title + ': ' + $hero.Shot)) + '"></figure>')
+      '" data-caption="' + (HtmlEnc $hero.Shot) + '" alt="' +
+      (HtmlEnc ($album.artist + ' - ' + $album.title + ': ' + $hero.Shot)) + '"></figure>')
     if ($shots.Count -gt 1) {
       [void]$sb.AppendLine('    <div class="strip">')
       foreach ($s in ($shots | Select-Object -Skip 1)) {
         [void]$sb.AppendLine('      <img src="img/t/' + $s.Name + '" data-full="img/' + $s.Name +
-          '" alt="' + (HtmlEnc $s.Shot) + '" loading="lazy">')
+          '" data-caption="' + (HtmlEnc $s.Shot) + '" alt="' + (HtmlEnc $s.Shot) +
+          '" loading="lazy">')
       }
       [void]$sb.AppendLine('    </div>')
     }
