@@ -12,6 +12,7 @@ param([switch]$Manual)
 
 $Site = Split-Path -Parent $MyInvocation.MyCommand.Path
 $DataFile = 'G:\My Drive\Vinyl Curator Website\collection.json'
+$RequestFile = 'G:\My Drive\Vinyl Curator Website\publish-request.json'
 $StateFile = Join-Path $Site '.autopublish-state.json'
 $LogFile = Join-Path $Site 'autopublish.log'
 
@@ -47,6 +48,19 @@ if (Test-Path $StateFile) {
     $state.attempts = [int]$s.attempts
   } catch {}
 }
+# Scheduled (windowless) mode acts ONLY on a publish request queued by the
+# sheet's "Website > Publish Vinyl Site..." item; the desktop shortcut
+# (-Manual) publishes the latest export regardless.
+if (-not $Manual) {
+  try {
+    if (-not (Test-Path $RequestFile)) { exit 0 }
+    $req = Get-Content -Raw $RequestFile | ConvertFrom-Json
+    $reqGen = [string]$req.generated
+  } catch { exit 0 }
+  if ($reqGen -eq '' -or $reqGen -eq $state.published) { exit 0 }
+  if ($reqGen -ne $gen) { exit 0 }   # export file still syncing - next tick
+}
+
 if ($gen -eq $state.published) {
   if ($Manual) { Write-Host "Site is already up to date with the latest export ($gen)." }
   Finish 0
