@@ -1,10 +1,14 @@
-# Auto-publish watcher for vinylcurator.net (run by the "Vinyl Archive
-# Auto-Publish" scheduled task every 5 minutes).
+# Publish vinylcurator.net from the latest sheet export (the "Publish
+# Vinyl Site" desktop shortcut runs this with -Manual; the former
+# 5-minute scheduled task is retired - user found the window flash noisy).
 #
 # Reads the export's "generated" stamp; when it differs from the last
-# published stamp, runs build.ps1 -Push. A failing export is retried on the
-# next two ticks, then held until a NEW export appears (see autopublish.log
-# in this folder). Delete .autopublish-state.json to force a republish.
+# published stamp, runs build.ps1 -Push. -Manual shows progress in the
+# console, always attempts (ignores the automatic 3-strike hold), and
+# waits for a key so the result can be read. Log: autopublish.log here.
+# Delete .autopublish-state.json to force a republish.
+
+param([switch]$Manual)
 
 $Site = Split-Path -Parent $MyInvocation.MyCommand.Path
 $DataFile = 'G:\My Drive\Vinyl Curator Website\collection.json'
@@ -13,15 +17,26 @@ $LogFile = Join-Path $Site 'autopublish.log'
 
 function Log([string]$msg) {
   Add-Content -Path $LogFile -Encoding UTF8 -Value ((Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + '  ' + $msg)
+  if ($Manual) { Write-Host $msg }
+}
+function Finish([int]$code) {
+  if ($Manual) { Read-Host 'Press Enter to close' | Out-Null }
+  exit $code
 }
 
-# Silently skip when Drive is not mounted or the file is mid-sync.
+# Skip when Drive is not mounted or the file is mid-sync.
 try {
-  if (-not (Test-Path $DataFile)) { exit 0 }
+  if (-not (Test-Path $DataFile)) {
+    if ($Manual) { Write-Host "Export file not found: $DataFile (is Google Drive running?)" }
+    Finish 0
+  }
   $json = [IO.File]::ReadAllText($DataFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
   $gen = [string]$json.generated
-  if ($gen -eq '') { exit 0 }
-} catch { exit 0 }
+  if ($gen -eq '') { Finish 0 }
+} catch {
+  if ($Manual) { Write-Host 'Could not read the export (mid-sync?) - try again in a minute.' }
+  Finish 0
+}
 
 $state = @{ published = ''; attempted = ''; attempts = 0 }
 if (Test-Path $StateFile) {
@@ -32,13 +47,22 @@ if (Test-Path $StateFile) {
     $state.attempts = [int]$s.attempts
   } catch {}
 }
-if ($gen -eq $state.published) { exit 0 }
-if ($gen -eq $state.attempted -and $state.attempts -ge 3) { exit 0 }
+if ($gen -eq $state.published) {
+  if ($Manual) { Write-Host "Site is already up to date with the latest export ($gen)." }
+  Finish 0
+}
+if (-not $Manual -and $gen -eq $state.attempted -and $state.attempts -ge 3) { exit 0 }
 
 Log "new export detected (generated $gen) - building"
 try { git -C $Site pull --rebase --autostash | Out-Null } catch {}
-& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Site 'build.ps1') -Push *>&1 |
-  Out-String -Stream | Out-File -FilePath $LogFile -Append -Encoding utf8
+if ($Manual) {
+  & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Site 'build.ps1') -Push *>&1 |
+    Tee-Object -Variable buildOut | Out-Host
+  $buildOut | Out-String -Stream | Out-File -FilePath $LogFile -Append -Encoding utf8
+} else {
+  & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Site 'build.ps1') -Push *>&1 |
+    Out-String -Stream | Out-File -FilePath $LogFile -Append -Encoding utf8
+}
 if ($LASTEXITCODE -eq 0) {
   $state.published = $gen; $state.attempted = ''; $state.attempts = 0
   Log "published $gen"
@@ -55,3 +79,5 @@ try {
   $lines = @(Get-Content $LogFile)
   if ($lines.Count -gt 800) { $lines[-500..-1] | Set-Content $LogFile -Encoding UTF8 }
 } catch {}
+
+Finish 0
