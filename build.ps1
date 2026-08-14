@@ -81,7 +81,10 @@ function Slugify([string]$s) {
 # draws the corner watermark (text height ~2.2% of the long edge, white at
 # ~45% opacity over a faint shadow so it reads on light and dark shots).
 function Resize-Jpeg([string]$src, [string]$dst, [int]$maxEdge, [int]$quality, [string]$wm) {
-  $img = [System.Drawing.Image]::FromFile($src)
+  # Byte-stream IO with \\?\ paths: long classical titles push source paths
+  # past the 260-char Windows limit, which plain GDI+ file calls refuse.
+  $srcStream = New-Object IO.MemoryStream(, [IO.File]::ReadAllBytes('\\?\' + $src))
+  $img = [System.Drawing.Image]::FromStream($srcStream)
   try {
     if ($img.PropertyIdList -contains 274) {
       $o = ($img.GetPropertyItem(274)).Value[0]
@@ -120,9 +123,12 @@ function Resize-Jpeg([string]$src, [string]$dst, [int]$maxEdge, [int]$quality, [
     $ep = New-Object System.Drawing.Imaging.EncoderParameters(1)
     $ep.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter(
       [System.Drawing.Imaging.Encoder]::Quality, [long]$quality)
-    $bmp.Save($dst, $codec, $ep)
+    $outStream = New-Object IO.MemoryStream
+    $bmp.Save($outStream, $codec, $ep)
+    [IO.File]::WriteAllBytes('\\?\' + $dst, $outStream.ToArray())
+    $outStream.Dispose()
     $bmp.Dispose()
-  } finally { $img.Dispose() }
+  } finally { $img.Dispose(); $srcStream.Dispose() }
 }
 
 function Section([string]$id, [string]$title, [string]$bodyHtml) {
@@ -140,12 +146,17 @@ if (-not (Test-Path $DataFile)) { throw "Data file not found: $DataFile (run the
 $json = [IO.File]::ReadAllText($DataFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
 
 $priceRx = [regex]'\$\s?\d'
+# Historical narrative amounts ("a $26 million flop") are not listing/value
+# data - strip them before the test. Everything else $-shaped stays fatal.
+$narrativeRx = [regex]'(?i)\$\s?\d+(\.\d+)?\s*(million|billion)\b'
 $keyRx = [regex]'(?i)price|estimate|delta|supplement|valuation'
 $violations = New-Object System.Collections.Generic.List[string]
 function Test-Node($node, [string]$path) {
   if ($null -eq $node) { return }
   if ($node -is [string]) {
-    if ($priceRx.IsMatch($node)) { $violations.Add("$path contains a `$ amount") }
+    if ($priceRx.IsMatch($narrativeRx.Replace($node, ''))) {
+      $violations.Add("$path contains a `$ amount")
+    }
     return
   }
   if ($node -is [System.Collections.IEnumerable] -and -not ($node -is [string])) {
