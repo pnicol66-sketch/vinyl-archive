@@ -387,10 +387,21 @@ foreach ($album in $json.albums) {
   $descSrc = $descSrc -replace '\s+', ' '
   if ($descSrc.Length -gt 155) { $descSrc = $descSrc.Substring(0, 152).TrimEnd() + '...' }
 
-  # Section order per the owner's spec (2026-08-13): Matrix/Runout,
-  # Condition, Variant chronology, This Pressing, The Album, Tracklist,
-  # The Label, Fidelity, Notes.
-  $content = $matrix + $condition + $chronology + $secPressing + $secStory +
+  # For Sale albums link out to their live Discogs listing right after the
+  # details table (2026-08-14, owner request). Outbound INTO a marketplace -
+  # no prices, no off-platform selling; vanishes when the record sells.
+  $listingSec = ''
+  $dgUrl = [string]$album.discogsListingUrl
+  if ($dgUrl -ne '') {
+    $listingSec = Section 'availability' 'Availability' ('    <p class="prose">This record ' +
+      'is currently listed for sale: <a href="' + (HtmlEnc $dgUrl) +
+      '" target="_blank" rel="noopener">view the listing on Discogs</a>.</p>')
+  }
+
+  # Section order per the owner's spec (2026-08-13): [Availability,]
+  # Matrix/Runout, Condition, Variant chronology, This Pressing, The Album,
+  # Tracklist, The Label, Fidelity, Notes.
+  $content = $listingSec + $matrix + $condition + $chronology + $secPressing + $secStory +
     $tracklist + $secLabel + $secFidelity + $secNotes
 
   $page = $tplAlbum.Replace('{{ARTIST}}', $enc.artist).Replace('{{TITLE}}', $enc.title)
