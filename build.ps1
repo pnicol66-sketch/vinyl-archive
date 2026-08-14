@@ -24,7 +24,11 @@ $PhotoRoots = @('G:\My Drive\Vinyl Curator', 'G:\My Drive\Vinyl Curator Dev')
 $WebEdge    = 1600   # max long edge, web size
 $ThumbEdge  = 480    # max long edge, thumbnails
 $JpegQ      = 82
-$ShotNums   = @('01','03','05','06','08','10','12','14','16','18','20')
+$ShotNums   = @('01','03','05','06','08','10','12','14','16','18','20','22','23','24','25')
+# Gallery order (mirrors websiteImageUrls_ in the sheet script): covers,
+# then each side's label followed by its vinyl surface shot (22-25),
+# matrix close-ups last.
+$ShotOrder  = @('01','03','05','06','22','08','23','10','24','12','25','14','16','18','20')
 
 # Corner ownership watermark, web-size images only (thumbs stay clean).
 # Sized to stay inside eBay's attribution-watermark rule (<=5% of image
@@ -239,7 +243,7 @@ foreach ($album in $json.albums) {
       $m = [regex]::Match($_.Name, ' - (\d\d) (.+)\.[^.]+$')
       [pscustomobject]@{ File = $_; Num = $m.Groups[1].Value; Shot = $m.Groups[2].Value }
     } | Where-Object { $ShotNums -contains $_.Num } |
-      Sort-Object @{ e = { $_.Num } }, @{ e = { $_.Shot } }
+      Sort-Object @{ e = { $ShotOrder.IndexOf($_.Num) } }, @{ e = { $_.Shot } }
 
     # incremental manifest: "name|length|mtimeticks" per source file, plus a
     # cfg entry - changing sizes/quality/watermark rebuilds every photo.
