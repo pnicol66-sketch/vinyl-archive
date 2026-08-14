@@ -37,7 +37,8 @@ if ($gen -eq $state.attempted -and $state.attempts -ge 3) { exit 0 }
 
 Log "new export detected (generated $gen) - building"
 try { git -C $Site pull --rebase --autostash | Out-Null } catch {}
-& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Site 'build.ps1') -Push *>> $LogFile
+& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Site 'build.ps1') -Push *>&1 |
+  Out-String -Stream | Out-File -FilePath $LogFile -Append -Encoding utf8
 if ($LASTEXITCODE -eq 0) {
   $state.published = $gen; $state.attempted = ''; $state.attempts = 0
   Log "published $gen"
