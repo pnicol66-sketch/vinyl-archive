@@ -196,7 +196,12 @@ if (-not (Test-Path $Albums)) { New-Item -ItemType Directory $Albums | Out-Null 
 
 $built = 0; $photosDone = 0; $photosSkipped = 0
 $warnings = New-Object System.Collections.Generic.List[string]
-$cards = New-Object System.Text.StringBuilder
+# Two index pages: Personal Archive (/albums/, Collection tab) and Available
+# from Archive (/available/, For Sale tab). Sold rows keep their pages but
+# appear on neither index (link permanence without a storefront signal).
+$cardsCollection = New-Object System.Text.StringBuilder
+$cardsAvailable = New-Object System.Text.StringBuilder
+$collectionCount = 0; $availableCount = 0
 $slugSet = @{}
 
 foreach ($album in $json.albums) {
@@ -410,23 +415,67 @@ foreach ($album in $json.albums) {
   if ($coverThumb -ne '') {
     $coverHtml = '<div class="cover"><img src="' + $coverThumb + '" alt="" loading="lazy"></div>'
   }
-  [void]$cards.AppendLine('    <a class="card" href="' + $slug + '/" data-search="' +
-    (HtmlEnc $search) + '">' + $coverHtml + '<div class="meta"><p class="a">' + $enc.artist +
+  # Card paths are relative to the index page rendering them: /albums/ links
+  # its own children directly; /available/ reaches across with ../albums/.
+  $p = ''
+  if ($album.tab -eq 'For Sale') { $p = '../albums/' }
+  $coverHtmlP = $coverHtml.Replace('src="' + $slug, 'src="' + $p + $slug)
+  $cardHtml = '<a class="card" href="' + $p + $slug + '/" data-search="' +
+    (HtmlEnc $search) + '">' + $coverHtmlP + '<div class="meta"><p class="a">' + $enc.artist +
     '</p><p class="t">' + $enc.title + '</p><p class="y">' +
     (($enc.year, $enc.labelName | Where-Object { $_ -ne '' }) -join " $mid ") +
-    '</p></div></a>')
+    '</p></div></a>'
+  if ($album.tab -eq 'Collection') {
+    [void]$cardsCollection.AppendLine('    ' + $cardHtml)
+    $collectionCount++
+  } elseif ($album.tab -eq 'For Sale') {
+    $listing = ''
+    $dgUrl = [string]$album.discogsListingUrl
+    if ($dgUrl -ne '') {
+      $listing = '<p class="listing-link"><a href="' + (HtmlEnc $dgUrl) +
+        '" target="_blank" rel="noopener">View listing on Discogs</a></p>'
+    }
+    [void]$cardsAvailable.AppendLine('    <div class="card-wrap">' + $cardHtml + $listing + '</div>')
+    $availableCount++
+  }
 }
 
-# ---------- index, landing, sitemap, data copy ----------
-$countLabel = "$built records"
-if ($built -eq 1) { $countLabel = '1 record' }
-$idx = $tplIndex.Replace('{{CARDS}}', $cards.ToString()).Replace('{{COUNTLABEL}}', $countLabel)
-$idx = $idx.Replace('{{CANONICAL}}', "$base/albums/").Replace('{{ROOT}}', '../')
-$idx = $idx.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
-$idx = $idx.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
-Write-Utf8 (Join-Path $Albums 'index.html') $idx
+# ---------- index pages, landing, sitemap, data copy ----------
+function CountLabel([int]$n) {
+  if ($n -eq 1) { return '1 record' }
+  return "$n records"
+}
+function Render-Index([string]$title, [string]$lede, [string]$desc,
+    [string]$canonical, [bool]$isAvailable, [string]$cardsHtml, [string]$outDir) {
+  $curA = ' aria-current="page"'; $curV = ''
+  if ($isAvailable) { $curA = ''; $curV = ' aria-current="page"' }
+  $h = $tplIndex.Replace('{{PAGE_TITLE}}', $title).Replace('{{LEDE}}', $lede)
+  $h = $h.Replace('{{META_DESC}}', $desc).Replace('{{CANONICAL}}', $canonical)
+  $h = $h.Replace('{{CUR_ARCHIVE}}', $curA).Replace('{{CUR_AVAILABLE}}', $curV)
+  $h = $h.Replace('{{CARDS}}', $cardsHtml).Replace('{{ROOT}}', '../')
+  $h = $h.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
+  $h = $h.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
+  if (-not (Test-Path $outDir)) { New-Item -ItemType Directory $outDir | Out-Null }
+  Write-Utf8 (Join-Path $outDir 'index.html') $h
+}
 
-$land = $tplLanding.Replace('{{COUNTLABEL}}', $countLabel).Replace('{{CANONICAL}}', "$base/")
+Render-Index 'Personal Archive' `
+  ((CountLabel $collectionCount) + " $mid the collection, photographed, transcribed, and researched.") `
+  'A documented personal vinyl collection: original pressings photographed, transcribed, and researched.' `
+  "$base/albums/" $false $cardsCollection.ToString() $Albums
+
+Render-Index 'Available from Archive' `
+  ((CountLabel $availableCount) + " currently listed for sale $mid each card opens the full documentation; the live listings are on Discogs and eBay.") `
+  'Documented vinyl records currently listed for sale on Discogs and eBay, with full pressing documentation.' `
+  "$base/available/" $true $cardsAvailable.ToString() (Join-Path $Site 'available')
+
+$cta = '<a class="button" href="albums/">The collection ' + $mid + ' ' +
+  (CountLabel $collectionCount) + '</a>'
+if ($availableCount -gt 0) {
+  $cta += ' <a class="button" href="available/">Available now ' + $mid + ' ' +
+    (CountLabel $availableCount) + '</a>'
+}
+$land = $tplLanding.Replace('{{CTA}}', $cta).Replace('{{CANONICAL}}', "$base/")
 $land = $land.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
 $land = $land.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
 Write-Utf8 (Join-Path $Site 'index.html') $land
@@ -434,7 +483,7 @@ Write-Utf8 (Join-Path $Site 'index.html') $land
 $sm = New-Object System.Text.StringBuilder
 [void]$sm.AppendLine('<?xml version="1.0" encoding="UTF-8"?>')
 [void]$sm.AppendLine('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
-foreach ($u in (@("$base/", "$base/albums/") + ($json.albums | ForEach-Object { "$base/albums/$($_.slug)/" }))) {
+foreach ($u in (@("$base/", "$base/albums/", "$base/available/") + ($json.albums | ForEach-Object { "$base/albums/$($_.slug)/" }))) {
   [void]$sm.AppendLine("  <url><loc>$u</loc><lastmod>$genDate</lastmod></url>")
 }
 [void]$sm.AppendLine('</urlset>')

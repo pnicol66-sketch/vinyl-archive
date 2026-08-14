@@ -21,7 +21,9 @@
       var shown = 0;
       cards.forEach(function (c) {
         var hit = !q || (c.getAttribute('data-search') || '').indexOf(q) !== -1;
-        c.hidden = !hit;
+        // On the Available page each card sits in a wrapper with its
+        // listing link - hide the wrapper, not just the card.
+        (c.closest('.card-wrap') || c).hidden = !hit;
         if (hit) shown++;
       });
       if (nomatch) nomatch.hidden = shown > 0;
