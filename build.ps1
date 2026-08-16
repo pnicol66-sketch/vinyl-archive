@@ -205,6 +205,7 @@ if (@($json.albums).Count -eq 0 -and -not $AllowEmpty) {
 # Per-album crawler policy. Absent "listed" (the current export shape) leaves
 # a page indexable; the unpublish work adds "listed": false for unlisted rows.
 function Test-Noindex($album) {
+  if ([string]$album.status -eq 'withdrawn') { return $true }
   if ($NoindexSold -and $album.tab -eq 'Sold') { return $true }
   if ($album.listed -eq $false) { return $true }
   return $false
@@ -223,6 +224,7 @@ $base = $json.site.baseUrl.TrimEnd('/')
 $tplAlbum = [IO.File]::ReadAllText((Join-Path $Site 'templates\album.html'), [Text.Encoding]::UTF8)
 $tplIndex = [IO.File]::ReadAllText((Join-Path $Site 'templates\archive-index.html'), [Text.Encoding]::UTF8)
 $tplLanding = [IO.File]::ReadAllText((Join-Path $Site 'templates\landing.html'), [Text.Encoding]::UTF8)
+$tplWithdrawn = [IO.File]::ReadAllText((Join-Path $Site 'templates\withdrawn.html'), [Text.Encoding]::UTF8)
 
 if (-not (Test-Path $Albums)) { New-Item -ItemType Directory $Albums | Out-Null }
 
@@ -234,12 +236,35 @@ $warnings = New-Object System.Collections.Generic.List[string]
 $cardsCollection = New-Object System.Text.StringBuilder
 $cardsAvailable = New-Object System.Text.StringBuilder
 $collectionCount = 0; $availableCount = 0; $unlistedCount = 0
+$withdrawnCount = 0; $photosPurged = 0
 $slugSet = @{}
 
 foreach ($album in $json.albums) {
   $slug = $album.slug
   $slugSet[$slug] = $true
   $dir = Join-Path $Albums $slug
+
+  # ----- withdrawn: tombstone, photos deleted, URL preserved -----
+  # The slug stays in $slugSet so the prune leaves the directory alone: the
+  # address must keep resolving, because it may sit in a Discogs listing
+  # comment. The export carries only artist/title/slug for these rows, so
+  # there is nothing here to render but the notice.
+  if ([string]$album.status -eq 'withdrawn') {
+    if (-not (Test-Path $dir)) { New-Item -ItemType Directory $dir | Out-Null }
+    $wImg = Join-Path $dir 'img'
+    if (Test-Path $wImg) {
+      [IO.Directory]::Delete((Convert-Path $wImg), $true)
+      $photosPurged++
+    }
+    $t = $tplWithdrawn.Replace('{{ROOT}}', '../../')
+    $t = $t.Replace('{{YEAR}}', "$year")
+    $t = $t.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
+    Write-Utf8 (Join-Path $dir 'index.html') $t
+    $withdrawnCount++
+    $built++
+    continue
+  }
+
   $imgDir = Join-Path $dir 'img'
   $thumbDir = Join-Path $imgDir 't'
   foreach ($d in @($dir, $imgDir, $thumbDir)) {
@@ -569,6 +594,10 @@ Write-Host ''
 Write-Host "Built $built album page(s); photos: $photosDone converted, $photosSkipped unchanged." -ForegroundColor Green
 if ($unlistedCount -gt 0) {
   Write-Host "$unlistedCount album page(s) are unlisted: reachable by URL, absent from both indexes, the sitemap and search." -ForegroundColor Cyan
+}
+if ($withdrawnCount -gt 0) {
+  Write-Host "$withdrawnCount album page(s) WITHDRAWN: replaced by a notice, $photosPurged photo folder(s) deleted. The URL still resolves." -ForegroundColor Magenta
+  Write-Host "  Note: deleting the photos here does not remove them from this repository's git history." -ForegroundColor DarkGray
 }
 foreach ($w in $warnings) { Write-Host "WARNING: $w" -ForegroundColor Yellow }
 Write-Host "Preview locally: powershell -ExecutionPolicy Bypass -File serve.ps1  ->  http://localhost:8322/"
