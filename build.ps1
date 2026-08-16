@@ -233,7 +233,7 @@ $warnings = New-Object System.Collections.Generic.List[string]
 # appear on neither index (link permanence without a storefront signal).
 $cardsCollection = New-Object System.Text.StringBuilder
 $cardsAvailable = New-Object System.Text.StringBuilder
-$collectionCount = 0; $availableCount = 0
+$collectionCount = 0; $availableCount = 0; $unlistedCount = 0
 $slugSet = @{}
 
 foreach ($album in $json.albums) {
@@ -471,7 +471,13 @@ foreach ($album in $json.albums) {
     '</p><p class="t">' + $enc.title + '</p><p class="y">' +
     (($enc.year, $enc.labelName | Where-Object { $_ -ne '' }) -join " $mid ") +
     '</p></div></a>'
-  if ($album.tab -eq 'Collection') {
+  # Unlisted albums keep their page and their URL but get no card on either
+  # index - same treatment Sold rows already get, driven by an explicit flag
+  # rather than by the tab. Their sitemap entry and noindex are handled by
+  # Test-Noindex above.
+  if (Test-Noindex $album) {
+    $unlistedCount++
+  } elseif ($album.tab -eq 'Collection') {
     [void]$cardsCollection.AppendLine('    ' + $cardHtml)
     $collectionCount++
   } elseif ($album.tab -eq 'For Sale') {
@@ -561,6 +567,9 @@ $stale | ForEach-Object {
 # ---------- report ----------
 Write-Host ''
 Write-Host "Built $built album page(s); photos: $photosDone converted, $photosSkipped unchanged." -ForegroundColor Green
+if ($unlistedCount -gt 0) {
+  Write-Host "$unlistedCount album page(s) are unlisted: reachable by URL, absent from both indexes, the sitemap and search." -ForegroundColor Cyan
+}
 foreach ($w in $warnings) { Write-Host "WARNING: $w" -ForegroundColor Yellow }
 Write-Host "Preview locally: powershell -ExecutionPolicy Bypass -File serve.ps1  ->  http://localhost:8322/"
 
