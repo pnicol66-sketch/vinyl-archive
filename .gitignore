@@ -3,3 +3,4 @@ Thumbs.db
 build.config.json
 .autopublish-state.json
 autopublish.log
+.foldercache.json
