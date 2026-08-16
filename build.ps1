@@ -13,7 +13,7 @@
 # data - album pages double as marketplace link targets and must stay
 # price-free.
 
-param([switch]$Push, [switch]$Force)
+param([switch]$Push, [switch]$Force, [switch]$AllowEmpty)
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
@@ -36,6 +36,14 @@ $ShotOrder  = @('01','03','05','06','22','08','23','10','24','12','25','14','16'
 # must use the CLEAN full-res originals from Drive - Discogs allows no
 # watermarks of any kind on item photos.
 $Watermark  = 'vinylcurator.net'
+
+# Sold records keep their pages but appear on neither index page - that is
+# about this site's own navigation, NOT about search engines. Their matrix
+# transcriptions are archive content and stay indexable by default; every
+# record eventually sells, so noindexing them would progressively remove the
+# archive from search. Flip to $true only if Sold pages should be hidden from
+# crawlers as well.
+$NoindexSold = $false
 
 # Contact address, split so the raw HTML never contains the assembled
 # address (site.js joins the parts at load - keeps scrapers off it).
@@ -180,6 +188,26 @@ foreach ($a in $json.albums) { Test-Node $a "albums[$ai]"; $ai++ }
 if ($violations.Count -gt 0) {
   $violations | ForEach-Object { Write-Host "GUARD: $_" -ForegroundColor Red }
   throw 'Price guard failed - fix the export (or the sheet cells) and re-export. Nothing was built.'
+}
+
+# EMPTY-EXPORT GUARD: an export carrying zero albums is almost always a failed
+# or half-synced export, not a deliberate decision to unpublish everything.
+# Building one would regenerate empty index pages AND stage every existing
+# album directory into _removed\ - one bad export would take the whole site
+# down in a single push. Refuse unless the caller says otherwise.
+if (@($json.albums).Count -eq 0 -and -not $AllowEmpty) {
+  throw ('The export contains 0 albums - refusing to build, because this ' +
+    'would empty the site. Re-export from the sheet (Website > Publish Vinyl ' +
+    'Site...). If you really do mean to publish an empty site, re-run with ' +
+    '-AllowEmpty.')
+}
+
+# Per-album crawler policy. Absent "listed" (the current export shape) leaves
+# a page indexable; the unpublish work adds "listed": false for unlisted rows.
+function Test-Noindex($album) {
+  if ($NoindexSold -and $album.tab -eq 'Sold') { return $true }
+  if ($album.listed -eq $false) { return $true }
+  return $false
 }
 
 $generated = [datetime]::Parse($json.generated, $null,
@@ -412,6 +440,9 @@ foreach ($album in $json.albums) {
   $page = $page.Replace('{{SUBTITLE}}', $subtitle)
   $page = $page.Replace('{{META_DESC}}', (HtmlEnc $descSrc))
   $page = $page.Replace('{{CANONICAL}}', "$base/albums/$slug/")
+  $robots = ''
+  if (Test-Noindex $album) { $robots = "`n<meta name=""robots"" content=""noindex"">" }
+  $page = $page.Replace('{{ROBOTS}}', $robots)
   $page = $page.Replace('{{GALLERY}}', $gallery).Replace('{{DETAILS}}', $details)
   $page = $page.Replace('{{CONTENT}}', $content)
   $page = $page.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
@@ -498,7 +529,11 @@ Write-Utf8 (Join-Path $Site 'index.html') $land
 $sm = New-Object System.Text.StringBuilder
 [void]$sm.AppendLine('<?xml version="1.0" encoding="UTF-8"?>')
 [void]$sm.AppendLine('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
-foreach ($u in (@("$base/", "$base/albums/", "$base/available/") + ($json.albums | ForEach-Object { "$base/albums/$($_.slug)/" }))) {
+# Noindexed albums are left out: a sitemap entry actively asks a crawler to
+# index the very page whose meta tag tells it not to.
+$smAlbums = @($json.albums | Where-Object { -not (Test-Noindex $_) } |
+  ForEach-Object { "$base/albums/$($_.slug)/" })
+foreach ($u in (@("$base/", "$base/albums/", "$base/available/") + $smAlbums)) {
   [void]$sm.AppendLine("  <url><loc>$u</loc><lastmod>$genDate</lastmod></url>")
 }
 [void]$sm.AppendLine('</urlset>')
@@ -507,8 +542,16 @@ Write-Utf8 (Join-Path $Site 'sitemap.xml') $sm.ToString()
 Copy-Item $DataFile (Join-Path $Site 'collection.json') -Force
 
 # ---------- prune removed albums ----------
-Get-ChildItem $Albums -Directory | Where-Object { -not $slugSet.ContainsKey($_.Name) } |
-  ForEach-Object {
+$stale = @(Get-ChildItem $Albums -Directory | Where-Object { -not $slugSet.ContainsKey($_.Name) })
+# A handful of removals is routine; a large share of the archive disappearing
+# in one build usually means the export was partial. Nothing is deleted (it is
+# staged in _removed\), but say so loudly before the push.
+if ($stale.Count -gt 3 -and $stale.Count -gt ($slugSet.Count / 4)) {
+  Write-Host ("WARNING: this build removes $($stale.Count) album page(s) but keeps only " +
+    "$($slugSet.Count) - is the export complete?") -ForegroundColor Red
+  $stale | ForEach-Object { Write-Host "         $($_.Name)" -ForegroundColor Red }
+}
+$stale | ForEach-Object {
     $hold = Join-Path $Site ('_removed\' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
     if (-not (Test-Path $hold)) { New-Item -ItemType Directory $hold -Force | Out-Null }
     Move-Item $_.FullName (Join-Path $hold $_.Name)
