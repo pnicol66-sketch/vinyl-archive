@@ -292,8 +292,36 @@ h2 {
   .site-foot { border-top: 1px solid #999; margin-top: 6mm; }
   .site-foot .method { font-size: 8pt; color: #444; padding: 3mm 0 0; }
 
-  /* COMPACT VARIANT (scope §3, not built): add .compact to <body> and hide
-     .story, .fidelity, .label, .notes to get a single sheet that keeps
-     the forensics. Left as a note until a real card has been through a
-     printer. */
+  /* ----- compact variant: one sheet, forensics kept -----
+     Reached with /albums/<slug>/?compact (site.js adds body.compact). The full
+     card runs 2-4 sheets because the research prose is the bulk of it; this is
+     the version for a parcel where the documentation matters more than the
+     essay.
+
+     Kept: cover, pressing details, matrix/runout, condition, variant
+     chronology, the one-line pressing verdict, thank-you, blurb, disclaimer.
+     Dropped: the four prose sections and the tracklist - per scope §3. The
+     tracklist is the debatable one: the buyer is holding the record, so it is
+     the least useful thing on the sheet, but restoring it is deleting one
+     selector below. */
+  body.compact .story,
+  body.compact .fidelity,
+  body.compact .label,
+  body.compact .notes,
+  body.compact .tracklist-wrap { display: none !important; }
+
+  /* Tightened so the kept sections actually land on one sheet. */
+  body.compact { font-size: 10pt; }
+  body.compact .print-thanks { margin-bottom: 7mm; }
+  body.compact h2 { margin: 3.5mm 0 1mm; }
+  body.compact section { margin-bottom: 3mm; }
+  body.compact .gallery { width: 46mm; margin-top: 4mm; }
+  /* The pressing table clears the cover instead of flowing beside it. Measured:
+     squeezed to 120mm every row wraps and the table runs 154mm; full width it
+     is ~122mm. The cover leaves a little whitespace beside the header, and the
+     table gains more than that back - net ~43mm, about a sixth of a sheet. */
+  body.compact .details { clear: both; }
+  body.compact .print-blurb { margin-top: 6mm; padding-top: 3mm; }
+  body.compact .site-foot { margin-top: 4mm; }
+  body.compact .site-foot .method { font-size: 7.5pt; }
 }
