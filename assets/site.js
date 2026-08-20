@@ -46,6 +46,31 @@
     });
   }
 
+  // Print layout: the disclaimer belongs with the matrix, not with the
+  // sign-off. It qualifies the identification and the condition assessment, so
+  // it reads as a footnote to the evidence rather than as a second ending
+  // competing with the closing note.
+  //
+  // CSS cannot reparent a node, and duplicating the wording in the template
+  // would leave two copies to keep in step - the exact problem just removed
+  // from the blurb. So it moves for the duration of the print and moves back
+  // afterwards. If beforeprint never fires the disclaimer simply prints where
+  // it always has, which is why .site-foot is hidden by a class the move sets
+  // rather than unconditionally.
+  var method = document.querySelector('.site-foot .method');
+  var matrixSec = document.querySelector('.matrix');
+  if (method && matrixSec && document.querySelector('.print-thanks')) {
+    var home = method.parentNode, after = method.nextSibling;
+    window.addEventListener('beforeprint', function () {
+      matrixSec.parentNode.insertBefore(method, matrixSec.nextSibling);
+      document.body.classList.add('method-moved');
+    });
+    window.addEventListener('afterprint', function () {
+      home.insertBefore(method, after);
+      document.body.classList.remove('method-moved');
+    });
+  }
+
   // Archive index: filter cards on artist / title / label / year.
   var filter = document.getElementById('filter');
   if (filter) {
