@@ -208,6 +208,26 @@ h2 {
 
 .print-only { display: none; }
 
+/* Toast for the "c" print-variant toggle. Created only when the key is
+   pressed, so a visitor never sees it - but it must never reach paper either,
+   hence the display:none in the print block below. */
+.print-note {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 50;
+  padding: 0.5rem 0.85rem;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.85rem;
+  opacity: 0;
+  transform: translateY(0.4rem);
+  transition: opacity 0.15s, transform 0.15s;
+  pointer-events: none;
+}
+.print-note.show { opacity: 0.92; transform: none; }
+
 @media print {
   @page { size: A4; margin: 16mm 15mm; }
 
@@ -239,6 +259,7 @@ h2 {
   .site-foot .colophon,
   .availability,
   .filter-row,
+  .print-note,
   #lightbox { display: none !important; }
 
   .print-thanks { margin: 0 0 10mm; }
