@@ -11,6 +11,15 @@
     if (a.textContent.trim() === 'email') a.textContent = addr;
   });
 
+  // Compact print card: /albums/<slug>/?compact prints the one-sheet version
+  // (forensics kept, research prose dropped - see the print block in
+  // site.css). A query string rather than a control on the page, because the
+  // printed card is an owner tool and the visitor's page must not change.
+  // Harmless if a visitor lands on it: nothing differs on screen.
+  if (/[?&](compact|print=compact)(&|=|$)/.test(location.search)) {
+    document.body.classList.add('compact');
+  }
+
   // Archive index: filter cards on artist / title / label / year.
   var filter = document.getElementById('filter');
   if (filter) {
