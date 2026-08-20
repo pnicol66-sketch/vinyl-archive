@@ -20,6 +20,32 @@
     document.body.classList.add('compact');
   }
 
+  // ...or press "c" on an album page. Nothing on screen distinguishes the two
+  // variants, so the toggle CONFIRMS itself - without that you would press the
+  // key, see nothing happen, and print the wrong one.
+  if (document.querySelector('.print-thanks')) {
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'c' && e.key !== 'C') return;
+      // Ctrl+C / Cmd+C is copy. Never steal it.
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      var t = e.target || {};
+      var tag = (t.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || t.isContentEditable) return;
+      var on = document.body.classList.toggle('compact');
+      var note = document.getElementById('print-note');
+      if (!note) {
+        note = document.createElement('div');
+        note.id = 'print-note';
+        note.className = 'print-note';
+        document.body.appendChild(note);
+      }
+      note.textContent = on ? 'Compact card - one sheet duplex' : 'Full card - two sheets duplex';
+      note.classList.add('show');
+      clearTimeout(note._t);
+      note._t = setTimeout(function () { note.classList.remove('show'); }, 1800);
+    });
+  }
+
   // Archive index: filter cards on artist / title / label / year.
   var filter = document.getElementById('filter');
   if (filter) {
