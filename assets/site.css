@@ -262,13 +262,33 @@ h2 {
   .print-note,
   #lightbox { display: none !important; }
 
-  .print-thanks { margin: 0 0 10mm; }
-  .print-thanks .ptitle {
+  /* The card carries three voices, and two of them used to look identical:
+     the record's data (sans, tabular, monospace matrix), the curator's own
+     words, and the legal disclaimer. Setting the owner's words in the serif
+     the site already uses for headings separates them at a glance - "a person
+     wrote this" rather than "this was compiled" - without adding a face. Three
+     families on one sheet would read busy; the matrix block is already the
+     third texture.
+
+     The measure matters as much as the face. At full width these paragraphs
+     ran ~110 characters a line and read as a wall; 115mm is about 65-75, which
+     is what makes them look considered rather than dumped there.
+
+     The old 15pt "Thank you" heading is gone: it competed with the album title,
+     and on a card about a record the record should be the loudest thing on the
+     sheet. The paragraph opens with the words anyway. */
+  .print-thanks {
+    margin: 0 0 10mm;
     font-family: var(--serif);
-    font-size: 15pt;
-    margin: 0 0 0.35rem;
+    font-size: 11pt;
+    line-height: 1.5;
+    max-width: 115mm;
   }
   .print-thanks p { margin: 0; max-width: none; }
+  .print-thanks .psign {
+    margin-top: 3.5mm;
+    font-size: 10pt;
+  }
 
   .album-head { padding-top: 0; }
   .album-head h1 { font-size: 20pt; }
@@ -304,8 +324,27 @@ h2 {
     padding-top: 4mm;
     border-top: 1px solid #999;
   }
+  .print-blurb {
+    font-family: var(--serif);
+    font-size: 10pt;
+    line-height: 1.45;
+    max-width: 115mm;
+  }
   .print-blurb p { margin: 0 0 2mm; max-width: none; }
-  .purl { font-size: 9pt; color: #444; }
+  /* A label, not a section head - the blurb is an aside after a rule, and an
+     h2 sized like the record's own headings would claim equal weight. */
+  .print-blurb h2 {
+    font-family: var(--sans);
+    font-size: 8pt;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #555;
+    margin: 0 0 2mm;
+  }
+  /* Sans for the address: it is the one thing on the sheet somebody may need
+     to copy accurately, and a serif at 10pt blurs l/1/I. */
+  .print-blurb .pmail { font-family: var(--sans); }
+  .purl { font-size: 9pt; color: #444; font-family: var(--sans); }
 
   /* The liability disclaimer travels with the document deliberately - the
      card carries identifications and condition assessments, so the same
