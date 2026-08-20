@@ -346,11 +346,29 @@ h2 {
   .print-blurb .pmail { font-family: var(--sans); }
   .purl { font-size: 9pt; color: #444; font-family: var(--sans); }
 
-  /* The liability disclaimer travels with the document deliberately - the
-     card carries identifications and condition assessments, so the same
-     wording that qualifies them on the page qualifies them on paper. */
-  .site-foot { border-top: 1px solid #999; margin-top: 6mm; }
-  .site-foot .method { font-size: 8pt; color: #444; padding: 3mm 0 0; }
+  /* The liability disclaimer travels with the document deliberately - the card
+     carries identifications and condition assessments, so the same wording that
+     qualifies them on the page qualifies them on paper.
+
+     It is styled on .method rather than .site-foot .method because site.js
+     moves the node under the matrix block for the duration of the print: the
+     disclaimer is a footnote to the evidence, not a second ending competing
+     with the sign-off. The rules below hold in either position, so a browser
+     that never fires beforeprint still prints it, just at the foot. */
+  .method {
+    font-size: 8pt;
+    color: #444;
+    max-width: none;
+    border-top: 1px solid #999;
+    padding-top: 2.5mm;
+    margin-top: 3mm;
+    /* It is a <p>, so the section rule above does not cover it, and a legal
+       notice broken across a page break looks like an accident. */
+    page-break-inside: avoid;
+  }
+  .site-foot { border-top: 0; margin-top: 6mm; }
+  /* Only hidden once the move has actually happened. */
+  body.method-moved .site-foot { display: none !important; }
 
   /* ----- compact variant: one sheet, forensics kept -----
      Reached with /albums/<slug>/?compact (site.js adds body.compact). The full
@@ -383,5 +401,5 @@ h2 {
   body.compact .details { clear: both; }
   body.compact .print-blurb { margin-top: 6mm; padding-top: 3mm; }
   body.compact .site-foot { margin-top: 4mm; }
-  body.compact .site-foot .method { font-size: 7.5pt; }
+  body.compact .method { font-size: 7.5pt; margin-top: 2.5mm; }
 }
