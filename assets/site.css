@@ -197,3 +197,103 @@ h2 {
   .lightbox { padding: 0.5rem 3.2rem; }
   .lb-btn { width: 2.4rem; height: 2.4rem; font-size: 1.6rem; }
 }
+
+/* ---------- print: the parcel insert for a sold record ----------
+   The printed album page IS the thank-you card, which is why there is no
+   second template to keep in step with this one. Screen rendering is
+   untouched: everything here lives inside @media print, and the two
+   print-only blocks in album.html are display:none until it applies.
+   A4, front cover only, research prose kept (2-4 sheets - see the compact
+   note at the end of this block). */
+
+.print-only { display: none; }
+
+@media print {
+  @page { size: A4; margin: 16mm 15mm; }
+
+  /* Ink, not screen: the paper palette is already near-white, but force it so
+     a dark-mode browser cannot print a black page. */
+  :root, body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  body { font-size: 10.5pt; line-height: 1.45; }
+  main { max-width: none; padding: 0; }
+
+  .print-only { display: block; }
+
+  /* Chrome/Firefox: keep the watermark and cover readable rather than
+     dropping backgrounds. */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* Gone from the sheet: site furniture, the extra photos (front cover only,
+     decided), the on-screen contact line, and anything interactive.
+
+     .availability matters more than it looks. It renders only for For Sale
+     rows, and the card is printed at PACKING time - after the record sells but
+     usually before the sheet is updated and the site republished. Without this
+     the thank-you card would tell the buyer the record they just bought is
+     "currently listed for sale" and link them to the live listing. */
+  .site-head,
+  .gallery .strip,
+  .site-foot .colophon,
+  .availability,
+  .filter-row,
+  #lightbox { display: none !important; }
+
+  .print-thanks { margin: 0 0 10mm; }
+  .print-thanks .ptitle {
+    font-family: var(--serif);
+    font-size: 15pt;
+    margin: 0 0 0.35rem;
+  }
+  .print-thanks p { margin: 0; max-width: none; }
+
+  .album-head { padding-top: 0; }
+  .album-head h1 { font-size: 20pt; }
+  .album-head .artist { font-size: 10pt; letter-spacing: 0.08em; }
+
+  /* The cover sits beside the pressing details rather than above them, so the
+     first sheet carries the identification instead of one large photo. */
+  .gallery { margin-top: 6mm; float: right; width: 62mm; margin-left: 8mm; }
+  .gallery .hero-shot { border-radius: 0; border: 1px solid #999; }
+  .gallery .hero-shot img { width: 100%; }
+
+  h2 { font-size: 11pt; margin: 5mm 0 1.5mm; }
+  section { margin-bottom: 4mm; }
+  .prose, .details table { max-width: none; }
+  .details th { width: 32mm; }
+  .details th, .details td { padding: 0.9mm 0; font-size: 9.5pt; }
+
+  /* The matrix transcription is the point of the document - never split it,
+     and keep it monospaced and legible. */
+  .matrix pre, .chronology pre, .tracklist .side pre {
+    font-size: 9pt;
+    white-space: pre-wrap;
+    page-break-inside: avoid;
+  }
+  section, .tracklist .side { page-break-inside: avoid; }
+  h2 { page-break-after: avoid; }
+
+  a { color: #000; text-decoration: none; }
+
+  .print-blurb {
+    page-break-inside: avoid;
+    margin-top: 8mm;
+    padding-top: 4mm;
+    border-top: 1px solid #999;
+  }
+  .print-blurb p { margin: 0 0 2mm; max-width: none; }
+  .purl { font-size: 9pt; color: #444; }
+
+  /* The liability disclaimer travels with the document deliberately - the
+     card carries identifications and condition assessments, so the same
+     wording that qualifies them on the page qualifies them on paper. */
+  .site-foot { border-top: 1px solid #999; margin-top: 6mm; }
+  .site-foot .method { font-size: 8pt; color: #444; padding: 3mm 0 0; }
+
+  /* COMPACT VARIANT (scope §3, not built): add .compact to <body> and hide
+     .story, .fidelity, .label, .notes to get a single sheet that keeps
+     the forensics. Left as a note until a real card has been through a
+     printer. */
+}
