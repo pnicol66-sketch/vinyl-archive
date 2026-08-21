@@ -32,7 +32,9 @@ price-free.
 
 ```
 /                      landing page (generated from templates/landing.html)
-/albums/               archive index: cards + client-side filter
+/albums/               Personal Archive index (Collection tab): cards + filter
+/available/            Available from Archive (For Sale tab) + Discogs links
+/sold/                 Sold from Archive (Sold tab); no links, no prices
 /albums/<slug>/        one album page; photos in img/ (web) + img/t/ (thumbs)
 /assets/               shared CSS + JS (lightbox, filter)
 /collection.json       public copy of the whitelisted export
