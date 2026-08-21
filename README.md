@@ -34,7 +34,8 @@ price-free.
 /                      landing page (generated from templates/landing.html)
 /albums/               Personal Archive index (Collection tab): cards + filter
 /available/            Available from Archive (For Sale tab) + Discogs links
-/sold/                 Sold from Archive (Sold tab); no links, no prices
+/sold/                 Sold from Archive (Sold tab); no prices, no listing
+                       links, and linked only from within /available/
 /albums/<slug>/        one album page; photos in img/ (web) + img/t/ (thumbs)
 /assets/               shared CSS + JS (lightbox, filter)
 /collection.json       public copy of the whitelisted export
