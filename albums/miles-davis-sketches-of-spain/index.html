@@ -15,9 +15,21 @@
     <a class="brand" href="../../">Vinyl Curator</a>
     <a href="../../albums/">Personal Archive</a>
     <a href="../../available/">Available</a>
+    <a href="../../sold/">Sold</a>
   </nav>
 </header>
 <main class="album">
+  <!-- Print-only blocks. These are display:none on screen and appear only in
+  @media print, so the page a visitor sees is unchanged - the printed sheet is
+  the parcel insert for a sold record. Wording lives here in the template so it
+  changes with a site rebuild, never a code edit. -->
+  <section class="print-only print-thanks">
+    <p>Thank you for buying this record. What follows is its documentation: the
+    pressing identified, the matrix / runout transcribed by hand from the dead
+    wax, and the condition as assessed before it was listed. It is yours to keep
+    with the record.</p>
+    <p class="psign">&mdash; Paul, Vinyl Curator</p>
+  </section>
   <section class="album-head">
     <p class="artist">Miles Davis</p>
     <h1>Sketches of Spain</h1>
@@ -112,6 +124,18 @@ Side B:  8869-7-40414-1B RJ STIRLING</pre>
     <div class="prose">2010 US Legacy/Columbia reissue of Sketches of Spain (88697 40414 1), stereo, 180 gram. Decisive evidence: retro red Columbia labels bearing the modern Legacy box logo and 11-digit Sony catalog number, a barcoded back cover with Legacy/Sony copyright lines, and the reproduced &quot;The Inner Sleeve&quot; newspaper insert - none of which exist on any vintage Columbia pressing. The typed dead-wax transcription &quot;RJ STERLING&quot; (Ray Janos, Sterling Sound) matches the RTI-pressed HQ-180 edition of Sony&#39;s Miles Davis vinyl reissue series. Not an original pressing; the 1960 originals carry six-eye &quot;360 Sound&quot; labels and CL 1480 / CS 8271 catalog numbers.</div>
   </section>
 
+  <section class="print-only print-blurb">
+    <!-- No methodology recap here: the footer's disclaimer paragraph already
+    opens with it, and on a printed sheet both are visible at once, so saying it
+    twice just reads as padding. This block is the offer only. -->
+    <h2>Documenting collections</h2>
+    <p>I do this work for other people&rsquo;s collections too &mdash; documenting a
+    collection record by record, researching individual pressings, and preparing
+    collections for sale or for insurance. If you have a collection you would like
+    documented, or a record you want identified properly, get in touch:
+    <a class="mail pmail" data-u="contact" data-d="vinylcurator.net">email</a></p>
+    <p class="purl">This record&rsquo;s page: https://vinylcurator.net/albums/miles-davis-sketches-of-spain/</p>
+  </section>
 </main>
 <footer class="site-foot">
   <p class="method">Each record in this archive is photographed against a full documentation

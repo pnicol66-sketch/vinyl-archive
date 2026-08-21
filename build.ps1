@@ -39,12 +39,13 @@ $ShotOrder  = @('01','03','05','06','22','08','23','10','24','12','25','14','16'
 # watermarks of any kind on item photos.
 $Watermark  = 'vinylcurator.net'
 
-# Sold records keep their pages but appear on neither index page - that is
-# about this site's own navigation, NOT about search engines. Their matrix
+# Sold records have their own index page (/sold/, 2026-08-21) - the archive
+# keeps the documentation of records it no longer holds. Their matrix
 # transcriptions are archive content and stay indexable by default; every
 # record eventually sells, so noindexing them would progressively remove the
 # archive from search. Flip to $true only if Sold pages should be hidden from
-# crawlers as well.
+# crawlers - note that also drops them from /sold/, since the card dispatch
+# treats a noindexed row as unlisted.
 $NoindexSold = $false
 
 # Contact address, split so the raw HTML never contains the assembled
@@ -441,12 +442,16 @@ $PendingManifests = New-Object System.Collections.ArrayList
 
 $built = 0; $photosDone = 0; $photosSkipped = 0
 $warnings = New-Object System.Collections.Generic.List[string]
-# Two index pages: Personal Archive (/albums/, Collection tab) and Available
-# from Archive (/available/, For Sale tab). Sold rows keep their pages but
-# appear on neither index (link permanence without a storefront signal).
+# Three index pages: Personal Archive (/albums/, Collection tab), Available
+# from Archive (/available/, For Sale tab) and Sold (/sold/, Sold tab). The
+# sold index carries no prices and no listing links - it is the record of what
+# the archive has documented and passed on, not a storefront.
 $cardsCollection = New-Object System.Text.StringBuilder
 $cardsAvailable = New-Object System.Text.StringBuilder
-$collectionCount = 0; $availableCount = 0; $unlistedCount = 0
+# Sold cards are held as rows, not appended HTML: they are ordered by the
+# sheet's Date Sold column after the loop, newest sale first.
+$soldRows = New-Object System.Collections.ArrayList
+$collectionCount = 0; $availableCount = 0; $soldCount = 0; $unlistedCount = 0
 $withdrawnCount = 0; $photosPurged = 0
 $slugSet = @{}
 
@@ -653,9 +658,17 @@ foreach ($album in $json.albums) {
   # For Sale albums link out to their live Discogs listing right after the
   # details table (2026-08-14, owner request). Outbound INTO a marketplace -
   # no prices, no off-platform selling; vanishes when the record sells.
+  #
+  # A Sold row usually still carries the URL of the listing it sold from, so
+  # the tab decides the wording, not the presence of the link: a sold record
+  # says so plainly and links nowhere, or the page would send a reader to a
+  # listing that no longer exists.
   $listingSec = ''
   $dgUrl = [string]$album.discogsListingUrl
-  if ($dgUrl -ne '') {
+  if ($album.tab -eq 'Sold') {
+    $listingSec = Section 'availability' 'Availability' ('    <p class="prose">This record ' +
+      'has been sold. Its documentation stays here.</p>')
+  } elseif ($dgUrl -ne '') {
     $listingSec = Section 'availability' 'Availability' ('    <p class="prose">This record ' +
       'is currently listed for sale: <a href="' + (HtmlEnc $dgUrl) +
       '" target="_blank" rel="noopener">view the listing on Discogs</a>.</p>')
@@ -696,19 +709,34 @@ foreach ($album in $json.albums) {
     $coverHtml = '<div class="cover"><img src="' + $coverThumb + '" alt="" loading="lazy"></div>'
   }
   # Card paths are relative to the index page rendering them: /albums/ links
-  # its own children directly; /available/ reaches across with ../albums/.
+  # its own children directly; /available/ and /sold/ reach across with
+  # ../albums/.
   $p = ''
-  if ($album.tab -eq 'For Sale') { $p = '../albums/' }
+  if ($album.tab -ne 'Collection') { $p = '../albums/' }
   $coverHtmlP = $coverHtml.Replace('src="' + $slug, 'src="' + $p + $slug)
+  # Date Sold, on Sold cards only. ISO in the sheet, spelled out here - and
+  # day-first with the month named, so no reader has to guess whether 08-09
+  # means August or September. Anything that is not a clean ISO date is
+  # treated as absent: it also drops the card to the end of the ordering.
+  $sd = ''
+  $soldLine = ''
+  if ($album.tab -eq 'Sold') {
+    $sd = ([string]$album.soldDate).Trim()
+    if ($sd -notmatch '^\d{4}-\d{2}-\d{2}$') {
+      $sd = ''
+    } else {
+      $soldLine = '<p class="sold">Sold ' + ([datetime]::ParseExact($sd, 'yyyy-MM-dd', $null).
+        ToString('d MMMM yyyy', [Globalization.CultureInfo]::InvariantCulture)) + '</p>'
+    }
+  }
   $cardHtml = '<a class="card" href="' + $p + $slug + '/" data-search="' +
     (HtmlEnc $search) + '">' + $coverHtmlP + '<div class="meta"><p class="a">' + $enc.artist +
     '</p><p class="t">' + $enc.title + '</p><p class="y">' +
     (($enc.year, $enc.labelName | Where-Object { $_ -ne '' }) -join " $mid ") +
-    '</p></div></a>'
-  # Unlisted albums keep their page and their URL but get no card on either
-  # index - same treatment Sold rows already get, driven by an explicit flag
-  # rather than by the tab. Their sitemap entry and noindex are handled by
-  # Test-Noindex above.
+    '</p>' + $soldLine + '</div></a>'
+  # Unlisted albums keep their page and their URL but get no card on any
+  # index, whichever tab they sit on. Their sitemap entry and noindex are
+  # handled by Test-Noindex above.
   if (Test-Noindex $album) {
     $unlistedCount++
   } elseif ($album.tab -eq 'Collection') {
@@ -723,6 +751,13 @@ foreach ($album in $json.albums) {
     }
     [void]$cardsAvailable.AppendLine('    <div class="card-wrap">' + $cardHtml + $listing + '</div>')
     $availableCount++
+  } elseif ($album.tab -eq 'Sold') {
+    # No listing link: the record is gone, only its documentation is still
+    # here. Ordering waits until every row is in - see below.
+    [void]$soldRows.Add([pscustomobject]@{
+      Date = $sd; Seq = $soldRows.Count; Html = $cardHtml
+    })
+    $soldCount++
   }
 }
 
@@ -742,12 +777,16 @@ function CountLabel([int]$n) {
   return "$n records"
 }
 function Render-Index([string]$title, [string]$lede, [string]$desc,
-    [string]$canonical, [bool]$isAvailable, [string]$cardsHtml, [string]$outDir) {
-  $curA = ' aria-current="page"'; $curV = ''
-  if ($isAvailable) { $curA = ''; $curV = ' aria-current="page"' }
+    [string]$canonical, [string]$current, [string]$cardsHtml, [string]$outDir) {
+  # $current is 'archive', 'available' or 'sold' - the nav link that marks
+  # itself as the page you are on.
+  $cur = @{ archive = ''; available = ''; sold = '' }
+  $cur[$current] = ' aria-current="page"'
   $h = $tplIndex.Replace('{{PAGE_TITLE}}', $title).Replace('{{LEDE}}', $lede)
   $h = $h.Replace('{{META_DESC}}', $desc).Replace('{{CANONICAL}}', $canonical)
-  $h = $h.Replace('{{CUR_ARCHIVE}}', $curA).Replace('{{CUR_AVAILABLE}}', $curV)
+  $h = $h.Replace('{{CUR_ARCHIVE}}', $cur.archive)
+  $h = $h.Replace('{{CUR_AVAILABLE}}', $cur.available)
+  $h = $h.Replace('{{CUR_SOLD}}', $cur.sold)
   $h = $h.Replace('{{CARDS}}', $cardsHtml).Replace('{{ROOT}}', '../')
   $h = $h.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
   $h = $h.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
@@ -758,12 +797,33 @@ function Render-Index([string]$title, [string]$lede, [string]$desc,
 Render-Index 'Personal Archive' `
   ((CountLabel $collectionCount) + " $mid the collection, photographed, transcribed, and researched.") `
   'A documented personal vinyl collection: original pressings photographed, transcribed, and researched.' `
-  "$base/albums/" $false $cardsCollection.ToString() $Albums
+  "$base/albums/" 'archive' $cardsCollection.ToString() $Albums
 
 Render-Index 'Available from Archive' `
   ((CountLabel $availableCount) + " currently listed for sale $mid each card opens the full documentation; the live listings are on Discogs and eBay.") `
   'Documented vinyl records currently listed for sale on Discogs and eBay, with full pressing documentation.' `
-  "$base/available/" $true $cardsAvailable.ToString() (Join-Path $Site 'available')
+  "$base/available/" 'available' $cardsAvailable.ToString() (Join-Path $Site 'available')
+
+# Newest sale first. Date Sold arrives as ISO text from the sheet, so sorting
+# the string sorts the date; anything else was normalised to blank above and
+# keeps export order at the end - records sold before the column existed have
+# no date to sort on, and guessing one would be a lie in a documented archive.
+$cardsSold = New-Object System.Text.StringBuilder
+$soldUndated = 0
+foreach ($r in ($soldRows |
+    Sort-Object @{ Expression = 'Date'; Descending = $true },
+                @{ Expression = 'Seq'; Descending = $false })) {
+  if ($r.Date -eq '') { $soldUndated++ }
+  [void]$cardsSold.AppendLine('    ' + $r.Html)
+}
+
+# Sold sits under Available in the nav: the same records, one step further on.
+# No prices, no listing links, no sold dates - just the documentation of a
+# record this archive researched and passed on.
+Render-Index 'Sold from Archive' `
+  ((CountLabel $soldCount) + " that have found new homes $mid the record has gone, its documentation stays here.") `
+  'Vinyl records previously sold from the archive, with their full pressing documentation kept online.' `
+  "$base/sold/" 'sold' $cardsSold.ToString() (Join-Path $Site 'sold')
 
 $cta = '<a class="button" href="albums/">The collection ' + $mid + ' ' +
   (CountLabel $collectionCount) + '</a>'
@@ -783,7 +843,7 @@ $sm = New-Object System.Text.StringBuilder
 # index the very page whose meta tag tells it not to.
 $smAlbums = @($json.albums | Where-Object { -not (Test-Noindex $_) } |
   ForEach-Object { "$base/albums/$($_.slug)/" })
-foreach ($u in (@("$base/", "$base/albums/", "$base/available/") + $smAlbums)) {
+foreach ($u in (@("$base/", "$base/albums/", "$base/available/", "$base/sold/") + $smAlbums)) {
   [void]$sm.AppendLine("  <url><loc>$u</loc><lastmod>$genDate</lastmod></url>")
 }
 [void]$sm.AppendLine('</urlset>')
@@ -818,8 +878,15 @@ Write-Host ''
 Write-Host "Built $built album page(s); photos: $photosDone converted, $photosSkipped unchanged." -ForegroundColor Green
 Write-Host ("Source folders: $scanHits from cache, $scanMisses scanned " +
   "$mid photo workers: $MaxWorkers $mid elapsed $([int]$Elapsed.Elapsed.TotalSeconds)s") -ForegroundColor DarkGray
+Write-Host ("Indexes: $collectionCount in the collection $mid $availableCount available " +
+  "$mid $soldCount sold") -ForegroundColor DarkGray
+if ($soldUndated -gt 0) {
+  Write-Host ("$soldUndated sold record(s) have no Date Sold and sit at the end of /sold/ " +
+    "in export order. Type a yyyy-mm-dd date in the Sold tab's Date Sold column to place " +
+    "them.") -ForegroundColor Cyan
+}
 if ($unlistedCount -gt 0) {
-  Write-Host "$unlistedCount album page(s) are unlisted: reachable by URL, absent from both indexes, the sitemap and search." -ForegroundColor Cyan
+  Write-Host "$unlistedCount album page(s) are unlisted: reachable by URL, absent from every index, the sitemap and search." -ForegroundColor Cyan
 }
 if ($withdrawnCount -gt 0) {
   Write-Host "$withdrawnCount album page(s) WITHDRAWN: replaced by a notice, $photosPurged photo folder(s) deleted. The URL still resolves." -ForegroundColor Magenta
