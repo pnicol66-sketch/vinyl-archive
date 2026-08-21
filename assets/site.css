@@ -43,10 +43,23 @@ a:hover { color: var(--accent); }
 .site-head nav {
   max-width: 62rem; margin: 0 auto; padding: 0.9rem 1.25rem;
   display: flex; gap: 1.5rem; align-items: baseline;
-  /* Three section links plus the brand overflow a narrow phone, so let them
-     drop to a second row rather than squeeze the brand. */
+  /* The two section links just fit beside the brand at 375px; wrapping is
+     the escape hatch for narrower phones and larger text sizes. */
   flex-wrap: wrap; row-gap: 0.45rem;
 }
+/* Second-row nav for links belonging to a section rather than to the site.
+   Rendered only inside that section, right-aligned so it sits under the
+   top-level link it hangs off (currently Sold, under Available).
+
+   It is a <nav> inside .site-head, so it already inherits the container
+   width, the flex row and the link colours from the rules above - and those
+   selectors outrank a bare .site-sub, hence .site-head here. Only what
+   differs from the main nav is restated. */
+.site-head .site-sub {
+  margin: -0.3rem auto 0; padding: 0 1.25rem 0.75rem;
+  justify-content: flex-end;
+}
+.site-head .site-sub a { font-size: 0.85rem; }
 .site-head a { text-decoration: none; color: var(--muted); font-size: 0.95rem; }
 .site-head a[aria-current] { color: var(--ink); }
 .site-head .brand {
@@ -204,11 +217,7 @@ h2 {
   width: 2.4rem; height: 2.4rem; font-size: 1.4rem; line-height: 1;
 }
 @media (max-width: 40rem) {
-  /* Three section links no longer fit beside the brand on a phone. Give the
-     brand its own row so they sit together rather than orphaning the last
-     one onto a line of its own. */
   .site-head nav { gap: 1.1rem; }
-  .site-head .brand { flex-basis: 100%; margin-right: 0; }
   .lightbox { padding: 0.5rem 3.2rem; }
   .lb-btn { width: 2.4rem; height: 2.4rem; font-size: 1.6rem; }
 }

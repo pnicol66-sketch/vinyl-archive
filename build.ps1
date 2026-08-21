@@ -687,6 +687,16 @@ foreach ($album in $json.albums) {
   $robots = ''
   if (Test-Noindex $album) { $robots = "`n<meta name=""robots"" content=""noindex"">" }
   $page = $page.Replace('{{ROBOTS}}', $robots)
+  # A sold record's page is inside the Sold section, so it carries the same
+  # second-row nav the section's index does - one click back up to /sold/
+  # rather than Available, then Sold, then find the card again. "Sold" is a
+  # plain link here, never aria-current: this is an album page, not the index.
+  # Collection and For Sale album pages keep the plain two-link nav.
+  $pageSub = ''
+  if ($album.tab -eq 'Sold') {
+    $pageSub = "`n  <nav class=""site-sub""><a href=""{{ROOT}}sold/"">Sold</a></nav>"
+  }
+  $page = $page.Replace('{{SUBNAV}}', $pageSub)
   $page = $page.Replace('{{GALLERY}}', $gallery).Replace('{{DETAILS}}', $details)
   $page = $page.Replace('{{CONTENT}}', $content)
   # No {{GENERATED}} here - album.html deliberately carries no build date, so
@@ -782,11 +792,20 @@ function Render-Index([string]$title, [string]$lede, [string]$desc,
   # itself as the page you are on.
   $cur = @{ archive = ''; available = ''; sold = '' }
   $cur[$current] = ' aria-current="page"'
+  # Sold is a sub-section of Available, not a peer of it, so its link is not
+  # in the top-level nav at all: it appears on a second row BELOW Available,
+  # and only while you are inside that section (/available/ and /sold/).
+  # Everywhere else - landing, Personal Archive, every album page - the nav
+  # stays the two top-level sections it was.
+  $subnav = ''
+  if ($current -eq 'available' -or $current -eq 'sold') {
+    $subnav = "`n  <nav class=""site-sub""><a href=""{{ROOT}}sold/""" + $cur.sold + '>Sold</a></nav>'
+  }
   $h = $tplIndex.Replace('{{PAGE_TITLE}}', $title).Replace('{{LEDE}}', $lede)
   $h = $h.Replace('{{META_DESC}}', $desc).Replace('{{CANONICAL}}', $canonical)
   $h = $h.Replace('{{CUR_ARCHIVE}}', $cur.archive)
   $h = $h.Replace('{{CUR_AVAILABLE}}', $cur.available)
-  $h = $h.Replace('{{CUR_SOLD}}', $cur.sold)
+  $h = $h.Replace('{{SUBNAV}}', $subnav)
   $h = $h.Replace('{{CARDS}}', $cardsHtml).Replace('{{ROOT}}', '../')
   $h = $h.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
   $h = $h.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
