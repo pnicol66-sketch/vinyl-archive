@@ -372,6 +372,31 @@ $tplIndex = [IO.File]::ReadAllText((Join-Path $Site 'templates\archive-index.htm
 $tplLanding = [IO.File]::ReadAllText((Join-Path $Site 'templates\landing.html'), [Text.Encoding]::UTF8)
 $tplWithdrawn = [IO.File]::ReadAllText((Join-Path $Site 'templates\withdrawn.html'), [Text.Encoding]::UTF8)
 
+# ---------- asset versions ----------
+# The stylesheet and script are linked with a short content hash, so a changed
+# asset is a NEW URL that no cache can answer from an old copy. GitHub Pages
+# serves /assets/ with max-age=600 and there is no way to set headers on it,
+# so without this a returning visitor spends up to ten minutes rendering new
+# HTML against the previous stylesheet - which does not look like a stale
+# cache, it looks like the layout is broken.
+#
+# Hashed per file, not one version for both: a CSS edit should not also make
+# every visitor re-fetch the JS.
+#
+# The cost lands on the album pages, which are otherwise written to be
+# byte-stable across publishes (see the note in album.html): a CSS edit now
+# rewrites all of them, one fresh git blob each. That is per CSS CHANGE, not
+# per publish - rare enough to be worth it, where a per-publish timestamp was
+# not. The hash is of the content, so reverting a CSS edit restores the old
+# URL rather than churning to a third value.
+function AssetVer([string]$rel) {
+  $p = Join-Path $Site $rel
+  if (-not (Test-Path $p)) { return '0' }
+  return (Get-FileHash $p -Algorithm MD5).Hash.Substring(0, 8).ToLowerInvariant()
+}
+$vCss = AssetVer 'assets\site.css'
+$vJs  = AssetVer 'assets\site.js'
+
 if (-not (Test-Path $Albums)) { New-Item -ItemType Directory $Albums | Out-Null }
 
 # ---------- workers ----------
@@ -475,6 +500,7 @@ foreach ($album in $json.albums) {
     $t = $tplWithdrawn.Replace('{{ROOT}}', '../../')
     $t = $t.Replace('{{YEAR}}', "$year")
     $t = $t.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
+    $t = $t.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
     Write-Utf8 (Join-Path $dir 'index.html') $t
     $withdrawnCount++
     $built++
@@ -705,6 +731,7 @@ foreach ($album in $json.albums) {
   $page = $page.Replace('{{YEAR}}', "$year")
   $page = $page.Replace('{{ROOT}}', '../../')
   $page = $page.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
+  $page = $page.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
   Write-Utf8 (Join-Path $dir 'index.html') $page
   $built++
 
@@ -809,6 +836,7 @@ function Render-Index([string]$title, [string]$lede, [string]$desc,
   $h = $h.Replace('{{CARDS}}', $cardsHtml).Replace('{{ROOT}}', '../')
   $h = $h.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
   $h = $h.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
+  $h = $h.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
   if (-not (Test-Path $outDir)) { New-Item -ItemType Directory $outDir | Out-Null }
   Write-Utf8 (Join-Path $outDir 'index.html') $h
 }
@@ -853,6 +881,7 @@ if ($availableCount -gt 0) {
 $land = $tplLanding.Replace('{{CTA}}', $cta).Replace('{{CANONICAL}}', "$base/")
 $land = $land.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
 $land = $land.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
+$land = $land.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
 Write-Utf8 (Join-Path $Site 'index.html') $land
 
 $sm = New-Object System.Text.StringBuilder
