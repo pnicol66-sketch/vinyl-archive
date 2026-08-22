@@ -371,6 +371,7 @@ $tplAlbum = [IO.File]::ReadAllText((Join-Path $Site 'templates\album.html'), [Te
 $tplIndex = [IO.File]::ReadAllText((Join-Path $Site 'templates\archive-index.html'), [Text.Encoding]::UTF8)
 $tplLanding = [IO.File]::ReadAllText((Join-Path $Site 'templates\landing.html'), [Text.Encoding]::UTF8)
 $tplWithdrawn = [IO.File]::ReadAllText((Join-Path $Site 'templates\withdrawn.html'), [Text.Encoding]::UTF8)
+$tplNotFound = [IO.File]::ReadAllText((Join-Path $Site 'templates\404.html'), [Text.Encoding]::UTF8)
 
 # ---------- asset versions ----------
 # The stylesheet and script are linked with a short content hash, so a changed
@@ -883,6 +884,18 @@ $land = $land.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
 $land = $land.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
 $land = $land.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
 Write-Utf8 (Join-Path $Site 'index.html') $land
+
+# 404: generated like everything else, so its stylesheet carries the same
+# content hash and a returning visitor cannot render it against a stale one.
+# It was hand-maintained until then, which is why it was the last page still
+# linking an unversioned asset.
+#
+# Its paths are ABSOLUTE, unlike every other template. GitHub Pages serves
+# this one file for a missing URL at ANY depth - /nope and /albums/nope/ both
+# get it - so there is no single {{ROOT}} that could be right for both.
+$nf = $tplNotFound.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
+$nf = $nf.Replace('{{YEAR}}', "$year")
+Write-Utf8 (Join-Path $Site '404.html') $nf
 
 $sm = New-Object System.Text.StringBuilder
 [void]$sm.AppendLine('<?xml version="1.0" encoding="UTF-8"?>')
