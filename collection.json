@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-22T12:48:43.572Z",
+ "generated": "2026-08-22T19:06:04.163Z",
  "site": {
   "title": "Vinyl Curator",
   "baseUrl": "https://vinylcurator.net",
@@ -1212,7 +1212,7 @@
   },
   {
    "artist": "Miles Davis",
-   "title": "Sketches of Spain (1960 first pressing)",
+   "title": "Sketches of Spain",
    "year": "1960",
    "labelName": "Columbia",
    "labelNumber": "CL 1480",
@@ -1427,7 +1427,7 @@
   },
   {
    "artist": "Miles Davis",
-   "title": "Sketches of Spain mofi",
+   "title": "Sketches of Spain",
    "year": "2012",
    "labelName": "Mobile Fidelity Sound Lab (licensed from Columbia/Sony Music)",
    "labelNumber": "MFSL 1-375",
@@ -1470,7 +1470,7 @@
   },
   {
    "artist": "Miles Davis",
-   "title": "Kind of Blue (2)",
+   "title": "Kind of Blue",
    "year": "1997",
    "labelName": "Classic Records (Columbia catalog number retained)",
    "labelNumber": "CS 8163",
@@ -1513,7 +1513,7 @@
   },
   {
    "artist": "Herbie Hancock",
-   "title": "Head Hunters (2)",
+   "title": "Head Hunters",
    "year": "1973",
    "labelName": "Columbia",
    "labelNumber": "KC 32731",
