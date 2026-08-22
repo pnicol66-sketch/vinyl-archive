@@ -60,6 +60,8 @@ $Albums = Join-Path $Site 'albums'
 # Middle dot as a code point: PS 5.1 reads BOM-less .ps1 files as ANSI, so a
 # literal multi-byte character here would mojibake into the output.
 $mid = [string][char]0x00B7
+# Em dash, same reason - used in the section-header ledes below.
+$dash = [string][char]0x2014
 
 # Optional local config (gitignored - holds machine paths): extra photo roots
 # and per-album folder overrides for albums whose photos don't resolve:
@@ -370,6 +372,7 @@ $base = $json.site.baseUrl.TrimEnd('/')
 $tplAlbum = [IO.File]::ReadAllText((Join-Path $Site 'templates\album.html'), [Text.Encoding]::UTF8)
 $tplIndex = [IO.File]::ReadAllText((Join-Path $Site 'templates\archive-index.html'), [Text.Encoding]::UTF8)
 $tplLanding = [IO.File]::ReadAllText((Join-Path $Site 'templates\landing.html'), [Text.Encoding]::UTF8)
+$tplAbout = [IO.File]::ReadAllText((Join-Path $Site 'templates\about.html'), [Text.Encoding]::UTF8)
 $tplWithdrawn = [IO.File]::ReadAllText((Join-Path $Site 'templates\withdrawn.html'), [Text.Encoding]::UTF8)
 $tplNotFound = [IO.File]::ReadAllText((Join-Path $Site 'templates\404.html'), [Text.Encoding]::UTF8)
 
@@ -843,12 +846,17 @@ function Render-Index([string]$title, [string]$lede, [string]$desc,
 }
 
 Render-Index 'Personal Archive' `
-  ((CountLabel $collectionCount) + " $mid the collection, photographed, transcribed, and researched.") `
+  ((CountLabel $collectionCount) + ", each photographed against a full checklist $dash covers, " +
+    "labels, dead-wax close-ups $dash the matrix / runout transcribed by hand and the exact " +
+    "pressing identified against label discographies and variant records.") `
   'A documented personal vinyl collection: original pressings photographed, transcribed, and researched.' `
   "$base/albums/" 'archive' $cardsCollection.ToString() $Albums
 
 Render-Index 'Available from Archive' `
-  ((CountLabel $availableCount) + " currently listed for sale $mid each card opens the full documentation; the live listings are on Discogs and eBay.") `
+  ((CountLabel $availableCount) + " currently listed for sale, each photographed against a full " +
+    "checklist $dash covers, labels, dead-wax close-ups $dash the matrix / runout transcribed by " +
+    "hand and the exact pressing identified against label discographies and variant records. " +
+    "Each card opens the full documentation; the live listings are on Discogs and eBay.") `
   'Documented vinyl records currently listed for sale on Discogs and eBay, with full pressing documentation.' `
   "$base/available/" 'available' $cardsAvailable.ToString() (Join-Path $Site 'available')
 
@@ -873,17 +881,25 @@ Render-Index 'Sold from Archive' `
   'Vinyl records previously sold from the archive, with their full pressing documentation kept online.' `
   "$base/sold/" 'sold' $cardsSold.ToString() (Join-Path $Site 'sold')
 
-$cta = '<a class="button" href="albums/">The collection ' + $mid + ' ' +
-  (CountLabel $collectionCount) + '</a>'
-if ($availableCount -gt 0) {
-  $cta += ' <a class="button" href="available/">Available now ' + $mid + ' ' +
-    (CountLabel $availableCount) + '</a>'
-}
-$land = $tplLanding.Replace('{{CTA}}', $cta).Replace('{{CANONICAL}}', "$base/")
+# The landing leads with the pitch and hands off to the story; the record
+# counts live on the section pages the nav points to, not on buttons here.
+$land = $tplLanding.Replace('{{CANONICAL}}', "$base/")
 $land = $land.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
 $land = $land.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
 $land = $land.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
 Write-Utf8 (Join-Path $Site 'index.html') $land
+
+# About / the story behind the archive: a single static page at /about/,
+# generated like everything else so its stylesheet hash stays in step. {{ROOT}}
+# is ../ because it sits one level down, same as the album and section pages.
+$about = $tplAbout.Replace('{{CANONICAL}}', "$base/about/")
+$about = $about.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
+$about = $about.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
+$about = $about.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
+$about = $about.Replace('{{ROOT}}', '../')
+$aboutDir = Join-Path $Site 'about'
+if (-not (Test-Path $aboutDir)) { New-Item -ItemType Directory $aboutDir | Out-Null }
+Write-Utf8 (Join-Path $aboutDir 'index.html') $about
 
 # 404: generated like everything else, so its stylesheet carries the same
 # content hash and a returning visitor cannot render it against a stale one.
@@ -904,7 +920,7 @@ $sm = New-Object System.Text.StringBuilder
 # index the very page whose meta tag tells it not to.
 $smAlbums = @($json.albums | Where-Object { -not (Test-Noindex $_) } |
   ForEach-Object { "$base/albums/$($_.slug)/" })
-foreach ($u in (@("$base/", "$base/albums/", "$base/available/", "$base/sold/") + $smAlbums)) {
+foreach ($u in (@("$base/", "$base/about/", "$base/albums/", "$base/available/", "$base/sold/") + $smAlbums)) {
   [void]$sm.AppendLine("  <url><loc>$u</loc><lastmod>$genDate</lastmod></url>")
 }
 [void]$sm.AppendLine('</urlset>')
