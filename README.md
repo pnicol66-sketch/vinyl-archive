@@ -1,7 +1,7 @@
 # vinylcurator.net — archive site
 
 The public, static archive site for a documented vinyl collection. Generated —
-do not hand-edit `index.html`, `albums/`, `sitemap.xml`, or `collection.json`;
+do not hand-edit `index.html`, `404.html`, `albums/`, `sitemap.xml`, or `collection.json`;
 edit `templates/` + `assets/` and rebuild.
 
 ## How it works
@@ -32,6 +32,7 @@ price-free.
 
 ```
 /                      landing page (generated from templates/landing.html)
+/404.html              not-found page; absolute paths, served at any depth
 /albums/               Personal Archive index (Collection tab): cards + filter
 /available/            Available from Archive (For Sale tab) + Discogs links
 /sold/                 Sold from Archive (Sold tab); no prices, no listing
