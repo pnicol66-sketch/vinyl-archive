@@ -60,7 +60,7 @@ a:hover { color: var(--accent); }
   justify-content: flex-end;
 }
 .site-head .site-sub a { font-size: 0.85rem; }
-.site-head a { text-decoration: none; color: var(--muted); font-size: 0.95rem; }
+.site-head a { text-decoration: none; color: var(--muted); font-size: 1.075rem; }
 .site-head a[aria-current] { color: var(--ink); }
 .site-head .brand {
   font-family: var(--serif); font-size: 1.15rem; color: var(--ink);
@@ -84,13 +84,52 @@ h2 {
 
 /* landing */
 .landing .hero { padding: 5rem 0 3rem; }
-.landing h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); }
+/* Only slightly larger than the about-teaser h2, and sized to sit on one line
+   on desktop rather than as a big display headline. */
+.landing h1 { font-size: clamp(1.5rem, 3vw, 1.9rem); }
+/* The hero lede carries the page now, so it takes full ink and the full
+   measure - not the muted, narrow treatment ledes get on the section pages. */
+.landing .hero .lede { font-size: 1.125rem; max-width: none; color: var(--ink); }
 .landing .contact { color: var(--muted); font-size: 0.95rem; margin-top: 2.2rem; }
+.landing .hero .contact { font-size: 0.975rem; margin-top: 1.2rem; }
 .button {
   display: inline-block; margin-top: 1rem; padding: 0.65rem 1.2rem;
   border: 1px solid var(--accent-ink); border-radius: 999px;
   text-decoration: none; font-size: 0.95rem;
 }
+
+/* About teaser on the landing: the story's opening, set below a rule as a
+   quiet second act to the hero - full measure like the hero, but a step
+   toward muted so the hero stays the lead. */
+.landing .about-teaser {
+  margin: 1rem 0 0; padding-top: 2.4rem; border-top: 1px solid var(--line);
+}
+.landing .about-teaser h2 {
+  border-top: 0; padding-top: 0; margin: 0 0 1.1rem;
+  font-size: clamp(1.4rem, 3.5vw, 1.8rem);
+}
+.teaser-prose { max-width: none; }
+.teaser-prose p {
+  font-family: var(--serif); font-size: 1.08rem; line-height: 1.7; margin: 0;
+  color: color-mix(in srgb, var(--ink) 40%, var(--muted));
+}
+.teaser-prose .more { white-space: nowrap; font-family: var(--sans); font-size: 0.95rem; }
+
+/* About page: the full story, set in the serif at a reading measure (narrower
+   than the landing - a long read wants a shorter line than a hero statement). */
+.about-head { padding-top: 3rem; }
+.about-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0 0 1.6rem; }
+.story-prose { max-width: 40rem; }
+.story-prose p {
+  font-family: var(--serif); font-size: 1.08rem; line-height: 1.72;
+  margin: 0 0 1.15rem; color: var(--ink);
+}
+.story-prose p:first-of-type { font-size: 1.16rem; }
+.story-prose em { font-style: italic; }
+.story-prose .closing {
+  margin-top: 1.8rem; padding-top: 1.4rem; border-top: 1px solid var(--line);
+}
+.about-back { margin-top: 2.4rem; font-size: 0.9rem; }
 
 /* archive index */
 .archive-head { padding-top: 2.5rem; }
