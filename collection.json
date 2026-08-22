@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-22T03:00:18.719Z",
+ "generated": "2026-08-22T12:48:43.572Z",
  "site": {
   "title": "Vinyl Curator",
   "baseUrl": "https://vinylcurator.net",
@@ -1383,49 +1383,6 @@
    "tab": "For Sale"
   },
   {
-   "artist": "Donald Byrd",
-   "title": "Off to the Races",
-   "year": "1959",
-   "labelName": "Blue Note",
-   "labelNumber": "BLP 4007",
-   "monoStereo": "Mono",
-   "countryOfOrigin": "US",
-   "format": "LP",
-   "genre": "Jazz - Hard Bop",
-   "speed": "33 1/3 RPM",
-   "producer": "Alfred Lion",
-   "composer": "",
-   "conductor": "",
-   "performerOrchestra": "",
-   "musicians": "Donald Byrd (trumpet), Jackie McLean (alto sax), Pepper Adams (baritone sax), Wynton Kelly (piano), Sam Jones (bass), Art Taylor (drums)",
-   "coverGrade": "VG-",
-   "vinylGrade": "G DEEP GROOVE/G DEEP GROOVE",
-   "matrix": {
-    "a": "BNLP-4007.A EAR RVG",
-    "b": "BNLP-4007.B EAR RVG",
-    "c": "",
-    "d": ""
-   },
-   "sides": [
-    "1. Lover (Romberg-Hammerstein)\n2. When Your Love Has Gone (Byrd)\n3. Sudwest Funk (Byrd)",
-    "1. Paul's Pal (Rollins)\n2. Off to the Races (Byrd)\n3. Down Tempo (Byrd)",
-    "",
-    ""
-   ],
-   "albumStory": "Recorded on December 21, 1958 at Rudy Van Gelder's Hackensack studio and released the following year, Off to the Races arrived as trumpeter Donald Byrd was establishing himself as one of the era's most in-demand hard bop leaders and sidemen after his Detroit upbringing and stints with Art Blakey and Max Roach. The session pairs Byrd with a young, fiery Jackie McLean on alto and the underrated baritone specialist Pepper Adams, backed by a crack rhythm section of Wynton Kelly, Sam Jones, and Art Taylor, giving the record a harder, more aggressive edge than some of Byrd's later, more soul-jazz-leaning work. The program mixes a standard (\"Lover\") and a Sonny Rollins tune (\"Paul's Pal\") with four Byrd originals, including the boppish title track and the German-tinged blues \"Sudwest Funk,\" named for a Southwest German radio station. Critically, the album is remembered as a solid, unpretentious showcase of late-1950s hard bop craftsmanship rather than a genre-defining statement, valued for its consistently strong blowing and the chemistry between Byrd, McLean, and Adams. It occupies a respected but modest place in Byrd's extensive Blue Note discography, appreciated by hard bop collectors for its personnel and unfussy, swinging character rather than for any singular historical breakthrough.",
-   "lpNotes": "1st pressing (mono, 1959) - deep-groove 47 West 63rd Blue Note label without ® trademark, RVG + Plastylite ear stamps in the dead wax.",
-   "labelNotes": "This copy carries the earliest Blue Note 47 West 63rd label design: light-blue rim, white body, deep-groove pressing ring, and no ® trademark symbol next to the address, matching the label style Blue Note used from roughly 1956 into 1959 at its West 63rd Street office (the address the back cover also cites: \"47 West 63rd St., New York 23\"). Discogs variant tracking shows a nearly identical label used slightly later with a ® added to the 47 West 63rd text, which collectors treat as a second-state pressing; this copy lacks that mark, placing it ahead of that variant in the pressing sequence. The deep groove plus the RVG/Plastylite ear stamps documented in the runout confirm this is a true Van Gelder-cut, Plastylite-pressed New York original rather than the later Liberty-era reissues (Bert-Co labels, no ear) that followed from 1966 onward.",
-   "fidelity": "Mastered by Rudy Van Gelder directly from his December 1958 mono session tapes and pressed by Plastylite (ear stamp), this is the top of the fidelity hierarchy for this title - warm, present horns and a tight, punchy rhythm section typical of Van Gelder's late-50s Hackensack mono cuts. Collectors on forums like Steve Hoffman generally rate original ear/RVG Blue Note mono pressings well above the later Liberty-era reissues, which used different mastering and lack the ear stamp, and well above generic 1970s-80s reissues; no major audiophile remaster (Music Matters, Tone Poet, Classic Records) of this specific title is documented, so the original RVG/ear pressing remains the reference standard. The G/G deep-groove vinyl grading on this particular copy, however, means actual playback surface noise will be well below what a clean example of this pressing can deliver.",
-   "generalNotes": "1959 Blue Note BLP-4007 mono - earliest issue of this title. Deep-groove 47 West 63rd St. labels lacking the later-added ® trademark, combined with RVG and Plastylite ear stamps in the runout, place this among the first pressings before Liberty took over the catalog and issued Bert-Co labeled reissues from 1966 onward. No stereo mix of the original session exists, so mono is the only correct configuration for a period-authentic copy.",
-   "discogsListingUrl": "",
-   "soldDate": "",
-   "variantChronology": "1959 - US Blue Note, deep-groove 47 West 63rd label, no ® trademark, RVG + Plastylite ear stamps in dead wax  <- this copy\n1959-60 - same 47 West 63rd label design but with ® trademark symbol added\n1966-67 - Liberty reissue, Bert-Co pressed labels, first stereo edition, no ear stamp\nc. 1969-70 - Liberty/UA \"West Coast\" pressing, no ear stamp\n1972/1975 - United Artists \"Division of UA\" replica-series reissue (export, e.g. Japan/Jazz Right Now)\n1997 - Blue Note/Toshiba-EMI CD reissue (not vinyl) - n/a",
-   "folderName": "Donald Byrd_Off to the Races",
-   "folderId": "1a1MVVzcoiD8b3tgXLQA3EXSFeL3NpHk-",
-   "slug": "donald-byrd-off-to-the-races",
-   "tab": "For Sale"
-  },
-  {
    "artist": "Big John Patton",
    "title": "Got a good thing going",
    "year": "1966",
@@ -1810,6 +1767,49 @@
    "folderName": "Pink Floyd_The Wall",
    "folderId": "12_82JFouDK9kdjBiNr1WHrVshFZFIgX4",
    "slug": "pink-floyd-the-wall",
+   "tab": "Sold"
+  },
+  {
+   "artist": "Donald Byrd",
+   "title": "Off to the Races",
+   "year": "1959",
+   "labelName": "Blue Note",
+   "labelNumber": "BLP 4007",
+   "monoStereo": "Mono",
+   "countryOfOrigin": "US",
+   "format": "LP",
+   "genre": "Jazz - Hard Bop",
+   "speed": "33 1/3 RPM",
+   "producer": "Alfred Lion",
+   "composer": "",
+   "conductor": "",
+   "performerOrchestra": "",
+   "musicians": "Donald Byrd (trumpet), Jackie McLean (alto sax), Pepper Adams (baritone sax), Wynton Kelly (piano), Sam Jones (bass), Art Taylor (drums)",
+   "coverGrade": "VG-",
+   "vinylGrade": "G DEEP GROOVE/G DEEP GROOVE",
+   "matrix": {
+    "a": "BNLP-4007.A EAR RVG",
+    "b": "BNLP-4007.B EAR RVG",
+    "c": "",
+    "d": ""
+   },
+   "sides": [
+    "1. Lover (Romberg-Hammerstein)\n2. When Your Love Has Gone (Byrd)\n3. Sudwest Funk (Byrd)",
+    "1. Paul's Pal (Rollins)\n2. Off to the Races (Byrd)\n3. Down Tempo (Byrd)",
+    "",
+    ""
+   ],
+   "albumStory": "Recorded on December 21, 1958 at Rudy Van Gelder's Hackensack studio and released the following year, Off to the Races arrived as trumpeter Donald Byrd was establishing himself as one of the era's most in-demand hard bop leaders and sidemen after his Detroit upbringing and stints with Art Blakey and Max Roach. The session pairs Byrd with a young, fiery Jackie McLean on alto and the underrated baritone specialist Pepper Adams, backed by a crack rhythm section of Wynton Kelly, Sam Jones, and Art Taylor, giving the record a harder, more aggressive edge than some of Byrd's later, more soul-jazz-leaning work. The program mixes a standard (\"Lover\") and a Sonny Rollins tune (\"Paul's Pal\") with four Byrd originals, including the boppish title track and the German-tinged blues \"Sudwest Funk,\" named for a Southwest German radio station. Critically, the album is remembered as a solid, unpretentious showcase of late-1950s hard bop craftsmanship rather than a genre-defining statement, valued for its consistently strong blowing and the chemistry between Byrd, McLean, and Adams. It occupies a respected but modest place in Byrd's extensive Blue Note discography, appreciated by hard bop collectors for its personnel and unfussy, swinging character rather than for any singular historical breakthrough.",
+   "lpNotes": "1st pressing (mono, 1959) - deep-groove 47 West 63rd Blue Note label without ® trademark, RVG + Plastylite ear stamps in the dead wax.",
+   "labelNotes": "This copy carries the earliest Blue Note 47 West 63rd label design: light-blue rim, white body, deep-groove pressing ring, and no ® trademark symbol next to the address, matching the label style Blue Note used from roughly 1956 into 1959 at its West 63rd Street office (the address the back cover also cites: \"47 West 63rd St., New York 23\"). Discogs variant tracking shows a nearly identical label used slightly later with a ® added to the 47 West 63rd text, which collectors treat as a second-state pressing; this copy lacks that mark, placing it ahead of that variant in the pressing sequence. The deep groove plus the RVG/Plastylite ear stamps documented in the runout confirm this is a true Van Gelder-cut, Plastylite-pressed New York original rather than the later Liberty-era reissues (Bert-Co labels, no ear) that followed from 1966 onward.",
+   "fidelity": "Mastered by Rudy Van Gelder directly from his December 1958 mono session tapes and pressed by Plastylite (ear stamp), this is the top of the fidelity hierarchy for this title - warm, present horns and a tight, punchy rhythm section typical of Van Gelder's late-50s Hackensack mono cuts. Collectors on forums like Steve Hoffman generally rate original ear/RVG Blue Note mono pressings well above the later Liberty-era reissues, which used different mastering and lack the ear stamp, and well above generic 1970s-80s reissues; no major audiophile remaster (Music Matters, Tone Poet, Classic Records) of this specific title is documented, so the original RVG/ear pressing remains the reference standard. The G/G deep-groove vinyl grading on this particular copy, however, means actual playback surface noise will be well below what a clean example of this pressing can deliver.",
+   "generalNotes": "1959 Blue Note BLP-4007 mono - earliest issue of this title. Deep-groove 47 West 63rd St. labels lacking the later-added ® trademark, combined with RVG and Plastylite ear stamps in the runout, place this among the first pressings before Liberty took over the catalog and issued Bert-Co labeled reissues from 1966 onward. No stereo mix of the original session exists, so mono is the only correct configuration for a period-authentic copy.",
+   "discogsListingUrl": "",
+   "soldDate": "2026-08-21",
+   "variantChronology": "1959 - US Blue Note, deep-groove 47 West 63rd label, no ® trademark, RVG + Plastylite ear stamps in dead wax  <- this copy\n1959-60 - same 47 West 63rd label design but with ® trademark symbol added\n1966-67 - Liberty reissue, Bert-Co pressed labels, first stereo edition, no ear stamp\nc. 1969-70 - Liberty/UA \"West Coast\" pressing, no ear stamp\n1972/1975 - United Artists \"Division of UA\" replica-series reissue (export, e.g. Japan/Jazz Right Now)\n1997 - Blue Note/Toshiba-EMI CD reissue (not vinyl) - n/a",
+   "folderName": "Donald Byrd_Off to the Races",
+   "folderId": "1a1MVVzcoiD8b3tgXLQA3EXSFeL3NpHk-",
+   "slug": "donald-byrd-off-to-the-races",
    "tab": "Sold"
   }
  ]
