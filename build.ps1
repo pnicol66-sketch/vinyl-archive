@@ -864,16 +864,17 @@ function Render-Index([string]$title, [string]$lede, [string]$desc,
 }
 
 Render-Index 'Personal Archive' `
-  ((CountLabel $collectionCount) + ", each photographed against a full checklist $dash covers, " +
-    "labels, dead-wax close-ups $dash the matrix / runout transcribed by hand and the exact " +
-    "pressing identified against label discographies and variant records.") `
+  ("Albums added constantly as I transition my collection into the Archive system. " +
+    "It's public to demonstrate the detail what it delivers in a real live collection " +
+    "minus the valuation research which remains private.") `
   'A documented personal vinyl collection: original pressings photographed, transcribed, and researched.' `
   "$base/albums/" 'archive' $cardsCollection.ToString() $Albums
 
 Render-Index 'Available from Archive' `
-  ((CountLabel $availableCount) + " currently listed for sale, each photographed against a full " +
-    "checklist $dash covers, labels, dead-wax close-ups $dash the matrix / runout transcribed by " +
-    "hand and the exact pressing identified against label discographies and variant records. " +
+  ("These are some albums I'm clearing out from my collection. They are currently listed for sale, " +
+    "each photographed against a full checklist $dash covers, labels, dead-wax close-ups $dash the " +
+    "matrix / runout transcribed by hand and the exact pressing identified against label " +
+    "discographies and variant records. " +
     "Each card opens the full documentation; the live listings are on Discogs and eBay.") `
   'Documented vinyl records currently listed for sale on Discogs and eBay, with full pressing documentation.' `
   "$base/available/" 'available' $cardsAvailable.ToString() (Join-Path $Site 'available')
