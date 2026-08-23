@@ -1,6 +1,18 @@
-# Publish vinylcurator.net from the latest sheet export (the "Publish
-# Vinyl Site" desktop shortcut runs this with -Manual; the former
-# 5-minute scheduled task is retired - user found the window flash noisy).
+# Publish vinylcurator.net from the latest sheet export.
+#
+# RUNS AUTOMATICALLY. Scheduled task "Vinyl Site Publish Queue" fires every
+# 2 minutes (PT2M) via publish-launcher.vbs, which wscript runs windowless -
+# that launcher is what replaced the bare powershell.exe task whose console
+# flash the user found noisy. The task is not retired; only the flash is.
+# The "Publish Vinyl Site" desktop shortcut runs this with -Manual for an
+# immediate, visible run.
+#
+# It logs ONLY when it publishes or fails, so silence in autopublish.log
+# means "nothing to do", never "not running". To check it is alive, ask the
+# task: Get-ScheduledTaskInfo -TaskName 'Vinyl Site Publish Queue' reports
+# LastRunTime and LastTaskResult (0 = fine). Reading the log inside the
+# 2-minute window and concluding the watcher is dead is a mistake already
+# made once, at the cost of a redundant manual build.
 #
 # Reads the export's "generated" stamp; when it differs from the last
 # published stamp, runs build.ps1 -Push. -Manual shows progress in the
