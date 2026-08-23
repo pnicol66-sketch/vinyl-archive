@@ -71,7 +71,7 @@
     });
   }
 
-  // Archive index: filter cards on artist / title / label / year.
+  // Archive index: filter cards on artist / title / label / year / genre.
   var filter = document.getElementById('filter');
   if (filter) {
     var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
