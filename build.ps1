@@ -695,13 +695,24 @@ foreach ($album in $json.albums) {
   # listing that no longer exists.
   $listingSec = ''
   $dgUrl = [string]$album.discogsListingUrl
+  $ebUrl = [string]$album.ebayItemUrl
   if ($album.tab -eq 'Sold') {
     $listingSec = Section 'availability' 'Availability' ('    <p class="prose">This record ' +
       'has been sold. Its documentation stays here.</p>')
-  } elseif ($dgUrl -ne '') {
+  } elseif ($dgUrl -ne '' -or $ebUrl -ne '') {
+    # One "listed for sale" line, one anchor per marketplace it is on, joined
+    # with "or". A record may be on Discogs, eBay, or both.
+    $links = New-Object System.Collections.Generic.List[string]
+    if ($dgUrl -ne '') {
+      [void]$links.Add('<a href="' + (HtmlEnc $dgUrl) +
+        '" target="_blank" rel="noopener">view the listing on Discogs</a>')
+    }
+    if ($ebUrl -ne '') {
+      [void]$links.Add('<a href="' + (HtmlEnc $ebUrl) +
+        '" target="_blank" rel="noopener">view the listing on eBay</a>')
+    }
     $listingSec = Section 'availability' 'Availability' ('    <p class="prose">This record ' +
-      'is currently listed for sale: <a href="' + (HtmlEnc $dgUrl) +
-      '" target="_blank" rel="noopener">view the listing on Discogs</a>.</p>')
+      'is currently listed for sale: ' + ($links -join ' or ') + '.</p>')
   }
 
   # Section order per the owner's spec (2026-08-13): [Availability,]
@@ -784,11 +795,18 @@ foreach ($album in $json.albums) {
     [void]$cardsCollection.AppendLine('    ' + $cardHtml)
     $collectionCount++
   } elseif ($album.tab -eq 'For Sale') {
+    # One listing link per marketplace the record is on; each stacks as its own
+    # centred line under the card.
     $listing = ''
     $dgUrl = [string]$album.discogsListingUrl
+    $ebUrl = [string]$album.ebayItemUrl
     if ($dgUrl -ne '') {
-      $listing = '<p class="listing-link"><a href="' + (HtmlEnc $dgUrl) +
+      $listing += '<p class="listing-link"><a href="' + (HtmlEnc $dgUrl) +
         '" target="_blank" rel="noopener">View listing on Discogs</a></p>'
+    }
+    if ($ebUrl -ne '') {
+      $listing += '<p class="listing-link"><a href="' + (HtmlEnc $ebUrl) +
+        '" target="_blank" rel="noopener">View listing on eBay</a></p>'
     }
     [void]$cardsAvailable.AppendLine('    <div class="card-wrap">' + $cardHtml + $listing + '</div>')
     $availableCount++
