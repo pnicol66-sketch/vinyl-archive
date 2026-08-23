@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-22T19:06:04.163Z",
+ "generated": "2026-08-23T04:41:04.662Z",
  "site": {
   "title": "Vinyl Curator",
   "baseUrl": "https://vinylcurator.net",
@@ -25,8 +25,8 @@
    "coverGrade": "EX+",
    "vinylGrade": "NN/NN",
    "matrix": {
-    "a": "SRI 75 012 1Y 1 670 1J 2 1\n6",
-    "b": "SRI 75012 2Y 1 670 1 31\n6",
+    "a": "SRI 75 012 1Y 1 670 1J 2 1\n06",
+    "b": "SRI 75012 2Y 1 670 1 31\n06",
     "c": "",
     "d": ""
    },
@@ -1250,7 +1250,7 @@
    "variantChronology": "1960 - US Columbia \"6-eye\" mono, deep groove, full (unabbreviated) orchestra credit, Terre Haute/unidentified plant  <- this copy\n1961-62 - US Columbia \"6-eye\" mono, flat edge (deep groove phased out), abbreviated orchestra credit variants\n1963-65 - US Columbia \"Guaranteed High Fidelity\" 2-eye mono reissue, CBS-era labels\n1965+ - US Columbia \"360 Sound\" mono/stereo reissue (Pitman)\n1970s-80s - US Columbia orange-label reissue",
    "folderName": "Miles Davis_Sketches of Spain (1960 first pressing)",
    "folderId": "1JIk3P-JIGDfuBr84caTzwQBW0_jpyUEs",
-   "slug": "miles-davis-sketches-of-spain-1960-first-pressing",
+   "slug": "miles-davis-sketches-of-spain-1960",
    "tab": "For Sale"
   },
   {
@@ -1465,7 +1465,7 @@
    "variantChronology": "1960 - US Columbia CS 8271, 6-eye stereo label, first pressing\n1960s-70s - Columbia 2-eye/360 Sound reissues\n2012 - Mobile Fidelity Sound Lab MFSL 1-375, numbered limited edition, 180g, GAIN 2 Ultra Analog, pressed at RTI  <- this copy\n2022 - Mobile Fidelity UltraDisc One-Step box set, MFSL UD1S",
    "folderName": "Miles Davis_Sketches of Spain mofi",
    "folderId": "188XyUqAAJhgWl4HRSEqIahc8ciiSgzZu",
-   "slug": "miles-davis-sketches-of-spain-mofi",
+   "slug": "miles-davis-sketches-of-spain-mobile-fidelity",
    "tab": "For Sale"
   },
   {
@@ -1508,7 +1508,7 @@
    "variantChronology": "1959 - US Columbia 6-eye label, mono/stereo (CL 1355/CS 8163), NY manufactured\n1963-1965 - US Columbia 2-eye label (Guaranteed High Fidelity)\nc.1970-1976 - US Columbia orange label (360 Sound Stereo)\n1977 - US Columbia Terre Haute press, orange label\n1980 - CBS Mastersound half-speed mastered LP (HC 44087)\n1995/1997 - Classic Records CS 8163, 200g Quiex SV-P, Bernie Grundman all-tube cut\n1997 - Classic Records RTI white-label TEST PRESSING (this variant, pre-release)  <- this copy\n2001 - Classic Records reissue, same catalog/jacket (repress run)\n2008 - Classic Records 200g Clarity Vinyl reissue\n2009 - Sony Legacy/Columbia 50th Anniversary Legacy Edition LP\n2022/2025 - Analogue Productions/QRP \"Corrected Speed\" 45RPM & 33 1/3 reissues",
    "folderName": "Miles Davis_Kind of Blue (2)",
    "folderId": "17F_PaysDLZM-8L1z0Gyo61kqTWRAHYi0",
-   "slug": "miles-davis-kind-of-blue-2",
+   "slug": "miles-davis-kind-of-blue-classic-records",
    "tab": "For Sale"
   },
   {
@@ -1551,7 +1551,7 @@
    "variantChronology": "1973 - Orange/red Columbia label, Pitman plant, -1A stamper, \"P\" etched runout\n1973-74 - Orange/red Columbia label, Pitman plant, -1B stamper, \"P\" etched runout  <- this copy\n1973-74 - Orange/red Columbia label, Santa Maria, CA plant, \"S\" etched runout\n1973-74 - Orange/red Columbia label, Terre Haute, IN or other secondary US plants\n1970s UK/European Columbia/CBS pressings\nc. 1980s-90s - Later Columbia reissues, black label\n1997 - Columbia/Legacy CD remaster (reference only, not vinyl) - n/a\n2011 - Music On Vinyl 180g reissue\n2021 - Analogue Productions 200g LP (Ryan K. Smith mastering)",
    "folderName": "Herbie Hancock_Head Hunters (2)",
    "folderId": "1DUImEi35gNjcq_otQBuEE8_awad9LTmF",
-   "slug": "herbie-hancock-head-hunters-2",
+   "slug": "herbie-hancock-head-hunters-1973",
    "tab": "For Sale"
   },
   {
