@@ -755,7 +755,7 @@ foreach ($album in $json.albums) {
   $firstCover = $shots | Where-Object { $_.Name -like '01-*' } | Select-Object -First 1
   if ($firstCover) { $coverThumb = "$slug/img/t/$($firstCover.Name)" }
   $search = (($album.artist + ' ' + $album.title + ' ' + $album.labelName + ' ' +
-    $album.labelNumber + ' ' + $album.year).ToLowerInvariant() -replace '\s+', ' ').Trim()
+    $album.labelNumber + ' ' + $album.year + ' ' + $album.genre).ToLowerInvariant() -replace '\s+', ' ').Trim()
   $coverHtml = '<div class="cover"></div>'
   if ($coverThumb -ne '') {
     $coverHtml = '<div class="cover"><img src="' + $coverThumb + '" alt="" loading="lazy"></div>'
