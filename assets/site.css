@@ -469,3 +469,386 @@ h2 {
   body.compact .site-foot { margin-top: 4mm; }
   body.compact .method { font-size: 7.5pt; margin-top: 2.5mm; }
 }
+/* ============================================================
+   Landing page (templates/landing.html) — append to site.css
+   Uses the existing :root tokens, so it follows light/dark with
+   the rest of the site. The phone mock keeps the APP's own dark
+   palette in both themes, because that is what the app looks like.
+   ============================================================ */
+
+.lp { padding-bottom: 1rem; }
+.lp h2 {
+  font-family: var(--serif); font-weight: 500; font-size: 1.45rem;
+  margin: 0 0 0.9rem; padding-top: 0; border-top: 0;
+}
+.lp-eyebrow {
+  margin: 0 0 0.9rem; font-family: var(--mono); font-size: 0.78rem;
+  letter-spacing: 0.11em; text-transform: uppercase; color: var(--accent);
+}
+.lp-sublede { color: var(--muted); margin: 0 0 1.8rem; max-width: 40rem; }
+.lp-body, .lp-grid4 p { color: color-mix(in srgb, var(--ink) 78%, var(--muted)); }
+
+/* hero */
+.lp-hero {
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 3rem; align-items: end; padding: 4.5rem 0 3rem;
+}
+.lp-hero h1 {
+  font-size: clamp(2rem, 4.4vw, 3.05rem); line-height: 1.14;
+  margin: 0 0 1.2rem; text-wrap: pretty;
+}
+.lp-lede { font-size: 1.14rem; line-height: 1.62; margin: 0 0 1.4rem; max-width: 34rem; text-wrap: pretty; }
+.lp-note { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.lp-hero-shot { margin: 0; }
+.lp-frame { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--card); }
+.lp-hero-shot figcaption {
+  margin-top: 0.55rem; color: var(--muted); font-size: 0.82rem;
+  font-family: var(--mono); line-height: 1.5;
+}
+
+/* ---------- the app film ---------- */
+.lp-film {
+  border-top: 1px solid var(--line); padding: 2.6rem 0 0.5rem;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(17rem, 20rem);
+  gap: 3rem; align-items: start;
+}
+.lp-film h2 { font-size: clamp(1.5rem, 3vw, 2.05rem); line-height: 1.2; margin: 0 0 0.9rem; }
+.lp-film .lp-body { margin: 0 0 2rem; font-size: 1.02rem; line-height: 1.65; max-width: 32rem; }
+
+.lp-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.lp-steps button {
+  width: 100%; text-align: left; background: none; border: 0;
+  border-left: 2px solid var(--line); padding: 0.62rem 0 0.62rem 1.1rem;
+  cursor: pointer; font: inherit; display: block;
+}
+.lp-steps .k {
+  display: block; font-family: var(--mono); font-size: 0.72rem;
+  letter-spacing: 0.09em; color: var(--muted);
+}
+.lp-steps .t { display: block; margin-top: 0.15rem; font-size: 1rem; color: var(--muted); }
+.lp-steps [aria-current] { border-left-color: var(--accent); }
+.lp-steps [aria-current] .k { color: var(--accent); }
+.lp-steps [aria-current] .t { color: var(--ink); font-weight: 600; }
+
+.lp-regions {
+  margin-top: 1.9rem; padding-top: 1.3rem; border-top: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 0.5rem 0.6rem; align-items: center;
+}
+.lp-regions span {
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 0.2rem 0.7rem; font-size: 0.85rem;
+}
+.lp-regions-label {
+  border: 0 !important; padding: 0 !important; margin-right: 0.3rem;
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+.lp-phone-col { position: sticky; top: 1.5rem; }
+.lp-phone {
+  position: relative; width: 100%; max-width: 19rem; margin: 0 auto;
+  aspect-ratio: 9 / 16.4; border-radius: 2.1rem; padding: 0.5rem;
+  background: #1b1b20; border: 1px solid var(--line);
+  box-shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.55);
+}
+.lp-screen {
+  position: relative; width: 100%; height: 100%; border-radius: 1.7rem;
+  overflow: hidden; background: #101013; color: #ececf0;
+  font-size: 0.78rem; line-height: 1.45;
+}
+.lp-appbar {
+  position: absolute; top: 0; left: 0; right: 0; height: 2.6rem; z-index: 3;
+  display: flex; align-items: center; gap: 0.35rem; padding: 0 0.5rem;
+  background: rgba(16, 16, 19, 0.92); border-bottom: 1px solid #2a2a31; color: #9a9aa5;
+}
+.lp-apptitle {
+  flex: 1; text-align: center; font-weight: 650; font-size: 0.85rem; color: #ececf0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lp-back { width: 1.6rem; text-align: center; font-size: 1.05rem; }
+
+.lp-scr {
+  position: absolute; top: 2.6rem; left: 0; right: 0; bottom: 0;
+  padding: 0.8rem; display: flex; flex-direction: column;
+  opacity: 0; transition: opacity 0.45s ease; pointer-events: none;
+}
+.lp-scr[data-on] { opacity: 1; }
+.lp-scr.lp-black { padding: 0; background: #000; }
+.lp-foot { margin-top: auto !important; }
+/* Beat 01 follows the app: the primary sits under the fields after a small
+   spacer (#scr-new in the app), not pinned to the foot of the screen. */
+.lp-scr[data-scr="0"] .lp-primary { margin-top: 1.4rem; }
+
+.lp-flabel { margin: 0 0 0.28rem; font-size: 0.63rem; color: #9a9aa5; }
+.lp-flabel + .lp-flabel { margin-top: 0.7rem; }
+.lp-field, .lp-textarea {
+  padding: 0.6rem 0.65rem; border-radius: 0.6rem; background: #202027;
+  border: 1px solid #2a2a31;
+}
+.lp-field + .lp-flabel { margin-top: 0.75rem; }
+.lp-textarea { flex: 1; min-height: 2.8rem; font-family: var(--mono); font-size: 0.78rem; }
+.lp-on { border-color: #f0a832 !important; }
+.lp-caret { color: #f0a832; }
+.lp-radios { display: flex; gap: 0.45rem; }
+.lp-radios span {
+  flex: 1; text-align: center; padding: 0.55rem 0.2rem; border-radius: 0.6rem;
+  background: #202027; border: 1px solid #2a2a31; color: #9a9aa5; font-size: 0.7rem;
+}
+.lp-radios .lp-on { background: #2a2213; color: #ececf0; }
+.lp-primary {
+  padding: 0.65rem; border-radius: 0.75rem; background: #f0a832; color: #191204;
+  text-align: center; font-weight: 700; font-size: 0.8rem;
+}
+.lp-secondary {
+  padding: 0.5rem; border-radius: 0.7rem; background: #1b1b20; border: 1px solid #2a2a31;
+  color: #ececf0; text-align: center; font-weight: 600; font-size: 0.72rem;
+}
+.lp-danger {
+  margin-top: 0.4rem; padding: 0.5rem; border-radius: 0.7rem; background: #1b1b20;
+  border: 1px solid #6b2c2c; color: #ff9d9d; text-align: center;
+  font-weight: 600; font-size: 0.72rem;
+}
+.lp-mic {
+  margin-top: 0.45rem; padding: 0.5rem; border-radius: 0.7rem; border: 1px solid #f0a832;
+  background: #2a2213; color: #f0a832; text-align: center; font-size: 0.72rem; font-weight: 600;
+}
+.lp-hint { margin: 0.45rem 0 0; color: #9a9aa5; font-size: 0.57rem; line-height: 1.45; }
+.lp-sect {
+  margin: 0.6rem 0 0.3rem; font-size: 0.58rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #9a9aa5;
+}
+.lp-slotrow { display: flex; gap: 0.35rem; }
+.lp-select {
+  flex: 1; padding: 0.35rem 0.45rem; border-radius: 0.5rem; background: #202027;
+  border: 1px solid #2a2a31; font-size: 0.62rem; color: #9a9aa5;
+}
+.lp-slotrow .lp-secondary { flex: 1.3; padding: 0.35rem; font-size: 0.62rem; }
+.lp-slots { display: flex; gap: 0.32rem; margin: 0.35rem 0 0.55rem; }
+.lp-slots span {
+  flex: 1; aspect-ratio: 1; border-radius: 0.5rem; border: 1px dashed #2a2a31;
+  display: flex; align-items: center; justify-content: center; color: #9a9aa5; font-size: 0.58rem;
+}
+
+/* checklist */
+.lp-albumhdr { margin: 0; font-weight: 700; font-size: 0.76rem; }
+.lp-sub { margin: 0.15rem 0 0.5rem; color: #9a9aa5; font-size: 0.62rem; }
+.lp-listwrap { flex: 1; overflow: hidden; position: relative; }
+.lp-list {
+  display: flex; flex-direction: column; gap: 0.3rem;
+  transform: translateY(0); transition: transform 1.6s ease-in-out;
+}
+.lp-scr[data-shot] .lp-list { transform: translateY(-7.5rem); }
+.lp-row {
+  display: flex; align-items: center; gap: 0.45rem; background: #1b1b20;
+  border: 1px solid #2a2a31; border-radius: 0.55rem; padding: 0.25rem 0.45rem 0.25rem 0.25rem;
+}
+.lp-row img, .lp-row i {
+  width: 1.7rem; height: 1.7rem; border-radius: 0.35rem; object-fit: cover; flex: none;
+  background: #26262c; display: flex; align-items: center; justify-content: center;
+  color: #9a9aa5; font-size: 0.7rem; font-style: normal;
+}
+.lp-row span { flex: 1; font-size: 0.66rem; line-height: 1.3; }
+.lp-row em { font-style: normal; color: #9a9aa5; font-size: 0.57rem; }
+.lp-row b { font-weight: 400; color: #9a9aa5; font-size: 0.62rem; }
+.lp-row b.ok, .lp-ok { color: #6fd97e; }
+.lp-row b.now, .lp-exports b.now { color: #f0a832; }
+.lp-fade {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 2.2rem;
+  background: linear-gradient(transparent, #101013);
+}
+
+/* camera + review */
+.lp-phase { position: absolute; inset: 0; opacity: 0; transition: opacity 0.4s ease; }
+.lp-scr[data-scr="2"]:not([data-shot]) [data-phase="cam"] { opacity: 1; }
+.lp-scr[data-scr="2"][data-shot] [data-phase="review"] { opacity: 1; }
+.lp-phase[data-phase="review"] { display: flex; flex-direction: column; }
+.lp-stage { position: absolute; inset: 0; background: #15130f; }
+.lp-stage img { position: absolute; top: 13%; left: 10%; width: 80%; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+.lp-pill {
+  position: absolute; background: rgba(0, 0, 0, 0.6); padding: 0.2rem 0.55rem;
+  border-radius: 999px; font-size: 0.6rem; color: #ececf0; z-index: 2;
+}
+.lp-tl { top: 0.5rem; left: 0.55rem; }
+.lp-bl { bottom: 0.5rem; left: 0.55rem; right: 0.55rem; }
+.lp-tip {
+  position: absolute; left: 0.6rem; right: 0.6rem; bottom: 7rem; text-align: center;
+  font-size: 0.62rem; color: #ddd; text-shadow: 0 1px 3px #000;
+}
+.lp-camctl {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 0.6rem 0 1rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+}
+.lp-slider { display: flex; align-items: center; gap: 0.5rem; width: 88%; margin: 0 auto 0.5rem; }
+.lp-slider span { font-size: 0.55rem; color: #ddd; min-width: 1.9rem; text-align: right; }
+.lp-slider i {
+  flex: 1; height: 3px; border-radius: 999px; background: rgba(255, 255, 255, 0.35);
+  position: relative;
+}
+.lp-slider i::after {
+  content: ""; position: absolute; left: 22%; top: -4px; width: 11px; height: 11px;
+  border-radius: 50%; background: #f0a832;
+}
+.lp-camrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; }
+.lp-cbtn {
+  width: 2rem; height: 2rem; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.4); display: flex; align-items: center; justify-content: center;
+}
+.lp-shutter {
+  width: 3.1rem; height: 3.1rem; border-radius: 50%; border: 3px solid #fff;
+  background: rgba(255, 255, 255, 0.25); transition: background 0.25s;
+}
+.lp-scr[data-shot] .lp-shutter { background: #fff; }
+
+.lp-canvas { position: relative; flex: 1; overflow: hidden; background: #000; }
+.lp-shot { position: absolute; top: 50%; left: 50%; width: 92%; transform: translate(-50%, -50%); }
+.lp-shot img { width: 100%; }
+.lp-shot-label { width: 77%; }
+.lp-crop {
+  position: absolute; inset: -26px; border: 2px solid #f0a832;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+  transition: inset 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.lp-scr[data-shot] .lp-crop { inset: 0; }
+.lp-crop s, .lp-circle s { position: absolute; background: #f0a832; }
+.lp-crop .c1, .lp-crop .c2, .lp-crop .c3, .lp-crop .c4 { width: 11px; height: 11px; border-radius: 2px; }
+.lp-crop .c1 { top: -5px; left: -5px; }
+.lp-crop .c2 { top: -5px; right: -5px; }
+.lp-crop .c3 { bottom: -5px; left: -5px; }
+.lp-crop .c4 { bottom: -5px; right: -5px; }
+.lp-crop .e1, .lp-crop .e2 { width: 5px; height: 26px; border-radius: 3px; top: 50%; transform: translateY(-50%); }
+.lp-crop .e1 { left: -3px; } .lp-crop .e2 { right: -3px; }
+.lp-crop .e3, .lp-crop .e4 { height: 5px; width: 26px; border-radius: 3px; left: 50%; transform: translateX(-50%); }
+.lp-crop .e3 { top: -3px; } .lp-crop .e4 { bottom: -3px; }
+.lp-circle {
+  position: absolute; top: 50%; left: 50%; width: 118%; aspect-ratio: 1;
+  transform: translate(-50%, -50%); border-radius: 50%; border: 2px solid #f0a832;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+  transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.lp-scr[data-shot] .lp-circle { width: 100%; }
+.lp-circle s { width: 11px; height: 11px; border-radius: 50%; top: 50%; transform: translateY(-50%); }
+.lp-circle .r1 { right: -5px; } .lp-circle .r2 { left: -5px; }
+.lp-loupe {
+  position: absolute; top: 0.5rem; right: 0.5rem; width: 4.4rem; height: 4.4rem;
+  border-radius: 50%; border: 2px solid #f0a832; opacity: 0; transition: opacity 0.4s;
+  background-image: url(../albums/miles-davis-kind-of-blue-classic-records/img/01-front-cover.jpg);
+  background-size: 320%; background-position: 14% 86%; z-index: 2;
+}
+.lp-scr[data-shot] .lp-loupe { opacity: 1; }
+.lp-revbar {
+  display: flex; gap: 0.3rem; padding: 0.55rem 0.5rem 0.7rem;
+  background: #101013; border-top: 1px solid #2a2a31;
+}
+.lp-revbar span {
+  flex: 1; text-align: center; padding: 0.45rem 0.1rem; border-radius: 0.55rem;
+  border: 1px solid #2a2a31; background: #1b1b20; font-size: 0.6rem; font-weight: 600;
+}
+.lp-revbar .lp-save { flex: 1.3; border-color: #f0a832; background: #f0a832; color: #191204; font-weight: 700; }
+
+/* upload + work */
+.lp-exports div {
+  display: flex; justify-content: space-between; gap: 0.5rem; padding: 0.35rem 0;
+  border-bottom: 1px solid #2a2a31; font-size: 0.68rem; color: #9a9aa5;
+}
+.lp-exports b { font-weight: 400; }
+.lp-progresslabel { margin: 0.7rem 0 0.35rem; color: #f0a832; font-size: 0.7rem; }
+.lp-bar { height: 4px; border-radius: 999px; background: #2a2a31; overflow: hidden; }
+.lp-bar i { display: block; height: 100%; width: 64%; background: #f0a832; }
+.lp-card { background: #1b1b20; border: 1px solid #2a2a31; border-radius: 0.7rem; padding: 0.65rem 0.7rem; }
+.lp-cardhdr { margin: 0 0 0.35rem; font-size: 0.72rem; font-weight: 600; }
+.lp-cardbody { margin: 0; color: #9a9aa5; font-size: 0.64rem; line-height: 1.45; }
+.lp-cardbtns { display: flex; gap: 0.4rem; margin-top: 0.55rem; }
+.lp-cardbtns span { flex: 1; padding: 0.4rem; font-size: 0.7rem; }
+.lp-ok { margin: 0; font-size: 0.72rem; }
+.lp-stack { display: flex; flex-direction: column; gap: 0.4rem; }
+.lp-tile { background: #1b1b20; border: 1px solid #2a2a31; border-radius: 0.6rem; padding: 0.5rem 0.6rem; font-size: 0.7rem; }
+.lp-tile code { font-family: var(--mono); }
+.lp-tile-on { background: #2a2213; border-color: #f0a832; color: #f0a832; }
+
+.lp-caption {
+  margin: 0.9rem auto 0; max-width: 19rem; text-align: center; color: var(--muted);
+  font-size: 0.8rem; font-family: var(--mono);
+}
+.lp-beatnote {
+  margin: 0.5rem auto 0; max-width: 19rem; text-align: center; font-size: 0.85rem;
+  line-height: 1.5; min-height: 4.6rem; color: color-mix(in srgb, var(--ink) 75%, var(--muted));
+}
+
+/* ---------- proof ---------- */
+.lp-proof { border-top: 1px solid var(--line); padding: 2.6rem 0 0.4rem; }
+.lp-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.5rem; }
+.lp-pcard {
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.lp-pcard > img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.lp-pcard-body { padding: 0.85rem 1rem 1rem; }
+.lp-pcard-plain { padding: 1.1rem 1.2rem; }
+.lp-kicker {
+  margin: 0 0 0.4rem; font-family: var(--mono); font-size: 0.72rem;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+}
+.lp-pcard pre {
+  margin: 0; font-family: var(--mono); font-size: 0.84rem; line-height: 1.65;
+  white-space: pre-wrap; color: var(--ink);
+}
+.lp-small { margin: 0.6rem 0 0; color: var(--muted); font-size: 0.88rem; }
+.lp-small-ink { color: var(--ink); }
+.lp-dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.4rem 1.1rem; margin: 0; font-size: 0.93rem; }
+.lp-dl dt { color: var(--muted); }
+.lp-dl dd { margin: 0; }
+.lp-verdict {
+  margin: 0.9rem 0 0; padding-top: 0.8rem; border-top: 1px solid var(--line);
+  font-family: var(--serif); font-size: 0.98rem; line-height: 1.6;
+  color: color-mix(in srgb, var(--ink) 75%, var(--muted));
+}
+
+/* ---------- who it's for / how ---------- */
+.lp-who, .lp-how { border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 2.6rem; }
+.lp-story {
+  font-family: var(--serif); font-size: 1.08rem; line-height: 1.7; margin: 0 0 2.2rem;
+  max-width: 42rem; color: color-mix(in srgb, var(--ink) 75%, var(--muted)); text-wrap: pretty;
+}
+.lp-story .more { font-family: var(--sans); font-size: 0.95rem; white-space: nowrap; }
+.lp-grid4 {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1.8rem 2.2rem; list-style: none; margin: 0; padding: 0;
+}
+.lp-grid4 h3 { margin: 0 0 0.35rem; font-family: var(--serif); font-weight: 500; font-size: 1.06rem; }
+.lp-grid4 p { margin: 0; font-size: 0.95rem; line-height: 1.6; }
+.lp-num { margin: 0 0 0.4rem; font-family: var(--mono); font-size: 0.78rem; color: var(--accent); }
+.lp-who-tag {
+  margin: 0 0 0.5rem !important; font-family: var(--mono); font-size: 0.68rem;
+  letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted);
+}
+
+/* ---------- contact band ---------- */
+.lp-contact {
+  border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 2.6rem;
+  display: flex; flex-wrap: wrap; gap: 1.4rem 2.5rem; align-items: center; justify-content: space-between;
+}
+.lp-contact h2 { font-size: 1.35rem; margin: 0 0 0.5rem; }
+.lp-contact p { margin: 0; max-width: 34rem; font-size: 1rem; line-height: 1.6; }
+.lp-contact .button {
+  margin: 0; background: var(--accent); border-color: var(--accent); color: var(--paper);
+  cursor: pointer;
+}
+.lp-contact .button:hover { background: var(--accent-ink); border-color: var(--accent-ink); }
+
+.site-foot .disclaimer {
+  padding-bottom: 0; font-size: 0.8rem; line-height: 1.55;
+}
+
+/* ---------- narrow screens ---------- */
+@media (max-width: 60rem) {
+  .lp-hero, .lp-film { grid-template-columns: 1fr; gap: 2.2rem; }
+  .lp-hero { align-items: start; padding-top: 3rem; }
+  .lp-hero-shot { max-width: 22rem; }
+  .lp-phone-col { position: static; }
+}
+
+/* Motion is decorative: the phone holds its first beat if the visitor
+   asks for less of it, and the step list still switches on click. */
+@media (prefers-reduced-motion: reduce) {
+  .lp-scr, .lp-phase, .lp-list, .lp-crop, .lp-circle, .lp-loupe, .lp-shutter { transition: none; }
+}

@@ -162,3 +162,99 @@
     }, { passive: true });
   }
 })();
+
+/* ============================================================
+   Landing page film — append to assets/site.js
+   Drives the phone mock on the landing page only; every other page
+   has no #film, so this exits immediately.
+   ============================================================ */
+(function () {
+  var film = document.getElementById('film');
+  if (!film) return;
+
+  var steps = [].slice.call(film.querySelectorAll('.lp-steps button'));
+  var scrs = [].slice.call(film.querySelectorAll('.lp-scr'));
+  var title = film.querySelector('.lp-apptitle');
+  var back = film.querySelector('.lp-back');
+  var caption = film.querySelector('.lp-caption');
+  var note = film.querySelector('.lp-beatnote');
+  var dict = film.querySelector('.lp-dict');
+
+  var TITLES = ['New Album', 'Miles Davis — Kind of Blue', 'Take photo', 'Crop photo',
+                '14 Side 1 Matrix/Runout', 'Save to Drive', 'Uploaded albums'];
+  var CAPTIONS = [
+    '01 · New album — two fields and a disc count',
+    '02 · The checklist does the remembering',
+    '03 · Shoot, then crop the cover',
+    '04 · Label crops as a circle',
+    '05 · Typing or dictating the matrix',
+    '06 · Into your own Google Drive',
+    '07 · Shared read-only — work begins'
+  ];
+  var NOTES = [
+    'Label artist, album title, one disc or two. That is the entire setup — no account with us.',
+    'Thirteen entries for a single LP — front and back cover, a typed grade for each, both labels, both disc faces, a typed grade per side, and the matrix for each side. Photo rows open the camera; ⌨ rows open a text screen. Optional entries carry a Skip.',
+    'Torch, zoom and manual focus if you want them; otherwise just shoot. The sleeve outline is detected the moment the photo is taken — then drag a corner, a whole side, or the frame itself, with a 3× magnifier under your fingertip.',
+    'Centre the label and fill the frame: the round outline is detected and cropped as a circle. Drag inside it to move, drag the ring to resize. ⟳ rotates the saved photo in 90° steps.',
+    'The matrix is typed, or simply read out loud character by character — dictation converts spoken symbol words as you say them. Dead-wax photos have their own four slots if you want them, but they are optional: the transcription is what the identification runs on.',
+    'Straight into My Drive / Vinyl Curator / Artist_Album, updating in place if you re-shoot.',
+    'You share that one folder, read-only. Nothing else in your Drive is visible, and you can revoke it any time.'
+  ];
+  var SAID = ['CS 8163', 'CS 8163-A', 'CS 8163-A T', 'CS 8163-A T BG'];
+  var HOLD = [1, 1.8, 1.7, 1.2, 1.7, 1.1, 1.3];
+  var PHASE = { 1: 1600, 2: 1400, 3: 900 };   // ms into the beat when the second phase fires
+  var BEAT = 3000;
+
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var beat = -1, tNext, tPhase, tSay;
+
+  function go(i, manual) {
+    clearTimeout(tNext); clearTimeout(tPhase); clearInterval(tSay);
+    beat = i;
+
+    scrs.forEach(function (s, n) {
+      if (n === i) { s.setAttribute('data-on', ''); } else { s.removeAttribute('data-on'); }
+      s.removeAttribute('data-shot');
+    });
+    steps.forEach(function (b, n) {
+      if (n === i) { b.setAttribute('aria-current', 'step'); } else { b.removeAttribute('aria-current'); }
+    });
+
+    title.textContent = TITLES[i];
+    back.style.color = i === 0 ? '#9a9aa5' : '#ececf0';
+    caption.textContent = CAPTIONS[i];
+    note.textContent = NOTES[i];
+    if (dict) dict.textContent = i === 4 ? SAID[0] : SAID[SAID.length - 1];
+
+    if (PHASE[i]) {
+      tPhase = setTimeout(function () { scrs[i].setAttribute('data-shot', ''); }, still ? 0 : PHASE[i]);
+    }
+    if (i === 4 && dict && !still) {
+      var n = 0;
+      tSay = setInterval(function () {
+        n++;
+        dict.textContent = SAID[n];
+        if (n >= SAID.length - 1) clearInterval(tSay);
+      }, 750);
+    }
+    if (!still || manual) {
+      if (!still) tNext = setTimeout(function () { go((beat + 1) % scrs.length); }, BEAT * HOLD[i]);
+    }
+  }
+
+  steps.forEach(function (b, n) {
+    b.addEventListener('click', function () { go(n, true); });
+  });
+
+  // Only run while the film is actually on screen.
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { if (beat < 0) go(0); }
+        else { clearTimeout(tNext); clearTimeout(tPhase); clearInterval(tSay); beat = -1; }
+      });
+    }, { threshold: 0.15 }).observe(film);
+  } else {
+    go(0);
+  }
+})();
