@@ -47,19 +47,22 @@ a:hover { color: var(--accent); }
      the escape hatch for narrower phones and larger text sizes. */
   flex-wrap: wrap; row-gap: 0.45rem;
 }
-/* Second-row nav for links belonging to a section rather than to the site.
-   Rendered only inside that section, right-aligned so it sits under the
-   top-level link it hangs off (currently Sold, under Available).
+/* Sold belongs to the Available section, so it hangs directly beneath the
+   Available link as a sub-item - not on its own second row. Making it a child
+   of an inline column WITH Available is what keeps it under Available at every
+   width: when the nav wraps on a phone, the whole Available+Sold unit wraps
+   together, so Sold tracks Available wherever it lands. (An earlier design put
+   Sold on a right-aligned second row, which sat under whatever link happened
+   to be rightmost - it drifted under About the moment About joined the nav.)
 
-   It is a <nav> inside .site-head, so it already inherits the container
-   width, the flex row and the link colours from the rules above - and those
-   selectors outrank a bare .site-sub, hence .site-head here. Only what
-   differs from the main nav is restated. */
-.site-head .site-sub {
-  margin: -0.3rem auto 0; padding: 0 1.25rem 0.75rem;
-  justify-content: flex-end;
+   align-self: baseline pins the column's Available line to the same baseline
+   as the sibling links, so the top row still reads flush; Sold then drops
+   below it. The wrapper renders only in the Available/Sold sections. */
+.site-head nav .nav-sec {
+  display: inline-flex; flex-direction: column; align-items: flex-start;
+  align-self: baseline; row-gap: 0.1rem;
 }
-.site-head .site-sub a { font-size: 0.85rem; }
+.site-head nav .nav-sec .sub { font-size: 0.85rem; }
 .site-head a { text-decoration: none; color: var(--muted); font-size: 1.075rem; }
 .site-head a[aria-current] { color: var(--ink); }
 .site-head .brand {
