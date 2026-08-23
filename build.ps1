@@ -475,7 +475,9 @@ $warnings = New-Object System.Collections.Generic.List[string]
 # from Archive (/available/, For Sale tab) and Sold (/sold/, Sold tab). The
 # sold index carries no prices and no listing links - it is the record of what
 # the archive has documented and passed on, not a storefront.
-$cardsCollection = New-Object System.Text.StringBuilder
+# Collection cards are held as rows, not appended HTML: the Personal Archive
+# is ordered by genre then artist after the loop (see below).
+$collectionRows = New-Object System.Collections.ArrayList
 $cardsAvailable = New-Object System.Text.StringBuilder
 # Sold cards are held as rows, not appended HTML: they are ordered by the
 # sheet's Date Sold column after the loop, newest sale first.
@@ -792,7 +794,18 @@ foreach ($album in $json.albums) {
   if (Test-Noindex $album) {
     $unlistedCount++
   } elseif ($album.tab -eq 'Collection') {
-    [void]$cardsCollection.AppendLine('    ' + $cardHtml)
+    # Ordering waits until every row is in - see below. Sort keys are held
+    # lower-cased, and a leading "The " is dropped from the artist key so
+    # bands like "The Band" file under B, not T.
+    # Group on the primary genre only (the part before " - "), so every "jazz -
+    # <subgenre>" files together and the artist sort keeps one artist adjacent
+    # within it, rather than the subgenre string splitting them apart.
+    $primaryGenre = (([string]$album.genre).Trim() -split ' - ', 2)[0].Trim().ToLowerInvariant()
+    [void]$collectionRows.Add([pscustomobject]@{
+      Genre  = $primaryGenre
+      Artist = ((([string]$album.artist).Trim() -replace '^(?i)the\s+', '')).ToLowerInvariant()
+      Seq    = $collectionRows.Count; Html = $cardHtml
+    })
     $collectionCount++
   } elseif ($album.tab -eq 'For Sale') {
     # One listing link per marketplace the record is on; each stacks as its own
@@ -861,6 +874,17 @@ function Render-Index([string]$title, [string]$lede, [string]$desc,
   $h = $h.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
   if (-not (Test-Path $outDir)) { New-Item -ItemType Directory $outDir | Out-Null }
   Write-Utf8 (Join-Path $outDir 'index.html') $h
+}
+
+# Personal Archive is ordered by genre, then artist (a leading "The" is
+# ignored for the artist sort). Ties fall back to export order. Records with
+# no genre yet sort to the top as an empty key.
+$cardsCollection = New-Object System.Text.StringBuilder
+foreach ($r in ($collectionRows |
+    Sort-Object @{ Expression = 'Genre' },
+                @{ Expression = 'Artist' },
+                @{ Expression = 'Seq' })) {
+  [void]$cardsCollection.AppendLine('    ' + $r.Html)
 }
 
 Render-Index 'Personal Archive' `
