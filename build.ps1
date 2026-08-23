@@ -865,7 +865,7 @@ function Render-Index([string]$title, [string]$lede, [string]$desc,
 
 Render-Index 'Personal Archive' `
   ("Albums added constantly as I transition my collection into the Archive system. " +
-    "It's public to demonstrate the detail what it delivers in a real live collection " +
+    "It's public to demonstrate the detail that it delivers in a real live collection " +
     "minus the valuation research which remains private.") `
   'A documented personal vinyl collection: original pressings photographed, transcribed, and researched.' `
   "$base/albums/" 'archive' $cardsCollection.ToString() $Albums
