@@ -32,7 +32,7 @@ $ShotNums   = @('01','03','05','06','08','10','12','14','16','18','20','22','23'
 # matrix close-ups last.
 $ShotOrder  = @('01','03','05','06','22','08','23','10','24','12','25','14','16','18','20')
 
-# Corner ownership watermark, web-size images only (thumbs stay clean).
+# Corner ownership watermark, on both the web-size images and the thumbs.
 # Sized to stay inside eBay's attribution-watermark rule (<=5% of image
 # area, <=50% opacity, corner placement). Discogs listing photo uploads
 # must use the CLEAN full-res originals from Drive - Discogs allows no
@@ -95,7 +95,7 @@ function Slugify([string]$s) {
 
 # Resize + re-encode (drops EXIF incl. GPS). Honors the EXIF orientation tag
 # before it is lost so rotated phone shots come out upright. A non-empty $wm
-# draws the corner watermark (text height ~2.2% of the long edge, white at
+# draws the corner watermark (text height ~3% of the long edge, white at
 # ~45% opacity over a faint shadow so it reads on light and dark shots).
 #
 # A scriptblock rather than a function because it also runs inside worker
@@ -128,7 +128,7 @@ $ResizeScript = {
     $g.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
     $g.DrawImage($img, 0, 0, $nw, $nh)
     if ($mark -ne '') {
-      $fs = [Math]::Max(13, [int][Math]::Round([Math]::Max($nw, $nh) * 0.022))
+      $fs = [Math]::Max(13, [int][Math]::Round([Math]::Max($nw, $nh) * 0.030))
       $font = New-Object System.Drawing.Font('Segoe UI', $fs,
         [System.Drawing.FontStyle]::Regular, [System.Drawing.GraphicsUnit]::Pixel)
       $g.TextRenderingHint = [System.Drawing.Text.TextRenderingHint]::AntiAlias
@@ -166,7 +166,7 @@ $ResizeScript = {
         elseif ($o -eq 8) { $img.RotateFlip([System.Drawing.RotateFlipType]::Rotate270FlipNone) }
       }
       Save-Scaled $img $j.Web $webEdge $wm $codec $ep
-      Save-Scaled $img $j.Thumb $thumbEdge '' $codec $ep
+      Save-Scaled $img $j.Thumb $thumbEdge $wm $codec $ep
     } finally { $img.Dispose(); $srcStream.Dispose() }
   }
 }
@@ -542,7 +542,7 @@ foreach ($album in $json.albums) {
 
     # incremental manifest: "name|length|mtimeticks" per source file, plus a
     # cfg entry - changing sizes/quality/watermark rebuilds every photo.
-    $cfgKey = "cfg|$WebEdge|$ThumbEdge|$JpegQ|$Watermark"
+    $cfgKey = "cfg|$WebEdge|$ThumbEdge|$JpegQ|$Watermark|wm2"
     $maniFile = Join-Path $imgDir 'manifest.json'
     $old = @{}
     if ((Test-Path $maniFile) -and -not $Force) {
