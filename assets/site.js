@@ -11,6 +11,41 @@
     if (a.textContent.trim() === 'email') a.textContent = addr;
   });
 
+  // Compact one-sheet space savers: put the matrix sides on a single line, and
+  // trim the variant chronology to two lines past "this copy" so the kept
+  // sections land on one sheet instead of spilling and getting cut off. Both
+  // are reversible (the on-screen toggle flips them back) and NEVER run on the
+  // visitor's full page - the originals are cached on the node's dataset.
+  var matrixPre = document.querySelector('.matrix pre');
+  var chronPre = document.querySelector('.chronology pre');
+  function compactText(on) {
+    if (matrixPre) {
+      if (matrixPre.dataset.full == null) matrixPre.dataset.full = matrixPre.textContent;
+      matrixPre.textContent = on
+        ? matrixPre.dataset.full.split('\n').map(function (s) { return s.trim(); })
+            .filter(Boolean).join('     ')
+        : matrixPre.dataset.full;
+    }
+    if (chronPre) {
+      if (chronPre.dataset.full == null) chronPre.dataset.full = chronPre.textContent;
+      var out = chronPre.dataset.full;
+      if (on) {
+        var lines = out.split('\n'), idx = -1;
+        for (var i = 0; i < lines.length; i++) {
+          if (/this copy/i.test(lines[i])) { idx = i; break; }
+        }
+        // keep everything up to and including two lines after "this copy";
+        // if there is anything past that, drop it and mark the cut.
+        if (idx >= 0 && lines.length > idx + 3) {
+          var kept = lines.slice(0, idx + 3);
+          kept[kept.length - 1] += ' ...';
+          out = kept.join('\n');
+        }
+      }
+      chronPre.textContent = out;
+    }
+  }
+
   // Compact print card: /albums/<slug>/?compact prints the one-sheet version
   // (forensics kept, research prose dropped - see the print block in
   // site.css). A query string rather than a control on the page, because the
@@ -18,6 +53,7 @@
   // Harmless if a visitor lands on it: nothing differs on screen.
   if (/[?&](compact|print=compact)(&|=|$)/.test(location.search)) {
     document.body.classList.add('compact');
+    compactText(true);
   }
 
   // ...or press "c" on an album page. Nothing on screen distinguishes the two
@@ -32,6 +68,7 @@
       var tag = (t.tagName || '').toLowerCase();
       if (tag === 'input' || tag === 'textarea' || tag === 'select' || t.isContentEditable) return;
       var on = document.body.classList.toggle('compact');
+      compactText(on);
       var note = document.getElementById('print-note');
       if (!note) {
         note = document.createElement('div');
