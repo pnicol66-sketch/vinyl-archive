@@ -14,14 +14,17 @@
 # data - album pages double as marketplace link targets and must stay
 # price-free.
 
-param([switch]$Push, [switch]$Force, [switch]$AllowEmpty)
+param([switch]$Push, [switch]$Force, [switch]$AllowEmpty, [string]$Tenant = 'owner')
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 $Elapsed = [Diagnostics.Stopwatch]::StartNew()
 
 # ---------- config ----------
-$DataFile   = 'G:\My Drive\Vinyl Curator Website\collection.json'
+# The Website export folder on the Drive mount. Each tenant's data file lives
+# here (owner: collection.json; a client: collection-<slug>.json); the specific
+# file is chosen from the tenant registry below. $DataFile is set there.
+$WebsiteDataDir = 'G:\My Drive\Vinyl Curator Website'
 $PhotoRoots = @('G:\My Drive\Vinyl Curator', 'G:\My Drive\Vinyl Curator Dev')
 $WebEdge    = 1600   # max long edge, web size
 $ThumbEdge  = 480    # max long edge, thumbnails
@@ -64,7 +67,7 @@ $AssetBaseDefault = 'https://img.vinylcurator.net'
 $R2Remote         = 'r2:vinyl-img/albums'
 
 $Site   = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Albums = Join-Path $Site 'albums'
+# $Albums (this tenant's album output dir) is set from the tenant registry below.
 
 # Middle dot as a code point: PS 5.1 reads BOM-less .ps1 files as ANSI, so a
 # literal multi-byte character here would mojibake into the output.
@@ -87,6 +90,33 @@ if (Test-Path $ConfigFile) {
     }
   }
 }
+
+# ---------- tenant registry ----------
+# Each collection published to this site is a tenant: its own URL prefix, data
+# file, asset base and watermark (tenants.json, committed). The owner is tenant
+# zero with an EMPTY prefix, so every path and URL below is exactly what it was.
+# This step scopes the data file, the album output dir, the asset base, the
+# watermark and the prune to the chosen tenant; the per-tenant nav / {{ROOT}}
+# depth and the multi-tenant build loop are later Phase B steps (B3, B5).
+if ([string]::IsNullOrWhiteSpace($Tenant)) { $Tenant = 'owner' }
+$TenantsFile = Join-Path $Site 'tenants.json'
+$ownerDefault = [pscustomobject]@{ slug = 'owner'; urlPrefix = ''
+  dataFile = 'collection.json'; assetBase = $AssetBaseDefault; watermark = 'vinylcurator.net' }
+$tenantCfg = $ownerDefault
+if (Test-Path $TenantsFile) {
+  $reg = [IO.File]::ReadAllText($TenantsFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
+  $tenantCfg = @($reg.tenants) | Where-Object { $_.slug -eq $Tenant } | Select-Object -First 1
+  if (-not $tenantCfg) {
+    throw ("Unknown tenant '$Tenant' - not in tenants.json (have: " +
+      ((@($reg.tenants).slug) -join ', ') + ').')
+  }
+}
+$urlPrefix = [string]$tenantCfg.urlPrefix
+$DataFile  = Join-Path $WebsiteDataDir ([string]$tenantCfg.dataFile)
+if ($urlPrefix -ne '') { $Albums = Join-Path $Site (($urlPrefix -replace '/', '\') + '\albums') }
+else                   { $Albums = Join-Path $Site 'albums' }
+# Watermark comes from the tenant ('' = clean images, the white-label option).
+if ($null -ne $tenantCfg.watermark) { $Watermark = [string]$tenantCfg.watermark }
 
 # ---------- helpers ----------
 function HtmlEnc([string]$s) { return [System.Net.WebUtility]::HtmlEncode($s) }
@@ -379,6 +409,7 @@ $base = $json.site.baseUrl.TrimEnd('/')
 # Where photos are served from (R2). Prefer the export's own value so the sheet
 # stays the single source of truth once it emits it; fall back otherwise.
 $assetBase = [string]$json.site.assetBaseUrl
+if ([string]::IsNullOrWhiteSpace($assetBase)) { $assetBase = [string]$tenantCfg.assetBase }
 if ([string]::IsNullOrWhiteSpace($assetBase)) { $assetBase = $AssetBaseDefault }
 $assetBase = $assetBase.TrimEnd('/')
 
@@ -991,6 +1022,10 @@ Write-Utf8 (Join-Path $Site 'sitemap.xml') $sm.ToString()
 Copy-Item $DataFile (Join-Path $Site 'collection.json') -Force
 
 # ---------- prune removed albums ----------
+# Scoped to THIS tenant's album dir ($Albums is per-tenant now), so a client
+# build can never stage the owner's albums into _removed\ - the landmine in
+# vinyl-site-multitenancy-design.md sec 1 #3. The empty-export guard above is
+# the other half: a failed/partial export never reaches this prune at all.
 $stale = @(Get-ChildItem $Albums -Directory | Where-Object { -not $slugSet.ContainsKey($_.Name) })
 # A handful of removals is routine; a large share of the archive disappearing
 # in one build usually means the export was partial. Nothing is deleted (it is
