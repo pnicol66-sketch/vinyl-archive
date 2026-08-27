@@ -65,6 +65,10 @@ $MailDomain = 'vinylcurator.net'
 # fallback for a build whose export predates that field.
 $AssetBaseDefault = 'https://img.vinylcurator.net'
 $R2Remote         = 'r2:vinyl-img/albums'
+# Private client sites (Phase P) sync their whole tree to this bucket, keyed by
+# the client's subdomain label. The rclone `r2` remote's token must have access
+# to it (broaden the token to cover both buckets, or use an account-scoped one).
+$ClientBucket     = 'vinyl-client'
 
 $Site   = Split-Path -Parent $MyInvocation.MyCommand.Path
 # $Albums (this tenant's album output dir) is set from the tenant registry below.
@@ -152,19 +156,31 @@ if (Test-Path $TenantsFile) {
       ((@($reg.tenants).slug) -join ', ') + ').')
   }
 }
-$urlPrefix = [string]$tenantCfg.urlPrefix
+# A PRIVATE tenant (a login-gated client site, Phase P) is served from its own
+# subdomain root, with relative image/asset URLs, and is built into a gitignored
+# per-client STAGING tree that never enters the public repo - then synced to the
+# private R2 bucket. Owner and public tenants build into the site repo itself.
+$private = ($tenantCfg.private -eq $true)
+$urlPrefix = if ($private) { '' } else { [string]$tenantCfg.urlPrefix }
 $DataFile  = Join-Path $WebsiteDataDir ([string]$tenantCfg.dataFile)
-# This tenant's three section output dirs, under its prefix. Owner (empty
-# prefix) keeps /albums, /available, /sold at the site root exactly as before.
+if ($private) {
+  $OutRoot = Join-Path $env:LOCALAPPDATA ('vinyl-private\' + [string]$tenantCfg.slug)
+  if (-not (Test-Path $OutRoot)) { New-Item -ItemType Directory $OutRoot -Force | Out-Null }
+} else {
+  $OutRoot = $Site
+}
+# This tenant's three section output dirs, under its prefix, within the output
+# root. Owner (empty prefix, OutRoot = the repo) keeps /albums, /available,
+# /sold at the site root exactly as before.
 if ($urlPrefix -ne '') {
   $pfx = $urlPrefix -replace '/', '\'
-  $Albums       = Join-Path $Site ($pfx + '\albums')
-  $AvailableDir = Join-Path $Site ($pfx + '\available')
-  $SoldDir      = Join-Path $Site ($pfx + '\sold')
+  $Albums       = Join-Path $OutRoot ($pfx + '\albums')
+  $AvailableDir = Join-Path $OutRoot ($pfx + '\available')
+  $SoldDir      = Join-Path $OutRoot ($pfx + '\sold')
 } else {
-  $Albums       = Join-Path $Site 'albums'
-  $AvailableDir = Join-Path $Site 'available'
-  $SoldDir      = Join-Path $Site 'sold'
+  $Albums       = Join-Path $OutRoot 'albums'
+  $AvailableDir = Join-Path $OutRoot 'available'
+  $SoldDir      = Join-Path $OutRoot 'sold'
 }
 # Watermark comes from the tenant ('' = clean images, the white-label option).
 if ($null -ne $tenantCfg.watermark) { $Watermark = [string]$tenantCfg.watermark }
@@ -509,7 +525,9 @@ $year = (Get-Date).Year
 $base = $json.site.baseUrl.TrimEnd('/')
 # Canonical URL base for THIS tenant: the owner's is the site root; a client's
 # is the site root plus its collection prefix. Used for canonical + sitemap URLs.
-if ($urlPrefix -ne '') { $tenantBase = "$base/$urlPrefix" } else { $tenantBase = $base }
+if ($private) { $tenantBase = ($base -replace '^https?://', ('https://' + [string]$tenantCfg.slug + '.')) }
+elseif ($urlPrefix -ne '') { $tenantBase = "$base/$urlPrefix" }
+else { $tenantBase = $base }
 # Where photos are served from (R2). Prefer the export's own value so the sheet
 # stays the single source of truth once it emits it; fall back otherwise.
 $assetBase = [string]$json.site.assetBaseUrl
@@ -666,7 +684,9 @@ foreach ($album in $json.albums) {
   $thumbDir = Join-Path $imgDir 't'
   # Absolute R2 base for this album's photos - the page HTML points here, not
   # at its own img/ directory (which is no longer published to Pages).
-  $imgUrl = "$assetBase/albums/$slug/img"
+  # Public/owner: absolute R2 URLs. Private client: relative (served from the
+  # private bucket via the Worker, behind Access), so the tree is host-portable.
+  $imgUrl = if ($private) { 'img' } else { "$assetBase/albums/$slug/img" }
   foreach ($d in @($dir, $imgDir, $thumbDir)) {
     if (-not (Test-Path $d)) { New-Item -ItemType Directory $d | Out-Null }
   }
@@ -902,7 +922,10 @@ foreach ($album in $json.albums) {
   # ----- index card -----
   $coverThumb = ''
   $firstCover = $shots | Where-Object { $_.Name -like '01-*' } | Select-Object -First 1
-  if ($firstCover) { $coverThumb = "$assetBase/albums/$slug/img/t/$($firstCover.Name)" }
+  if ($firstCover) {
+    $coverThumb = if ($private) { "$slug/img/t/$($firstCover.Name)" }
+                  else { "$assetBase/albums/$slug/img/t/$($firstCover.Name)" }
+  }
   $search = (($album.artist + ' ' + $album.title + ' ' + $album.labelName + ' ' +
     $album.labelNumber + ' ' + $album.year + ' ' + $album.genre).ToLowerInvariant() -replace '\s+', ' ').Trim()
   $coverHtml = '<div class="cover"></div>'
@@ -913,8 +936,10 @@ foreach ($album in $json.albums) {
   # its own children directly; /available/ and /sold/ reach across with
   # ../albums/. (The cover IMAGE is now an absolute R2 URL, so it needs no such
   # prefix - the same cover markup serves every index.)
+  # Cross-tab card link prefix. Private clients have a single /albums/ index
+  # (all their records), so cards always link to <slug>/ with no prefix.
   $p = ''
-  if ($album.tab -ne 'Collection') { $p = '../albums/' }
+  if (-not $private -and $album.tab -ne 'Collection') { $p = '../albums/' }
   $coverHtmlP = $coverHtml
   # Date Sold, on Sold cards only. ISO in the sheet, spelled out here - and
   # day-first with the month named, so no reader has to guess whether 08-09
@@ -939,7 +964,17 @@ foreach ($album in $json.albums) {
   # Unlisted albums keep their page and their URL but get no card on any
   # index, whichever tab they sit on. Their sitemap entry and noindex are
   # handled by Test-Noindex above.
-  if (Test-Noindex $album) {
+  if ($private) {
+    # Private client: every record goes into the one collection index,
+    # regardless of tab (they are not selling here).
+    $primaryGenre = (([string]$album.genre).Trim() -split ' - ', 2)[0].Trim().ToLowerInvariant()
+    [void]$collectionRows.Add([pscustomobject]@{
+      Genre  = $primaryGenre
+      Artist = ((([string]$album.artist).Trim() -replace '^(?i)the\s+', '')).ToLowerInvariant()
+      Seq    = $collectionRows.Count; Html = $cardHtml
+    })
+    $collectionCount++
+  } elseif (Test-Noindex $album) {
     $unlistedCount++
   } elseif ($album.tab -eq 'Collection') {
     # Ordering waits until every row is in - see below. Sort keys are held
@@ -1023,13 +1058,24 @@ foreach ($r in ($collectionRows |
   [void]$cardsCollection.AppendLine('    ' + $r.Html)
 }
 
-Render-Index 'Personal Archive' `
-  ("Albums added constantly as I transition my collection into the Archive system. " +
-    "It's public to demonstrate the detail that it delivers in a real live collection " +
-    "minus the valuation research which remains private.") `
-  'A documented personal vinyl collection: original pressings photographed, transcribed, and researched.' `
-  "$tenantBase/albums/" 'archive' $cardsCollection.ToString() $Albums
+if ($private) {
+  # Private client: one index titled with their collection name; no
+  # public/for-sale framing, no Available/Sold split.
+  Render-Index ([string]$tenantCfg.name) `
+    ('Your collection, fully documented ' + $dash + ' every pressing photographed, the ' +
+      'matrix transcribed by hand, and the exact pressing identified.') `
+    'A private, documented vinyl collection.' `
+    "$tenantBase/albums/" 'archive' $cardsCollection.ToString() $Albums
+} else {
+  Render-Index 'Personal Archive' `
+    ("Albums added constantly as I transition my collection into the Archive system. " +
+      "It's public to demonstrate the detail that it delivers in a real live collection " +
+      "minus the valuation research which remains private.") `
+    'A documented personal vinyl collection: original pressings photographed, transcribed, and researched.' `
+    "$tenantBase/albums/" 'archive' $cardsCollection.ToString() $Albums
+}
 
+if (-not $private) {
 Render-Index 'Available from Archive' `
   ("These are some albums I'm clearing out from my collection. They are currently listed for sale, " +
     "each photographed against a full checklist $dash covers, labels, dead-wax close-ups $dash the " +
@@ -1059,6 +1105,7 @@ Render-Index 'Sold from Archive' `
   ((CountLabel $soldCount) + " that have found new homes $mid the record has gone, its documentation stays here.") `
   'Vinyl records previously sold from the archive, with their full pressing documentation kept online.' `
   "$tenantBase/sold/" 'sold' $cardsSold.ToString() $SoldDir
+}  # end: Available + Sold indexes (public/owner only)
 
 # ---------- owner-only global pages ----------
 # The landing, About, 404, the root sitemap and the root collection.json copy
@@ -1101,6 +1148,26 @@ Write-Utf8 (Join-Path $Site '404.html') $nf
 Copy-Item $DataFile (Join-Path $Site 'collection.json') -Force
 }
 
+# ---------- private client: self-contained assets + root page ----------
+# A private client site is served entirely from the private bucket via the
+# Worker, so it must carry its OWN copy of /assets and a root page (public/owner
+# tenants use the repo's committed /assets and root index.html). The stylesheet
+# hash (VCSS/VJS) in the pages is computed from these same files, so the copy
+# matches.
+if ($private) {
+  $assetsDst = Join-Path $OutRoot 'assets'
+  if (Test-Path $assetsDst) { Remove-Item $assetsDst -Recurse -Force }
+  Copy-Item (Join-Path $Site 'assets') $assetsDst -Recurse -Force
+  Copy-Item (Join-Path $Site 'favicon.svg') (Join-Path $OutRoot 'favicon.svg') -Force
+  # Root of the subdomain -> the collection index.
+  Write-Utf8 (Join-Path $OutRoot 'index.html') (
+    '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
+    '<meta name="robots" content="noindex">' +
+    '<meta http-equiv="refresh" content="0; url=albums/">' +
+    '<title>' + (HtmlEnc ([string]$tenantCfg.name)) + '</title></head>' +
+    '<body><a href="albums/">Enter your collection</a></body></html>')
+}
+
 # ---------- sitemap: per-tenant .urls.txt, assembled globally (B4) ----------
 # Each PUBLIC (indexed) tenant records its indexed page URLs, with lastmod, in
 # its own .urls.txt under its prefix; the global sitemap.xml is then rebuilt
@@ -1109,7 +1176,7 @@ Copy-Item $DataFile (Join-Path $Site 'collection.json') -Force
 # served behind auth (Phase P) and must never appear in a public sitemap.
 # Noindexed albums are left out: a sitemap entry asks a crawler to index the
 # very page whose meta tag tells it not to. .urls.txt is gitignored.
-$tenantRoot = if ($urlPrefix -ne '') { Join-Path $Site ($urlPrefix -replace '/', '\') } else { $Site }
+$tenantRoot = if ($urlPrefix -ne '') { Join-Path $OutRoot ($urlPrefix -replace '/', '\') } else { $OutRoot }
 $urlsFile = Join-Path $tenantRoot '.urls.txt'
 if ($tenantCfg.indexed -eq $false) {
   if (Test-Path $urlsFile) { Remove-Item $urlsFile -Force }
@@ -1156,7 +1223,7 @@ if ($stale.Count -gt 3 -and $stale.Count -gt ($slugSet.Count / 4)) {
   $stale | ForEach-Object { Write-Host "         $($_.Name)" -ForegroundColor Red }
 }
 $stale | ForEach-Object {
-    $hold = Join-Path $Site ('_removed\' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+    $hold = Join-Path $OutRoot ('_removed\' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
     if (-not (Test-Path $hold)) { New-Item -ItemType Directory $hold -Force | Out-Null }
     Move-Item $_.FullName (Join-Path $hold $_.Name)
     $warnings.Add("Removed album staged in _removed\: $($_.Name) (no longer in the export)")
@@ -1202,6 +1269,24 @@ if ($Push) {
   if (-not $rclone) {
     throw 'rclone not found - install it (winget install Rclone.Rclone) so photos can sync to R2 before publishing.'
   }
+
+  if ($private) {
+    # Private client: sync the whole self-contained tree (pages + images +
+    # assets) to the private bucket under the client's prefix. NOTHING goes to
+    # the public repo. Build metadata (manifests, caches) is excluded.
+    $target = 'r2:' + $ClientBucket + '/' + [string]$tenantCfg.slug
+    Write-Host "Syncing private client tree to $target ..." -ForegroundColor DarkGray
+    & $rclone sync $OutRoot $target --exclude '.foldercache.json' --exclude '**/manifest.json' `
+      --exclude '.urls.txt' --exclude '_removed/**' --s3-no-check-bucket --transfers 16 --checkers 16 --stats-one-line
+    if ($LASTEXITCODE -ne 0) {
+      throw ("rclone sync to $target failed (exit $LASTEXITCODE) - the r2 remote's token must have " +
+        "access to the '$ClientBucket' bucket.")
+    }
+    Write-Host "Published private client '$($tenantCfg.slug)'. Ensure a Cloudflare Access policy allows their email on $($tenantCfg.slug).vinylcurator.net." -ForegroundColor Green
+    return
+  }
+
+  # Owner / public tenant: photos to the public image bucket, then git.
   Write-Host "Syncing photos to $R2Remote ..." -ForegroundColor DarkGray
   & $rclone sync $Albums $R2Remote --include '**/*.jpg' --s3-no-check-bucket --transfers 16 --checkers 16 --stats-one-line
   if ($LASTEXITCODE -ne 0) {
