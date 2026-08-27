@@ -14,7 +14,7 @@
 # data - album pages double as marketplace link targets and must stay
 # price-free.
 
-param([switch]$Push, [switch]$Force, [switch]$AllowEmpty, [string]$Tenant = 'owner')
+param([switch]$Push, [switch]$Force, [switch]$AllowEmpty, [string]$Tenant = 'owner', [switch]$All)
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
@@ -100,6 +100,47 @@ if (Test-Path $ConfigFile) {
 # depth and the multi-tenant build loop are later Phase B steps (B3, B5).
 if ([string]::IsNullOrWhiteSpace($Tenant)) { $Tenant = 'owner' }
 $TenantsFile = Join-Path $Site 'tenants.json'
+
+# -All: build every active tenant, each in its own process. A per-tenant build
+# is self-contained (it writes only its own prefix + its own sitemap
+# contribution), so looping child processes is simpler and safer than threading
+# one pass through N tenants. -All -Push publishes ONCE after all builds; full
+# multi-tenant publishing (per-tenant R2 buckets etc.) is B7 - for now this
+# syncs the owner's public image tree and does a single git push.
+if ($All) {
+  if (-not (Test-Path $TenantsFile)) { throw 'tenants.json not found - cannot -All.' }
+  $regAll = [IO.File]::ReadAllText($TenantsFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
+  $activeTenants = @($regAll.tenants | Where-Object {
+    [string]$_.status -ne 'suspended' -and [string]$_.status -ne 'removed' })
+  if ($activeTenants.Count -eq 0) { throw 'No active tenants in tenants.json.' }
+  foreach ($t in $activeTenants) {
+    Write-Host ("=== Building tenant: " + $t.slug + " ===") -ForegroundColor Cyan
+    $argv = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $PSCommandPath, '-Tenant', [string]$t.slug)
+    if ($Force)      { $argv += '-Force' }
+    if ($AllowEmpty) { $argv += '-AllowEmpty' }
+    & powershell @argv
+    if ($LASTEXITCODE -ne 0) { throw ("Tenant build failed: " + $t.slug + " (exit $LASTEXITCODE)") }
+  }
+  if ($Push) {
+    $rclone = (Get-Command rclone -ErrorAction SilentlyContinue).Source
+    if (-not $rclone) {
+      $rclone = (Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages" -Recurse -Filter rclone.exe -ErrorAction SilentlyContinue |
+        Select-Object -First 1).FullName
+    }
+    if (-not $rclone) { throw 'rclone not found - install it (winget install Rclone.Rclone).' }
+    Write-Host "Syncing owner photos to $R2Remote ..." -ForegroundColor DarkGray
+    & $rclone sync (Join-Path $Site 'albums') $R2Remote --include '**/*.jpg' --s3-no-check-bucket --transfers 16 --checkers 16 --stats-one-line
+    if ($LASTEXITCODE -ne 0) { throw "rclone sync to R2 failed (exit $LASTEXITCODE) - not committing." }
+    Push-Location $Site
+    try {
+      git add -A
+      git commit -m ("publish " + (Get-Date -Format 'yyyy-MM-dd') + " (all tenants)")
+      git push
+    } finally { Pop-Location }
+  }
+  return
+}
+
 $ownerDefault = [pscustomobject]@{ slug = 'owner'; urlPrefix = ''
   dataFile = 'collection.json'; assetBase = $AssetBaseDefault; watermark = 'vinylcurator.net' }
 $tenantCfg = $ownerDefault
@@ -1057,20 +1098,47 @@ $nf = $tplNotFound.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
 $nf = $nf.Replace('{{YEAR}}', "$year")
 Write-Utf8 (Join-Path $Site '404.html') $nf
 
-$sm = New-Object System.Text.StringBuilder
-[void]$sm.AppendLine('<?xml version="1.0" encoding="UTF-8"?>')
-[void]$sm.AppendLine('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
-# Noindexed albums are left out: a sitemap entry actively asks a crawler to
-# index the very page whose meta tag tells it not to.
-$smAlbums = @($json.albums | Where-Object { -not (Test-Noindex $_) } |
-  ForEach-Object { "$base/albums/$($_.slug)/" })
-foreach ($u in (@("$base/", "$base/about/", "$base/albums/", "$base/available/", "$base/sold/") + $smAlbums)) {
-  [void]$sm.AppendLine("  <url><loc>$u</loc><lastmod>$genDate</lastmod></url>")
-}
-[void]$sm.AppendLine('</urlset>')
-Write-Utf8 (Join-Path $Site 'sitemap.xml') $sm.ToString()
-
 Copy-Item $DataFile (Join-Path $Site 'collection.json') -Force
+}
+
+# ---------- sitemap: per-tenant .urls.txt, assembled globally (B4) ----------
+# Each PUBLIC (indexed) tenant records its indexed page URLs, with lastmod, in
+# its own .urls.txt under its prefix; the global sitemap.xml is then rebuilt
+# from EVERY tenant's file, so building one tenant never drops another's
+# entries. Private tenants (indexed:false) contribute nothing - clients are
+# served behind auth (Phase P) and must never appear in a public sitemap.
+# Noindexed albums are left out: a sitemap entry asks a crawler to index the
+# very page whose meta tag tells it not to. .urls.txt is gitignored.
+$tenantRoot = if ($urlPrefix -ne '') { Join-Path $Site ($urlPrefix -replace '/', '\') } else { $Site }
+$urlsFile = Join-Path $tenantRoot '.urls.txt'
+if ($tenantCfg.indexed -eq $false) {
+  if (Test-Path $urlsFile) { Remove-Item $urlsFile -Force }
+} else {
+  $secUrls = @("$tenantBase/")
+  if ($tenantCfg.slug -eq 'owner') {
+    $secUrls += @("$tenantBase/about/", "$tenantBase/albums/", "$tenantBase/available/", "$tenantBase/sold/")
+  } else {
+    foreach ($ix in @($tenantCfg.indexes)) { $secUrls += "$tenantBase/$(([string]$ix.path).Trim('/'))/" }
+  }
+  $albUrls = @($json.albums | Where-Object { -not (Test-Noindex $_) } |
+    ForEach-Object { "$tenantBase/albums/$($_.slug)/" })
+  $lines = @($secUrls + $albUrls | ForEach-Object { "$_`t$genDate" })
+  Write-Utf8 $urlsFile (($lines -join "`n") + "`n")
+
+  # Rebuild the global sitemap from every tenant's .urls.txt (owner's sorts
+  # first, so its URLs keep their historical order).
+  $sm = New-Object System.Text.StringBuilder
+  [void]$sm.AppendLine('<?xml version="1.0" encoding="UTF-8"?>')
+  [void]$sm.AppendLine('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+  foreach ($f in (Get-ChildItem -Path $Site -Recurse -Filter '.urls.txt' -Force | Sort-Object FullName)) {
+    foreach ($ln in [IO.File]::ReadAllLines($f.FullName)) {
+      if ($ln.Trim() -eq '') { continue }
+      $parts = $ln -split "`t", 2
+      [void]$sm.AppendLine("  <url><loc>$($parts[0])</loc><lastmod>$($parts[1])</lastmod></url>")
+    }
+  }
+  [void]$sm.AppendLine('</urlset>')
+  Write-Utf8 (Join-Path $Site 'sitemap.xml') $sm.ToString()
 }
 
 # ---------- prune removed albums ----------
