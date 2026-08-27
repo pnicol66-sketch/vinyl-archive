@@ -113,10 +113,29 @@ if (Test-Path $TenantsFile) {
 }
 $urlPrefix = [string]$tenantCfg.urlPrefix
 $DataFile  = Join-Path $WebsiteDataDir ([string]$tenantCfg.dataFile)
-if ($urlPrefix -ne '') { $Albums = Join-Path $Site (($urlPrefix -replace '/', '\') + '\albums') }
-else                   { $Albums = Join-Path $Site 'albums' }
+# This tenant's three section output dirs, under its prefix. Owner (empty
+# prefix) keeps /albums, /available, /sold at the site root exactly as before.
+if ($urlPrefix -ne '') {
+  $pfx = $urlPrefix -replace '/', '\'
+  $Albums       = Join-Path $Site ($pfx + '\albums')
+  $AvailableDir = Join-Path $Site ($pfx + '\available')
+  $SoldDir      = Join-Path $Site ($pfx + '\sold')
+} else {
+  $Albums       = Join-Path $Site 'albums'
+  $AvailableDir = Join-Path $Site 'available'
+  $SoldDir      = Join-Path $Site 'sold'
+}
 # Watermark comes from the tenant ('' = clean images, the white-label option).
 if ($null -ne $tenantCfg.watermark) { $Watermark = [string]$tenantCfg.watermark }
+
+# Depth of this tenant's pages below the site root, for the '../' asset/nav
+# prefixes ({{ROOT}}). Owner (empty prefix): an album page sits at
+# albums/<slug>/ (2 deep) and an index/about at <section>/ (1 deep), so these
+# come out '../../' and '../' - exactly as the hardcoded values they replace. A
+# client at collections/<slug>/ is two segments deeper.
+$prefixDepth = @($urlPrefix -split '/' | Where-Object { $_ -ne '' }).Count
+$RootAlbum = '../' * ($prefixDepth + 2)   # album page + withdrawn tombstone
+$RootIndex = '../' * ($prefixDepth + 1)   # section index + about
 
 # ---------- helpers ----------
 function HtmlEnc([string]$s) { return [System.Net.WebUtility]::HtmlEncode($s) }
@@ -340,6 +359,47 @@ function Prose([string]$text) {
   return '    <div class="prose">' + (HtmlEnc $text.Trim()) + '</div>'
 }
 
+# The site nav, built per tenant (the {{NAV}} token in album.html /
+# archive-index.html). LF-joined to match those (LF) templates exactly.
+#   $current : 'album' | 'archive' | 'available' | 'sold'
+#   $root    : the page's '../' prefix to the site root
+#   $albumTab: the album's tab, only read when $current is 'album'
+# The OWNER nav is reproduced byte-for-byte from the old template markup: album
+# pages carry no aria-current, the Sold sublink shows on a Sold album page and
+# inside Available/Sold on the indexes. A CLIENT tenant shows ONLY its own
+# collection(s) from its `indexes` - never the owner's sections or About.
+function Build-Nav([string]$current, [string]$root, [string]$albumTab) {
+  $nl = "`n"
+  if ($tenantCfg.slug -eq 'owner') {
+    $curA = ''; $curV = ''; $curS = ''
+    if ($current -eq 'archive')   { $curA = ' aria-current="page"' }
+    if ($current -eq 'available') { $curV = ' aria-current="page"' }
+    if ($current -eq 'sold')      { $curS = ' aria-current="page"' }
+    $sold = ''
+    if ($current -eq 'album') {
+      if ($albumTab -eq 'Sold') { $sold = '<a class="sub" href="' + $root + 'sold/">Sold</a>' }
+    } elseif ($current -eq 'available' -or $current -eq 'sold') {
+      $sold = '<a class="sub" href="' + $root + 'sold/"' + $curS + '>Sold</a>'
+    }
+    return '  <nav>' + $nl +
+      '    <a class="brand" href="' + $root + '">Vinyl Curator</a>' + $nl +
+      '    <a href="' + $root + 'albums/"' + $curA + '>Personal Archive</a>' + $nl +
+      '    <span class="nav-sec"><a href="' + $root + 'available/"' + $curV + '>Available</a>' + $sold + '</span>' + $nl +
+      '    <a href="' + $root + 'about/">About</a>' + $nl +
+      '  </nav>'
+  }
+  # Client tenant: brand + only its own indexes.
+  $nav = '  <nav>' + $nl +
+    '    <a class="brand" href="' + $root + '">' + (HtmlEnc ([string]$tenantCfg.name)) + '</a>' + $nl
+  foreach ($ix in @($tenantCfg.indexes)) {
+    $ipath = ([string]$ix.path).Trim('/')
+    $cur = ''
+    if ($current -eq $ipath -or ($current -eq 'archive' -and $ipath -eq 'albums')) { $cur = ' aria-current="page"' }
+    $nav += '    <a href="' + $root + $ipath + '/"' + $cur + '>' + (HtmlEnc ([string]$ix.title)) + '</a>' + $nl
+  }
+  return $nav + '  </nav>'
+}
+
 # ---------- load + guard ----------
 if (-not (Test-Path $DataFile)) { throw "Data file not found: $DataFile (run the sheet's Website export first)" }
 $json = [IO.File]::ReadAllText($DataFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
@@ -406,6 +466,9 @@ if (((Get-Date).ToUniversalTime() - $generated.ToUniversalTime()).TotalDays -gt 
 $genDate = $generated.ToString('yyyy-MM-dd')
 $year = (Get-Date).Year
 $base = $json.site.baseUrl.TrimEnd('/')
+# Canonical URL base for THIS tenant: the owner's is the site root; a client's
+# is the site root plus its collection prefix. Used for canonical + sitemap URLs.
+if ($urlPrefix -ne '') { $tenantBase = "$base/$urlPrefix" } else { $tenantBase = $base }
 # Where photos are served from (R2). Prefer the export's own value so the sheet
 # stays the single source of truth once it emits it; fall back otherwise.
 $assetBase = [string]$json.site.assetBaseUrl
@@ -548,7 +611,7 @@ foreach ($album in $json.albums) {
       [IO.Directory]::Delete((Convert-Path $wImg), $true)
       $photosPurged++
     }
-    $t = $tplWithdrawn.Replace('{{ROOT}}', '../../')
+    $t = $tplWithdrawn.Replace('{{ROOT}}', $RootAlbum)
     $t = $t.Replace('{{YEAR}}', "$year")
     $t = $t.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
     $t = $t.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
@@ -778,23 +841,18 @@ foreach ($album in $json.albums) {
   $robots = ''
   if (Test-Noindex $album) { $robots = "`n<meta name=""robots"" content=""noindex"">" }
   $page = $page.Replace('{{ROBOTS}}', $robots)
-  # A sold record's page is inside the Sold section, so it carries the same
-  # second-row nav the section's index does - one click back up to /sold/
-  # rather than Available, then Sold, then find the card again. "Sold" is a
-  # plain link here, never aria-current: this is an album page, not the index.
-  # Collection and For Sale album pages keep the plain two-link nav.
-  $soldSub = ''
-  if ($album.tab -eq 'Sold') {
-    $soldSub = '<a class="sub" href="{{ROOT}}sold/">Sold</a>'
-  }
-  $page = $page.Replace('{{SOLD_SUB}}', $soldSub)
+  # The site nav (per tenant). On an album page nothing is aria-current; a Sold
+  # album still gets the Sold sublink so a reader can step back up to /sold/
+  # rather than Available, then Sold, then find the card again. Build-Nav does
+  # all of this - Collection and For Sale album pages get the plain nav.
+  $page = $page.Replace('{{NAV}}', (Build-Nav 'album' $RootAlbum ([string]$album.tab)))
   $page = $page.Replace('{{GALLERY}}', $gallery).Replace('{{DETAILS}}', $details)
   $page = $page.Replace('{{CONTENT}}', $content)
   # No {{GENERATED}} here - album.html deliberately carries no build date, so
   # a page's bytes change only when its content does (see the note in the
   # template). The index pages and the sitemap still carry the date.
   $page = $page.Replace('{{YEAR}}', "$year")
-  $page = $page.Replace('{{ROOT}}', '../../')
+  $page = $page.Replace('{{ROOT}}', $RootAlbum)
   $page = $page.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
   $page = $page.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
   Write-Utf8 (Join-Path $dir 'index.html') $page
@@ -899,25 +957,13 @@ function CountLabel([int]$n) {
 }
 function Render-Index([string]$title, [string]$lede, [string]$desc,
     [string]$canonical, [string]$current, [string]$cardsHtml, [string]$outDir) {
-  # $current is 'archive', 'available' or 'sold' - the nav link that marks
-  # itself as the page you are on.
-  $cur = @{ archive = ''; available = ''; sold = '' }
-  $cur[$current] = ' aria-current="page"'
-  # Sold is a sub-section of Available, not a peer of it, so its link is not
-  # in the top-level nav at all: it hangs beneath Available as a sub-item
-  # (see .nav-sec in the stylesheet), and only while you are inside that
-  # section (/available/ and /sold/). Everywhere else - landing, Personal
-  # Archive, every album page - the nav stays the top-level sections it was.
-  $soldSub = ''
-  if ($current -eq 'available' -or $current -eq 'sold') {
-    $soldSub = '<a class="sub" href="{{ROOT}}sold/"' + $cur.sold + '>Sold</a>'
-  }
+  # $current is 'archive', 'available' or 'sold' - the section this index is.
+  # Build-Nav marks it aria-current and, inside Available/Sold, shows the Sold
+  # sublink (a sub-item under Available, per .nav-sec). The nav is per-tenant.
   $h = $tplIndex.Replace('{{PAGE_TITLE}}', $title).Replace('{{LEDE}}', $lede)
   $h = $h.Replace('{{META_DESC}}', $desc).Replace('{{CANONICAL}}', $canonical)
-  $h = $h.Replace('{{CUR_ARCHIVE}}', $cur.archive)
-  $h = $h.Replace('{{CUR_AVAILABLE}}', $cur.available)
-  $h = $h.Replace('{{SOLD_SUB}}', $soldSub)
-  $h = $h.Replace('{{CARDS}}', $cardsHtml).Replace('{{ROOT}}', '../')
+  $h = $h.Replace('{{NAV}}', (Build-Nav $current $RootIndex ''))
+  $h = $h.Replace('{{CARDS}}', $cardsHtml).Replace('{{ROOT}}', $RootIndex)
   $h = $h.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
   $h = $h.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
   $h = $h.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
@@ -941,7 +987,7 @@ Render-Index 'Personal Archive' `
     "It's public to demonstrate the detail that it delivers in a real live collection " +
     "minus the valuation research which remains private.") `
   'A documented personal vinyl collection: original pressings photographed, transcribed, and researched.' `
-  "$base/albums/" 'archive' $cardsCollection.ToString() $Albums
+  "$tenantBase/albums/" 'archive' $cardsCollection.ToString() $Albums
 
 Render-Index 'Available from Archive' `
   ("These are some albums I'm clearing out from my collection. They are currently listed for sale, " +
@@ -950,7 +996,7 @@ Render-Index 'Available from Archive' `
     "discographies and variant records. " +
     "Each card opens the full documentation; the live listings are on Discogs and eBay.") `
   'Documented vinyl records currently listed for sale on Discogs and eBay, with full pressing documentation.' `
-  "$base/available/" 'available' $cardsAvailable.ToString() (Join-Path $Site 'available')
+  "$tenantBase/available/" 'available' $cardsAvailable.ToString() $AvailableDir
 
 # Newest sale first. Date Sold arrives as ISO text from the sheet, so sorting
 # the string sorts the date; anything else was normalised to blank above and
@@ -971,8 +1017,13 @@ foreach ($r in ($soldRows |
 Render-Index 'Sold from Archive' `
   ((CountLabel $soldCount) + " that have found new homes $mid the record has gone, its documentation stays here.") `
   'Vinyl records previously sold from the archive, with their full pressing documentation kept online.' `
-  "$base/sold/" 'sold' $cardsSold.ToString() (Join-Path $Site 'sold')
+  "$tenantBase/sold/" 'sold' $cardsSold.ToString() $SoldDir
 
+# ---------- owner-only global pages ----------
+# The landing, About, 404, the root sitemap and the root collection.json copy
+# ARE the owner site at the domain root. A client tenant renders only its own
+# album + section pages under its prefix and must never write these.
+if ($tenantCfg.slug -eq 'owner') {
 # The landing leads with the pitch and hands off to the story; the record
 # counts live on the section pages the nav points to, not on buttons here.
 $land = $tplLanding.Replace('{{CANONICAL}}', "$base/")
@@ -989,7 +1040,7 @@ $about = $tplAbout.Replace('{{CANONICAL}}', "$base/about/")
 $about = $about.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
 $about = $about.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
 $about = $about.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
-$about = $about.Replace('{{ROOT}}', '../')
+$about = $about.Replace('{{ROOT}}', $RootIndex)
 $aboutDir = Join-Path $Site 'about'
 if (-not (Test-Path $aboutDir)) { New-Item -ItemType Directory $aboutDir | Out-Null }
 Write-Utf8 (Join-Path $aboutDir 'index.html') $about
@@ -1020,6 +1071,7 @@ foreach ($u in (@("$base/", "$base/about/", "$base/albums/", "$base/available/",
 Write-Utf8 (Join-Path $Site 'sitemap.xml') $sm.ToString()
 
 Copy-Item $DataFile (Join-Path $Site 'collection.json') -Force
+}
 
 # ---------- prune removed albums ----------
 # Scoped to THIS tenant's album dir ($Albums is per-tenant now), so a client
