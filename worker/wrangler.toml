@@ -1,0 +1,25 @@
+# Cloudflare Worker config for the private client sites.
+# Deploy with:  npx wrangler deploy      (or paste vinyl-client-worker.js into
+# the dashboard Worker editor and bind the bucket + route there).
+
+name = "vinyl-client-sites"
+main = "vinyl-client-worker.js"
+compatibility_date = "2026-08-01"
+
+# The private R2 bucket holding every client's site tree, keyed by the client's
+# subdomain label (smith/..., jones/..., ...). Create it first:
+#   R2  >  Create bucket  >  vinyl-client
+# Do NOT connect a public custom domain to it - it must stay private; the Worker
+# is its only reader.
+[[r2_buckets]]
+binding = "CLIENT_BUCKET"
+bucket_name = "vinyl-client"
+
+# ONE wildcard route covers every client under the .clients namespace, so
+# onboarding a new client needs no new route - just an Access policy + an upload
+# to the bucket. Needs a proxied wildcard DNS record for *.clients and the zone
+# on Cloudflare (it is). www / img / apex are NOT under .clients and are never
+# intercepted.
+[[routes]]
+pattern = "*.clients.vinylcurator.net/*"
+zone_name = "vinylcurator.net"
