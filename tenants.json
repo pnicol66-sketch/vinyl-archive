@@ -1,0 +1,16 @@
+{
+  "_comment": "Tenant registry for the archive site. Each collection published here is a tenant with its own URL prefix, data file, asset base and watermark. The owner is tenant zero: an empty urlPrefix keeps its page/asset URLs exactly as they were. See vinyl-site-multitenancy-design.md. Client (private) tenants are served via Cloudflare Access + a private R2 bucket in Phase P; the per-tenant nav / {{ROOT}} depth and multi-tenant loop are Phase B B3+.",
+  "tenants": [
+    {
+      "slug": "owner",
+      "name": "Vinyl Curator",
+      "urlPrefix": "",
+      "dataFile": "collection.json",
+      "assetBase": "https://img.vinylcurator.net",
+      "watermark": "vinylcurator.net",
+      "listed": true,
+      "indexed": true,
+      "status": "active"
+    }
+  ]
+}
