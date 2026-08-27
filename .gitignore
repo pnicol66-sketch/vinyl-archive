@@ -4,3 +4,11 @@ build.config.json
 .autopublish-state.json
 autopublish.log
 .foldercache.json
+
+# Album photos live in Cloudflare R2 (synced by build.ps1 -Push), not in the
+# repo. They are still generated locally under albums/<slug>/img/ as the sync
+# source, but never committed - GitHub Pages cannot hold the collection at
+# scale (see vinyl-site-multitenancy-design.md). One-time, to drop the copies
+# already committed: `git rm -r --cached albums/*/img` (this does not reclaim
+# history, it only stops future growth).
+albums/*/img/

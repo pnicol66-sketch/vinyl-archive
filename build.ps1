@@ -54,6 +54,15 @@ $NoindexSold = $false
 $MailUser   = 'contact'
 $MailDomain = 'vinylcurator.net'
 
+# Image host. Album photos are served from Cloudflare R2 at this origin, NOT
+# from GitHub Pages: the generated HTML references absolute URLs here, and
+# -Push syncs the photos up to the bucket instead of committing them (Pages
+# cannot hold the collection at scale - see vinyl-site-multitenancy-design.md).
+# The sheet export can override per-build via site.assetBaseUrl; this is the
+# fallback for a build whose export predates that field.
+$AssetBaseDefault = 'https://img.vinylcurator.net'
+$R2Remote         = 'r2:vinyl-img/albums'
+
 $Site   = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Albums = Join-Path $Site 'albums'
 
@@ -367,6 +376,11 @@ if (((Get-Date).ToUniversalTime() - $generated.ToUniversalTime()).TotalDays -gt 
 $genDate = $generated.ToString('yyyy-MM-dd')
 $year = (Get-Date).Year
 $base = $json.site.baseUrl.TrimEnd('/')
+# Where photos are served from (R2). Prefer the export's own value so the sheet
+# stays the single source of truth once it emits it; fall back otherwise.
+$assetBase = [string]$json.site.assetBaseUrl
+if ([string]::IsNullOrWhiteSpace($assetBase)) { $assetBase = $AssetBaseDefault }
+$assetBase = $assetBase.TrimEnd('/')
 
 # ---------- templates ----------
 $tplAlbum = [IO.File]::ReadAllText((Join-Path $Site 'templates\album.html'), [Text.Encoding]::UTF8)
@@ -515,6 +529,9 @@ foreach ($album in $json.albums) {
 
   $imgDir = Join-Path $dir 'img'
   $thumbDir = Join-Path $imgDir 't'
+  # Absolute R2 base for this album's photos - the page HTML points here, not
+  # at its own img/ directory (which is no longer published to Pages).
+  $imgUrl = "$assetBase/albums/$slug/img"
   foreach ($d in @($dir, $imgDir, $thumbDir)) {
     if (-not (Test-Path $d)) { New-Item -ItemType Directory $d | Out-Null }
   }
@@ -601,13 +618,13 @@ foreach ($album in $json.albums) {
     $hero = $shots[0]
     $sb = New-Object System.Text.StringBuilder
     [void]$sb.AppendLine('  <section class="gallery">')
-    [void]$sb.AppendLine('    <figure class="hero-shot"><img src="img/' + $hero.Name +
+    [void]$sb.AppendLine('    <figure class="hero-shot"><img src="' + $imgUrl + '/' + $hero.Name +
       '" data-caption="' + (HtmlEnc $hero.Shot) + '" alt="' +
       (HtmlEnc ($album.artist + ' - ' + $album.title + ': ' + $hero.Shot)) + '"></figure>')
     if ($shots.Count -gt 1) {
       [void]$sb.AppendLine('    <div class="strip">')
       foreach ($s in ($shots | Select-Object -Skip 1)) {
-        [void]$sb.AppendLine('      <img src="img/t/' + $s.Name + '" data-full="img/' + $s.Name +
+        [void]$sb.AppendLine('      <img src="' + $imgUrl + '/t/' + $s.Name + '" data-full="' + $imgUrl + '/' + $s.Name +
           '" data-caption="' + (HtmlEnc $s.Shot) + '" alt="' + (HtmlEnc $s.Shot) +
           '" loading="lazy">')
       }
@@ -755,19 +772,20 @@ foreach ($album in $json.albums) {
   # ----- index card -----
   $coverThumb = ''
   $firstCover = $shots | Where-Object { $_.Name -like '01-*' } | Select-Object -First 1
-  if ($firstCover) { $coverThumb = "$slug/img/t/$($firstCover.Name)" }
+  if ($firstCover) { $coverThumb = "$assetBase/albums/$slug/img/t/$($firstCover.Name)" }
   $search = (($album.artist + ' ' + $album.title + ' ' + $album.labelName + ' ' +
     $album.labelNumber + ' ' + $album.year + ' ' + $album.genre).ToLowerInvariant() -replace '\s+', ' ').Trim()
   $coverHtml = '<div class="cover"></div>'
   if ($coverThumb -ne '') {
     $coverHtml = '<div class="cover"><img src="' + $coverThumb + '" alt="" loading="lazy"></div>'
   }
-  # Card paths are relative to the index page rendering them: /albums/ links
+  # The card's LINK is relative to the index page rendering it: /albums/ links
   # its own children directly; /available/ and /sold/ reach across with
-  # ../albums/.
+  # ../albums/. (The cover IMAGE is now an absolute R2 URL, so it needs no such
+  # prefix - the same cover markup serves every index.)
   $p = ''
   if ($album.tab -ne 'Collection') { $p = '../albums/' }
-  $coverHtmlP = $coverHtml.Replace('src="' + $slug, 'src="' + $p + $slug)
+  $coverHtmlP = $coverHtml
   # Date Sold, on Sold cards only. ISO in the sheet, spelled out here - and
   # day-first with the month named, so no reader has to guess whether 08-09
   # means August or September. Anything that is not a clean ISO date is
@@ -929,6 +947,7 @@ Render-Index 'Sold from Archive' `
 $land = $tplLanding.Replace('{{CANONICAL}}', "$base/")
 $land = $land.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
 $land = $land.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
+$land = $land.Replace('{{IMG}}', $assetBase)
 $land = $land.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
 Write-Utf8 (Join-Path $Site 'index.html') $land
 
@@ -1016,6 +1035,24 @@ foreach ($w in $warnings) { Write-Host "WARNING: $w" -ForegroundColor Yellow }
 Write-Host "Preview locally: powershell -ExecutionPolicy Bypass -File serve.ps1  ->  http://localhost:8322/"
 
 if ($Push) {
+  # Photos live in R2, not the repo. Push the current image tree to the bucket
+  # BEFORE the git commit, so the pages we publish never reference a photo that
+  # is not yet in the bucket. Only *.jpg is synced (manifests stay local); sync
+  # also deletes bucket photos whose source album is gone, mirroring a prune.
+  $rclone = (Get-Command rclone -ErrorAction SilentlyContinue).Source
+  if (-not $rclone) {
+    $rclone = (Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages" -Recurse -Filter rclone.exe -ErrorAction SilentlyContinue |
+      Select-Object -First 1).FullName
+  }
+  if (-not $rclone) {
+    throw 'rclone not found - install it (winget install Rclone.Rclone) so photos can sync to R2 before publishing.'
+  }
+  Write-Host "Syncing photos to $R2Remote ..." -ForegroundColor DarkGray
+  & $rclone sync $Albums $R2Remote --include '**/*.jpg' --s3-no-check-bucket --transfers 16 --checkers 16 --stats-one-line
+  if ($LASTEXITCODE -ne 0) {
+    throw "rclone sync to R2 failed (exit $LASTEXITCODE) - NOT committing, so the published pages never point at photos missing from the bucket."
+  }
+
   Push-Location $Site
   try {
     git add -A
