@@ -4,6 +4,8 @@ build.config.json
 .autopublish-state.json
 autopublish.log
 .foldercache.json
+.urls.txt
+collections/*/.urls.txt
 
 # Album photos live in Cloudflare R2 (synced by build.ps1 -Push), not in the
 # repo. They are still generated locally under albums/<slug>/img/ as the sync
