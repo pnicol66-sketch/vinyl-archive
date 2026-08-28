@@ -30,11 +30,21 @@ You only touch Section A again if any of it breaks. Everything below is per clie
 - [ ] Add a **shortcut** to it under `G:\My Drive\Vinyl Curator Clients\<slug>\`
       (Drive for desktop doesn't mount "Shared with me" — the shortcut is what
       makes it visible to the build).
-- [ ] Add that path to **`build.config.json`** `photoRoots` so the build finds
-      the client's album folders.
-      ⚠ Album *folder names* are matched globally across photoRoots — if two
-      collections share a folder name (e.g. `Miles Davis_Kind of Blue`), scope
-      the build with per-album `folderOverrides` to avoid grabbing the wrong one.
+- [ ] Register that folder as this client's **own** photo root in
+      **`build.config.json`** so the build searches ONLY it for this client (never
+      the owner's or another client's folders — this prevents a shared album
+      folder-name pulling the wrong copy):
+```json
+{
+  "photoRoots": [],
+  "folderOverrides": {},
+  "tenants": {
+    "<slug>": { "photoRoots": ["G:\\My Drive\\Vinyl Curator Clients\\<slug>"] }
+  }
+}
+```
+      (Per-album `folderOverrides` can also be set inside the tenant block if a
+      folder name doesn't match.)
 
 ### 2. Build the client's collection data (sheet)
 - [ ] In a **client copy of the Vinyl Project sheet** (kept under the owner's
@@ -126,8 +136,6 @@ nothing of theirs was ever in the public repo — a total takedown.
 ## Notes / known gaps
 - **`-All` does not publish private tenants** — its loop syncs only the owner
   site + git. Publish each private client individually with `-Tenant <slug> -Push`.
-- **Per-tenant photoRoots** isn't implemented yet — clients share the global
-  `photoRoots`; watch for album folder-name collisions (see B.1).
 - **Login domain wording**: Google's sign-in shows "continue to
   cloudflareaccess.com" (Google shows the registrable domain; a custom Access
   domain to change it needs a paid plan). Reassure in the invite; it's standard.

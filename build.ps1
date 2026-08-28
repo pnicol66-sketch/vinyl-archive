@@ -185,6 +185,24 @@ if ($urlPrefix -ne '') {
 # Watermark comes from the tenant ('' = clean images, the white-label option).
 if ($null -ne $tenantCfg.watermark) { $Watermark = [string]$tenantCfg.watermark }
 
+# Per-tenant photo roots. A client's albums live in the client's OWN folder, so a
+# client build must search only that folder - never the owner's or another
+# client's - or a shared album folder-name could pull the wrong copy. When
+# build.config.json defines "tenants": { "<slug>": { "photoRoots": [...] } } for
+# this (non-owner) tenant, REPLACE the global roots with the client's; likewise
+# folderOverrides. The owner always uses the global roots (unchanged).
+if ($tenantCfg.slug -ne 'owner' -and $cfg -and $cfg.tenants) {
+  $tcfg = $cfg.tenants.PSObject.Properties[[string]$tenantCfg.slug]
+  if ($tcfg) {
+    $tcfg = $tcfg.Value
+    if ($tcfg.photoRoots) { $PhotoRoots = @($tcfg.photoRoots) }
+    if ($tcfg.folderOverrides) {
+      $FolderOverrides = @{}
+      foreach ($o in $tcfg.folderOverrides.PSObject.Properties) { $FolderOverrides[$o.Name] = [string]$o.Value }
+    }
+  }
+}
+
 # Depth of this tenant's pages below the site root, for the '../' asset/nav
 # prefixes ({{ROOT}}). Owner (empty prefix): an album page sits at
 # albums/<slug>/ (2 deep) and an index/about at <section>/ (1 deep), so these
