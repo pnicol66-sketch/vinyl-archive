@@ -9,21 +9,29 @@
 <link rel="icon" href="{{ROOT}}favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="{{ROOT}}assets/site.css?v={{VCSS}}">
 </head>
-<body>
+<body class="lib">
 <header class="site-head">
 {{NAV}}
 </header>
 <main class="archive">
   <section class="archive-head">
+    <p class="eyebrow">{{EYEBROW}}</p>
     <h1>{{PAGE_TITLE}}</h1>
     <p class="lede">{{LEDE}}</p>
-    <p class="filter-row"><input id="filter" type="search"
-      placeholder="Filter by artist, title, label, year, genre…" aria-label="Filter the archive"></p>
+  </section>
+  <section class="controls">
+    <div class="searchrow">
+      <input id="filter" type="search"
+        placeholder="Filter by artist, title, label, year, genre…" aria-label="Filter the archive">
+      <span class="count" id="count" data-total="{{TOTAL}}">{{COUNT}}</span>
+    </div>
+{{CONTROLS}}
   </section>
   <section class="card-grid" id="cards">
 {{CARDS}}
   </section>
   <p class="no-match" id="nomatch" hidden>Nothing matches that filter.</p>
+  <p class="archive-foot">A documented collection — Vinyl Curator.</p>
 </main>
 <footer class="site-foot">
   <p class="colophon">Documented with <a href="{{ROOT}}">Vinyl Curator</a> ·
