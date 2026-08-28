@@ -106,11 +106,12 @@ if ([string]::IsNullOrWhiteSpace($Tenant)) { $Tenant = 'owner' }
 $TenantsFile = Join-Path $Site 'tenants.json'
 
 # -All: build every active tenant, each in its own process. A per-tenant build
-# is self-contained (it writes only its own prefix + its own sitemap
-# contribution), so looping child processes is simpler and safer than threading
-# one pass through N tenants. -All -Push publishes ONCE after all builds; full
-# multi-tenant publishing (per-tenant R2 buckets etc.) is B7 - for now this
-# syncs the owner's public image tree and does a single git push.
+# is self-contained (it writes only its own prefix / private staging tree), so
+# looping child processes is simpler than threading one pass through N tenants.
+# With -Push, each PRIVATE tenant publishes ITSELF to its own private bucket
+# (the child's own -Push runs its private-sync branch and returns), and the
+# parent does ONE owner image-sync + git push covering the owner + any public
+# tenants' committed pages.
 if ($All) {
   if (-not (Test-Path $TenantsFile)) { throw 'tenants.json not found - cannot -All.' }
   $regAll = [IO.File]::ReadAllText($TenantsFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
@@ -118,10 +119,15 @@ if ($All) {
     [string]$_.status -ne 'suspended' -and [string]$_.status -ne 'removed' })
   if ($activeTenants.Count -eq 0) { throw 'No active tenants in tenants.json.' }
   foreach ($t in $activeTenants) {
-    Write-Host ("=== Building tenant: " + $t.slug + " ===") -ForegroundColor Cyan
+    # Private tenants publish themselves to their own bucket - pass -Push down to
+    # them. Public/owner tenants stay build-only; the parent syncs + commits below.
+    $pushPrivate = ($Push -and $t.private -eq $true)
+    $verb = if ($pushPrivate) { 'Publishing' } else { 'Building' }
+    Write-Host ("=== $verb tenant: " + $t.slug + " ===") -ForegroundColor Cyan
     $argv = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $PSCommandPath, '-Tenant', [string]$t.slug)
-    if ($Force)      { $argv += '-Force' }
-    if ($AllowEmpty) { $argv += '-AllowEmpty' }
+    if ($Force)       { $argv += '-Force' }
+    if ($AllowEmpty)  { $argv += '-AllowEmpty' }
+    if ($pushPrivate) { $argv += '-Push' }
     & powershell @argv
     if ($LASTEXITCODE -ne 0) { throw ("Tenant build failed: " + $t.slug + " (exit $LASTEXITCODE)") }
   }
