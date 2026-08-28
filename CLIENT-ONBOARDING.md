@@ -98,15 +98,24 @@ No Cloudflare changes needed.
 ---
 
 ## D. Offboard a client (takedown)
+One command — the reverse of onboarding:
+```
+.\Remove-VinylClient.ps1 -Slug <slug>
+```
+It purges the bucket prefix, deletes the Access app + Worker route + DNS record,
+and removes the `tenants.json` / `build.config.json` entries. Prompts once before
+deleting (add **`-Force`** to skip, **`-WhatIf`** to preview); idempotent, and it
+refuses `owner`. Their pages + photos are gone completely (private bucket, real
+deletion) and nothing of theirs was ever in the public repo — a total takedown.
+The `collection-<slug>.json` export and the Drive shortcut are left for you to
+keep or delete.
+
+Manual equivalent, if the tool is unavailable:
 - [ ] Purge their bucket prefix: `rclone purge r2:vinyl-client/<slug>`.
 - [ ] Delete their **Access application** (Applications → `<slug>` → Delete).
 - [ ] Delete their **Worker route** (`<slug>.vinylcurator.net/*`).
 - [ ] Delete their **DNS record** (`<slug>` AAAA).
 - [ ] Remove their entry from `tenants.json`.
-Their pages + photos are gone completely (private bucket, real deletion) and
-nothing of theirs was ever in the public repo — a total takedown.
-(A `Remove-VinylClient.ps1` to do all of this off the same token is planned —
-Phase 3 of the automation.)
 
 ---
 
