@@ -27,6 +27,9 @@
 
   .cc-sec, .cc-close { border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 2.6rem; }
   .cc-sec:first-of-type { margin-top: 0; }
+  /* The section already carries the divider; drop the global h2 border/padding
+     so each break shows one rule, not two. */
+  .cc h2 { border-top: 0; padding-top: 0; }
   .cc-h2 { font-family: var(--serif); font-weight: 500; font-size: 1.45rem; margin: 0 0 0.5rem; }
   .cc-sub { color: var(--muted); margin: 0 0 1.8rem; max-width: 44rem; }
   .cc-h3 { font-family: var(--serif); font-weight: 500; font-size: 1.05rem; margin: 0 0 0.35rem; }
