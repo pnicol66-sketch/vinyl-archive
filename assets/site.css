@@ -860,6 +860,51 @@ h2 {
 .lp-scr[data-shot] .lp-circle { width: 100%; }
 .lp-circle s { width: 11px; height: 11px; border-radius: 50%; top: 50%; transform: translateY(-50%); }
 .lp-circle .r1 { right: -5px; } .lp-circle .r2 { left: -5px; }
+
+/* Cover: auto-cropped, then adjusted by dragging the four corners. Round
+   handles (not the old square corner + side handles). */
+.lp-crop-handles .c1, .lp-crop-handles .c2, .lp-crop-handles .c3, .lp-crop-handles .c4 {
+  width: 13px; height: 13px; border-radius: 50%; border: 2px solid #191204; box-sizing: border-box;
+}
+
+/* Label / disc: tap 5 points around the rim; the app fits an ellipse and
+   deskews it to a true circle. Five pips sit at the pentagon points. */
+.lp-ellipse {
+  position: absolute; top: 50%; left: 50%; width: 118%; aspect-ratio: 1;
+  transform: translate(-50%, -50%); border-radius: 50%; border: 2px solid #f0a832;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+  transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.lp-scr[data-shot] .lp-ellipse { width: 100%; }
+.lp-ellipse s {
+  position: absolute; width: 12px; height: 12px; border-radius: 50%;
+  background: #f0a832; border: 2px solid #191204; box-sizing: border-box;
+  transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s ease;
+}
+.lp-scr[data-shot] .lp-ellipse s { opacity: 1; }
+.lp-ellipse .p1 { left: 50%;   top: 0%; }
+.lp-ellipse .p2 { left: 97.5%; top: 34.5%; transition-delay: 0.1s; }
+.lp-ellipse .p3 { left: 79.4%; top: 90.5%; transition-delay: 0.2s; }
+.lp-ellipse .p4 { left: 20.6%; top: 90.5%; transition-delay: 0.3s; }
+.lp-ellipse .p5 { left: 2.5%;  top: 34.5%; transition-delay: 0.4s; }
+
+/* Tap-to-crop prompt pill (mirrors the app's #tapPrompt: pip dots + message). */
+.lp-tapbar {
+  position: absolute; left: 0.55rem; right: 0.55rem; bottom: 0.5rem; z-index: 2;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.62); border-radius: 999px; padding: 0.3rem 0.7rem;
+  font-size: 0.62rem; color: #ececf0;
+}
+.lp-tappips { display: inline-flex; gap: 4px; flex: none; }
+.lp-tappips i {
+  width: 9px; height: 9px; border-radius: 50%; box-sizing: border-box;
+  border: 2px solid rgba(240, 168, 50, 0.55); transition: background 0.25s, border-color 0.25s;
+}
+.lp-scr[data-shot] .lp-tappips i { background: #f0a832; border-color: #f0a832; }
+.lp-scr[data-shot] .lp-tappips i:nth-child(2) { transition-delay: 0.1s; }
+.lp-scr[data-shot] .lp-tappips i:nth-child(3) { transition-delay: 0.2s; }
+.lp-scr[data-shot] .lp-tappips i:nth-child(4) { transition-delay: 0.3s; }
+.lp-scr[data-shot] .lp-tappips i:nth-child(5) { transition-delay: 0.4s; }
 .lp-loupe {
   position: absolute; top: 0.5rem; right: 0.5rem; width: 4.4rem; height: 4.4rem;
   border-radius: 50%; border: 2px solid #f0a832; opacity: 0; transition: opacity 0.4s;
@@ -982,5 +1027,5 @@ h2 {
 /* Motion is decorative: the phone holds its first beat if the visitor
    asks for less of it, and the step list still switches on click. */
 @media (prefers-reduced-motion: reduce) {
-  .lp-scr, .lp-phase, .lp-list, .lp-crop, .lp-circle, .lp-loupe, .lp-shutter { transition: none; }
+  .lp-scr, .lp-phase, .lp-list, .lp-crop, .lp-circle, .lp-ellipse, .lp-ellipse s, .lp-tappips i, .lp-loupe, .lp-shutter { transition: none; }
 }
