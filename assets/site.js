@@ -266,8 +266,8 @@
   var CAPTIONS = [
     '01 · New album — two fields and a disc count',
     '02 · The checklist does the remembering',
-    '03 · Shoot, then crop the cover',
-    '04 · Label crops as a circle',
+    '03 · Shoot the cover — it auto-crops',
+    '04 · Tap 5 points around the rim',
     '05 · Typing or dictating the matrix',
     '06 · Into your own Google Drive',
     '07 · Shared read-only — work begins'
@@ -275,8 +275,8 @@
   var NOTES = [
     'Label artist, album title, one disc or two. That is the entire setup — no account with us.',
     'Thirteen entries for a single LP — front and back cover, a typed grade for each, both labels, both disc faces, a typed grade per side, and the matrix for each side. Photo rows open the camera; ⌨ rows open a text screen. Optional entries carry a Skip.',
-    'Torch, zoom and manual focus if you want them; otherwise just shoot. The sleeve outline is detected the moment the photo is taken — then drag a corner, a whole side, or the frame itself, with a 3× magnifier under your fingertip.',
-    'Centre the label and fill the frame: the round outline is detected and cropped as a circle. Drag inside it to move, drag the ring to resize. ⟳ rotates the saved photo in 90° steps.',
+    'Torch, zoom and autofocus if you want them; otherwise just shoot. Covers are cropped for you on the phone — you just drag a corner to fix it, with a 3× magnifier under your fingertip, and Save.',
+    'Centre the label or disc and fill the frame, then tap five points around its rim — the app fits an ellipse through them and deskews a tilted disc to a true circle. ⟳ rotates the saved photo in 90° steps.',
     'The matrix is typed, or simply read out loud character by character — dictation converts spoken symbol words as you say them. Dead-wax photos have their own four slots if you want them, but they are optional: the transcription is what the identification runs on.',
     'Straight into My Drive / Vinyl Curator / Artist_Album, updating in place if you re-shoot.',
     'You share that one folder, read-only. Nothing else in your Drive is visible, and you can revoke it any time.'
