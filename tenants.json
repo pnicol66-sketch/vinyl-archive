@@ -11,6 +11,18 @@
       "listed": true,
       "indexed": true,
       "status": "active"
+    },
+    {
+      "_comment": "SALES REFERENCE tenant: the owner's own archive (dataFile = collection.json) served privately at smith.vinylcurator.net as a live example to show prospective clients. Rebuild + republish with: build.ps1 -Tenant smith -Push. Gated by a Cloudflare Access app allowing the owner's email; add a prospect's email to that app's policy to let them browse during a demo.",
+      "slug": "smith",
+      "name": "The Smith Collection",
+      "private": true,
+      "dataFile": "collection.json",
+      "watermark": "vinylcurator.net",
+      "indexes": [ { "path": "albums", "title": "The Smith Collection" } ],
+      "listed": false,
+      "indexed": false,
+      "status": "active"
     }
   ]
 }
