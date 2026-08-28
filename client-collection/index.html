@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Client Collection Service · Vinyl Curator</title>
+<meta name="description" content="A documented vinyl collection, curated and researched for you — record by record, pressing by pressing. Private, and yours.">
+<link rel="canonical" href="https://vinylcurator.net/client-collection/">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css?v=5a2ea6b7">
+<style>
+  /* Client Collection service page (self-contained; not loaded by album pages). */
+  .cc { padding-bottom: 1rem; }
+  .cc-hero { padding: 1.2rem 0 1.8rem; max-width: 44rem; }
+  .cc-eyebrow {
+    margin: 0 0 0.6rem; font-family: var(--mono); font-size: 0.7rem;
+    letter-spacing: 0.11em; text-transform: uppercase; color: var(--accent);
+  }
+  .cc-h1 {
+    font-family: var(--serif); font-weight: 500; line-height: 1.15;
+    font-size: clamp(1.25rem, 2.2vw, 1.6rem); margin: 0 0 0.7rem; text-wrap: pretty;
+  }
+  .cc-lede { font-size: 1.14rem; line-height: 1.62; margin: 0 0 1.4rem; max-width: 38rem; color: var(--muted); text-wrap: pretty; }
+  .cc-bullets { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.75rem; max-width: 38rem; }
+  .cc-bullets li { display: flex; gap: 0.7rem; font-size: 1.04rem; line-height: 1.5; color: var(--muted); }
+  .cc-dash { color: var(--accent); flex: none; }
+
+  .cc-sec, .cc-close { border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 2.6rem; }
+  .cc-sec:first-of-type { margin-top: 0; }
+  .cc-h2 { font-family: var(--serif); font-weight: 500; font-size: 1.45rem; margin: 0 0 0.5rem; }
+  .cc-sub { color: var(--muted); margin: 0 0 1.8rem; max-width: 44rem; }
+  .cc-h3 { font-family: var(--serif); font-weight: 500; font-size: 1.05rem; margin: 0 0 0.35rem; }
+  .cc-p { margin: 0; color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+
+  /* iPad-framed live preview, cross-fading grid <-> album page */
+  .cc-ipad {
+    max-width: 56rem; margin: 0 auto; position: relative;
+    background: linear-gradient(155deg, #2b2b30, #141416);
+    border-radius: 32px; padding: 2.4rem 2rem;
+    box-shadow: 0 36px 84px -32px rgba(0, 0, 0, 0.9); border: 1px solid #34333a;
+  }
+  .cc-cam {
+    position: absolute; top: 1.2rem; left: 50%; transform: translateX(-50%);
+    width: 8px; height: 8px; border-radius: 50%; background: #0c0c10;
+    box-shadow: inset 0 0 0 1px #47474e;
+  }
+  .cc-screen {
+    display: block; position: relative; border-radius: 8px; overflow: hidden;
+    background: var(--deep); aspect-ratio: 4/3; box-shadow: inset 0 0 0 2px #0a0a0c;
+  }
+  .cc-pv {
+    position: absolute; top: 0; left: 0; width: 167%; height: 167%;
+    transform: scale(0.6); transform-origin: top left; border: 0; pointer-events: none;
+  }
+  .cc-pv-b { opacity: 0; }
+  .cc-screen-hit { position: absolute; inset: 0; }
+  @keyframes ccFadeA { 0%, 44% { opacity: 1; } 56%, 94% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes ccFadeB { 0%, 44% { opacity: 0; } 56%, 94% { opacity: 1; } 100% { opacity: 0; } }
+  .cc-pv-a { animation: ccFadeA 9s ease-in-out infinite; }
+  .cc-pv-b { animation: ccFadeB 9s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .cc-pv-a, .cc-pv-b { animation: none; }
+    .cc-pv-b { opacity: 0; }
+  }
+
+  .cc-catframe {
+    border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+    background: var(--paper); height: 52rem;
+  }
+  .cc-catframe iframe { width: 100%; height: 100%; border: 0; }
+
+  /* how it's built */
+  .cc-steps {
+    list-style: none; margin: 0; padding: 0; display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1.6rem 2.2rem;
+  }
+  .cc-num { margin: 0 0 0.4rem; font-family: var(--mono); font-size: 0.78rem; color: var(--accent); }
+  .cc-fig {
+    height: 6.5rem; border-radius: 8px; border: 1px solid var(--line);
+    margin-bottom: 0.85rem; padding: 0.5rem; overflow: hidden;
+  }
+  .cc-fig-capture { background: #101013; display: flex; flex-direction: column; gap: 0.28rem; padding: 0.45rem; }
+  .cc-chk { display: flex; align-items: center; gap: 0.35rem; background: #1b1b20; border: 1px solid #2a2a31; border-radius: 0.35rem; padding: 0.22rem 0.35rem; font-size: 0.6rem; }
+  .cc-chk-t { flex: 1; color: #ececf0; }
+  .cc-chk-ok { color: var(--ok); font-size: 0.62rem; }
+  .cc-chk-now { color: #f0a832; font-size: 0.55rem; }
+  .cc-chk-save { margin-top: auto; background: #f0a832; color: #191204; text-align: center; font-size: 0.56rem; font-weight: 700; border-radius: 0.35rem; padding: 0.24rem; }
+  .cc-fig-drive { background: var(--card); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.45rem; }
+  .cc-dots { display: flex; gap: 0.28rem; }
+  .cc-dots i { width: 0.5rem; height: 0.5rem; border-radius: 50%; display: block; }
+  .cc-drive-t { font-size: 0.62rem; color: var(--ink); text-align: center; }
+  .cc-drive-ro { font-size: 0.56rem; color: var(--ok); }
+  .cc-fig-chron { background: #141210; font-family: var(--mono); font-size: 0.56rem; line-height: 1.5; color: var(--muted); padding: 0.5rem 0.55rem; }
+  .cc-chron-hit { color: #e8dfd0; }
+  .cc-thiscopy { color: var(--accent); }
+  .cc-fig-deliver { background: var(--card); display: flex; align-items: center; justify-content: center; gap: 0.7rem; }
+  .cc-doc { width: 2.6rem; height: 3.4rem; background: #fff; border-radius: 2px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,.5); padding: 0.32rem 0.28rem; }
+  .cc-doc-l { display: block; height: 2px; background: #e0dacd; margin-bottom: 2.5px; }
+  .cc-doc-l:first-child { background: #c9c2b4; }
+  .cc-doc-pdf { position: absolute; bottom: 0.2rem; right: 0.22rem; font-size: 0.42rem; font-weight: 700; color: #c0392b; }
+  .cc-deliver-t { font-size: 0.6rem; color: var(--muted); line-height: 1.4; }
+
+  /* close + contact */
+  .cc-close { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 2rem 3rem; align-items: start; }
+  .cc-story { font-family: var(--serif); font-size: 1.06rem; line-height: 1.7; margin: 0; color: var(--muted); text-wrap: pretty; }
+  .cc-start { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1.3rem 1.4rem; }
+  .cc-cta {
+    display: inline-block; margin-top: 0.6rem; padding: 0.6rem 1.2rem; border-radius: 999px;
+    background: var(--accent); border: 1px solid var(--accent); color: var(--deep);
+    text-decoration: none; font-size: 0.94rem;
+  }
+  .cc-cta:hover { background: var(--accent-ink); border-color: var(--accent-ink); color: var(--deep); }
+
+  @media (max-width: 40rem) {
+    .cc-catframe { height: 40rem; }
+    .cc-ipad { padding: 1.4rem 1.1rem; border-radius: 22px; }
+  }
+</style>
+</head>
+<body>
+<header class="site-head">
+  <nav>
+    <a class="brand" href="../">Vinyl Curator</a>
+    <a href="../albums/">Personal Archive</a>
+    <span class="nav-sec"><a href="../available/">Available</a></span>
+    <a href="../client-collection/" aria-current="page">Client Collection Service</a>
+    <a href="../about/">About</a>
+  </nav>
+</header>
+
+<main class="cc">
+
+  <section class="cc-hero">
+    <p class="cc-eyebrow">A collection documented for you</p>
+    <h1 class="cc-h1">Your collection, documented record by record — and kept entirely yours.</h1>
+    <p class="cc-lede">Every record is photographed, transcribed and identified to a fixed standard, then turned into whatever you need it to be:</p>
+    <ul class="cc-bullets">
+      <li><span class="cc-dash">—</span><span>An individual record page and archive for every album, hostable privately on the web, exactly as shown here.</span></li>
+      <li><span class="cc-dash">—</span><span>A working sheet that prints individual album summaries, full collection schedules, and a collection schedule with researched values for insurance.</span></li>
+      <li><span class="cc-dash">—</span><span>Coffee-table catalogue books you design yourself, straight from the sheet menu — choose the layout and records, and export a print-ready book of your collection.</span></li>
+      <li><span class="cc-dash">—</span><span>Private by default — no prices are published, and the files stay in your own Google Drive.</span></li>
+    </ul>
+  </section>
+
+  <section class="cc-sec">
+    <h2 class="cc-h2">A collection, hosted privately on the web</h2>
+    <p class="cc-sub">Your own record-by-record archive, browsable like a streaming library and private to you.</p>
+    <div class="cc-ipad">
+      <span class="cc-cam"></span>
+      <a class="cc-screen" href="../albums/">
+        <iframe class="cc-pv cc-pv-a" src="../albums/" title="Collection grid preview" loading="lazy" scrolling="no"></iframe>
+        <iframe class="cc-pv cc-pv-b" src="../albums/miles-davis-round-about-midnight/" title="Album page preview" loading="lazy" scrolling="no"></iframe>
+        <span class="cc-screen-hit"></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="cc-sec">
+    <h2 class="cc-h2">Design your own coffee-table catalogue book</h2>
+    <p class="cc-sub">Build it yourself from the sheet menu — pick the records and the order (by artist, genre, label or year), choose 1-up, 2-up or 4-up plates, and it lays out a print-ready book of your collection.</p>
+    <div class="cc-catframe">
+      <iframe src="../catalogue/" title="Catalogue book examples" loading="lazy"></iframe>
+    </div>
+  </section>
+
+  <section class="cc-sec">
+    <h2 class="cc-h2">How your collection is built</h2>
+    <ol class="cc-steps">
+      <li>
+        <div class="cc-fig cc-fig-capture">
+          <div class="cc-chk"><span>📷</span><span class="cc-chk-t">06 Side 1 Label</span><span class="cc-chk-ok">✓</span></div>
+          <div class="cc-chk"><span>⌨</span><span class="cc-chk-t">14 Matrix/Runout</span><span class="cc-chk-now">now</span></div>
+          <div class="cc-chk-save">Save to Google Drive</div>
+        </div>
+        <p class="cc-num">01</p>
+        <h3 class="cc-h3">Capture</h3>
+        <p class="cc-p">Photograph each record to the checklist and type or dictate the matrix — in the app, or I can do it for you.</p>
+      </li>
+      <li>
+        <div class="cc-fig cc-fig-drive">
+          <span class="cc-dots"><i style="background:#1a73e8"></i><i style="background:#1e8e3e"></i><i style="background:#fbbc04"></i></span>
+          <span class="cc-drive-t">Google Drive · your folder</span>
+          <span class="cc-drive-ro">Shared · read-only</span>
+        </div>
+        <p class="cc-num">02</p>
+        <h3 class="cc-h3">Kept in your Drive</h3>
+        <p class="cc-p">Everything lands in a folder you own and share read-only. You stay the owner; access can be revoked any time.</p>
+      </li>
+      <li>
+        <div class="cc-fig cc-fig-chron">
+          <div class="cc-chron-hit">1957 — six-eye deep-groove <span class="cc-thiscopy">— this copy</span></div>
+          <div>1958–61 — deep groove removed</div>
+          <div>1962–64 — 2-eye 'Guaranteed Hi-Fi'</div>
+          <div>1963–70 — 360 Sound red label</div>
+          <div>2013 — 180g mono reissue</div>
+        </div>
+        <p class="cc-num">03</p>
+        <h3 class="cc-h3">Researched</h3>
+        <p class="cc-p">Each pressing identified and its market history gathered, read against thirty years of handling these records first-hand.</p>
+      </li>
+      <li>
+        <div class="cc-fig cc-fig-deliver">
+          <div class="cc-doc"><span class="cc-doc-l" style="width:60%"></span><span class="cc-doc-l"></span><span class="cc-doc-l"></span><span class="cc-doc-l" style="width:85%"></span><span class="cc-doc-pdf">PDF</span></div>
+          <span class="cc-deliver-t">Catalogue<br>&amp; schedule</span>
+        </div>
+        <p class="cc-num">04</p>
+        <h3 class="cc-h3">Delivered</h3>
+        <p class="cc-p">Your private catalogue and an exportable schedule — ready for a broker, a buyer, or your own records.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="cc-close">
+    <div>
+      <h2 class="cc-h2">Private, and yours</h2>
+      <p class="cc-story">Your collection is never published. The photographs and files live in your own Google Drive, shared read-only for as long as you choose, and nothing about what you own is put on this site. The documentation is made for you — to insure, to sell, or simply to keep.</p>
+    </div>
+    <div class="cc-start">
+      <h3 class="cc-h3">Start your collection</h3>
+      <p class="cc-p">Tell me roughly how many records you have and what you need it for — insurance, sale, or your own peace of mind.</p>
+      <a class="cc-cta mail" data-u="contact" data-d="vinylcurator.net">Email the archive</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <p class="disclaimer">Each record is photographed against a full documentation checklist, its matrix / runout transcribed by hand, and the pressing identified against label references, variant records and recorded sales. Identifications, dates, condition notes and any market information are informed opinions, offered in good faith for reference only, without warranty of accuracy or completeness. Nothing here is professional appraisal, valuation, or purchasing advice; verify details independently before relying on them, as no liability is accepted for decisions made on the basis of this information.</p>
+  <p class="colophon">Documented with <a href="../">Vinyl Curator</a> ·
+  <a class="mail" data-u="contact" data-d="vinylcurator.net">contact</a> ·
+  © 2026 Vinyl Curator</p>
+</footer>
+<script src="../assets/site.js?v=9227f734"></script>
+</body>
+</html>

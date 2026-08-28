@@ -452,10 +452,11 @@ function Prose([string]$text) {
 function Build-Nav([string]$current, [string]$root, [string]$albumTab) {
   $nl = "`n"
   if ($tenantCfg.slug -eq 'owner') {
-    $curA = ''; $curV = ''; $curS = ''
+    $curA = ''; $curV = ''; $curS = ''; $curC = ''
     if ($current -eq 'archive')   { $curA = ' aria-current="page"' }
     if ($current -eq 'available') { $curV = ' aria-current="page"' }
     if ($current -eq 'sold')      { $curS = ' aria-current="page"' }
+    if ($current -eq 'client')    { $curC = ' aria-current="page"' }
     $sold = ''
     if ($current -eq 'album') {
       if ($albumTab -eq 'Sold') { $sold = '<a class="sub" href="' + $root + 'sold/">Sold</a>' }
@@ -466,6 +467,7 @@ function Build-Nav([string]$current, [string]$root, [string]$albumTab) {
       '    <a class="brand" href="' + $root + '">Vinyl Curator</a>' + $nl +
       '    <a href="' + $root + 'albums/"' + $curA + '>Personal Archive</a>' + $nl +
       '    <span class="nav-sec"><a href="' + $root + 'available/"' + $curV + '>Available</a>' + $sold + '</span>' + $nl +
+      '    <a href="' + $root + 'client-collection/"' + $curC + '>Client Collection Service</a>' + $nl +
       '    <a href="' + $root + 'about/">About</a>' + $nl +
       '  </nav>'
   }
@@ -566,6 +568,8 @@ $tplLanding = [IO.File]::ReadAllText((Join-Path $Site 'templates\landing.html'),
 $tplAbout = [IO.File]::ReadAllText((Join-Path $Site 'templates\about.html'), [Text.Encoding]::UTF8)
 $tplWithdrawn = [IO.File]::ReadAllText((Join-Path $Site 'templates\withdrawn.html'), [Text.Encoding]::UTF8)
 $tplNotFound = [IO.File]::ReadAllText((Join-Path $Site 'templates\404.html'), [Text.Encoding]::UTF8)
+$tplClientCollection = [IO.File]::ReadAllText((Join-Path $Site 'templates\client-collection.html'), [Text.Encoding]::UTF8)
+$tplCatalogue = [IO.File]::ReadAllText((Join-Path $Site 'templates\catalogue.html'), [Text.Encoding]::UTF8)
 
 # ---------- asset versions ----------
 # The stylesheet and script are linked with a short content hash, so a changed
@@ -980,11 +984,24 @@ foreach ($album in $json.albums) {
         ToString('d MMMM yyyy', [Globalization.CultureInfo]::InvariantCulture)) + '</p>'
     }
   }
+  # Sort keys for the streaming index's "Order by" control (site.js reads these
+  # data-* attributes): artist with a leading "The" dropped, title, primary
+  # genre (the part before " - "), label, and a 4-digit year (9999 if none).
+  $artistKey = (([string]$album.artist).Trim() -replace '^(?i)the\s+', '').ToLowerInvariant()
+  $titleKey  = ([string]$album.title).Trim().ToLowerInvariant()
+  $genreDisp = (([string]$album.genre).Trim() -split ' - ', 2)[0].Trim()
+  $genreKey  = $genreDisp.ToLowerInvariant()
+  $labelKey  = ([string]$album.labelName).Trim().ToLowerInvariant()
+  $yearNum   = if ([string]$album.year -match '(\d{4})') { $matches[1] } else { '9999' }
+  # Card meta line: year · label · genre (primary), matching the streaming tiles.
+  $metaLine = (($enc.year, $enc.labelName, (HtmlEnc $genreDisp) |
+    Where-Object { $_ -ne '' }) -join " $mid ")
   $cardHtml = '<a class="card" href="' + $p + $slug + '/" data-search="' +
-    (HtmlEnc $search) + '">' + $coverHtmlP + '<div class="meta"><p class="a">' + $enc.artist +
-    '</p><p class="t">' + $enc.title + '</p><p class="y">' +
-    (($enc.year, $enc.labelName | Where-Object { $_ -ne '' }) -join " $mid ") +
-    '</p>' + $soldLine + '</div></a>'
+    (HtmlEnc $search) + '" data-artist="' + (HtmlEnc $artistKey) + '" data-title="' +
+    (HtmlEnc $titleKey) + '" data-genre="' + (HtmlEnc $genreKey) + '" data-label="' +
+    (HtmlEnc $labelKey) + '" data-year="' + $yearNum + '">' + $coverHtmlP +
+    '<div class="meta"><p class="t">' + $enc.title + '</p><p class="a">' + $enc.artist +
+    '</p><p class="y">' + $metaLine + '</p>' + $soldLine + '</div></a>'
   # Unlisted albums keep their page and their URL but get no card on any
   # index, whichever tab they sit on. Their sitemap entry and noindex are
   # handled by Test-Noindex above.
@@ -1056,14 +1073,42 @@ function CountLabel([int]$n) {
   return "$n records"
 }
 function Render-Index([string]$title, [string]$lede, [string]$desc,
-    [string]$canonical, [string]$current, [string]$cardsHtml, [string]$outDir) {
+    [string]$canonical, [string]$current, [string]$cardsHtml, [string]$outDir,
+    [string]$eyebrow = 'A documented collection', [int]$total = 0,
+    [bool]$showControls = $false) {
   # $current is 'archive', 'available' or 'sold' - the section this index is.
   # Build-Nav marks it aria-current and, inside Available/Sold, shows the Sold
   # sublink (a sub-item under Available, per .nav-sec). The nav is per-tenant.
+  # $showControls adds the streaming Tiled/List + Order-by controls; they are on
+  # the collection library (Personal Archive / a client's) but not on the curated
+  # Available / Sold pages, whose server-side order should stand.
   $h = $tplIndex.Replace('{{PAGE_TITLE}}', $title).Replace('{{LEDE}}', $lede)
   $h = $h.Replace('{{META_DESC}}', $desc).Replace('{{CANONICAL}}', $canonical)
   $h = $h.Replace('{{NAV}}', (Build-Nav $current $RootIndex ''))
   $h = $h.Replace('{{CARDS}}', $cardsHtml).Replace('{{ROOT}}', $RootIndex)
+  $h = $h.Replace('{{EYEBROW}}', (HtmlEnc $eyebrow))
+  $h = $h.Replace('{{TOTAL}}', "$total").Replace('{{COUNT}}', "$total of $total")
+  $controls = ''
+  if ($showControls) {
+    $nl = "`n"
+    $controls =
+      '    <div class="viewrow">' + $nl +
+      '      <div class="viewbar" role="group" aria-label="View">' + $nl +
+      '        <button type="button" data-view="tiled" aria-pressed="true">Tiled</button>' + $nl +
+      '        <button type="button" data-view="list" aria-pressed="false">List</button>' + $nl +
+      '      </div>' + $nl +
+      '      <label class="orderby"><span class="orderby-label">Order by</span>' + $nl +
+      '        <select id="orderby">' + $nl +
+      '          <option value="artist">Artist</option>' + $nl +
+      '          <option value="album">Album</option>' + $nl +
+      '          <option value="genre">Genre</option>' + $nl +
+      '          <option value="label">Label</option>' + $nl +
+      '          <option value="year">Year</option>' + $nl +
+      '        </select>' + $nl +
+      '      </label>' + $nl +
+      '    </div>'
+  }
+  $h = $h.Replace('{{CONTROLS}}', $controls)
   $h = $h.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
   $h = $h.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
   $h = $h.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
@@ -1089,14 +1134,16 @@ if ($private) {
     ('Your collection, fully documented ' + $dash + ' every pressing photographed, the ' +
       'matrix transcribed by hand, and the exact pressing identified.') `
     'A private, documented vinyl collection.' `
-    "$tenantBase/albums/" 'archive' $cardsCollection.ToString() $Albums
+    "$tenantBase/albums/" 'archive' $cardsCollection.ToString() $Albums `
+    'Documented collection' $collectionCount $true
 } else {
   Render-Index 'Personal Archive' `
     ("Albums added constantly as I transition my collection into the Archive system. " +
       "It's public to demonstrate the detail that it delivers in a real live collection " +
       "minus the valuation research which remains private.") `
     'A documented personal vinyl collection: original pressings photographed, transcribed, and researched.' `
-    "$tenantBase/albums/" 'archive' $cardsCollection.ToString() $Albums
+    "$tenantBase/albums/" 'archive' $cardsCollection.ToString() $Albums `
+    'A documented collection' $collectionCount $true
 }
 
 if (-not $private) {
@@ -1107,7 +1154,8 @@ Render-Index 'Available from Archive' `
     "discographies and variant records. " +
     "Each card opens the full documentation; the live listings are on Discogs and eBay.") `
   'Documented vinyl records currently listed for sale on Discogs and eBay, with full pressing documentation.' `
-  "$tenantBase/available/" 'available' $cardsAvailable.ToString() $AvailableDir
+  "$tenantBase/available/" 'available' $cardsAvailable.ToString() $AvailableDir `
+  'Available from the archive' $availableCount $false
 
 # Newest sale first. Date Sold arrives as ISO text from the sheet, so sorting
 # the string sorts the date; anything else was normalised to blank above and
@@ -1128,7 +1176,8 @@ foreach ($r in ($soldRows |
 Render-Index 'Sold from Archive' `
   ((CountLabel $soldCount) + " that have found new homes $mid the record has gone, its documentation stays here.") `
   'Vinyl records previously sold from the archive, with their full pressing documentation kept online.' `
-  "$tenantBase/sold/" 'sold' $cardsSold.ToString() $SoldDir
+  "$tenantBase/sold/" 'sold' $cardsSold.ToString() $SoldDir `
+  'Sold from the archive' $soldCount $false
 }  # end: Available + Sold indexes (public/owner only)
 
 # ---------- owner-only global pages ----------
@@ -1156,6 +1205,31 @@ $about = $about.Replace('{{ROOT}}', $RootIndex)
 $aboutDir = Join-Path $Site 'about'
 if (-not (Test-Path $aboutDir)) { New-Item -ItemType Directory $aboutDir | Out-Null }
 Write-Utf8 (Join-Path $aboutDir 'index.html') $about
+
+# Client Collection Service (/client-collection/) and the Catalogue Books
+# showcase (/catalogue/). Both are owner-only marketing pages, rendered like
+# About: {{ROOT}} is ../ (one level down), {{NAV}} marks the service page
+# current. The service page embeds the live /albums/ and /catalogue/ as its
+# previews, so all three publish together.
+$cc = $tplClientCollection.Replace('{{CANONICAL}}', "$base/client-collection/")
+$cc = $cc.Replace('{{NAV}}', (Build-Nav 'client' $RootIndex ''))
+$cc = $cc.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
+$cc = $cc.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
+$cc = $cc.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
+$cc = $cc.Replace('{{ROOT}}', $RootIndex)
+$ccDir = Join-Path $Site 'client-collection'
+if (-not (Test-Path $ccDir)) { New-Item -ItemType Directory $ccDir | Out-Null }
+Write-Utf8 (Join-Path $ccDir 'index.html') $cc
+
+$cat = $tplCatalogue.Replace('{{CANONICAL}}', "$base/catalogue/")
+$cat = $cat.Replace('{{NAV}}', (Build-Nav '' $RootIndex ''))
+$cat = $cat.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
+$cat = $cat.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
+$cat = $cat.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
+$cat = $cat.Replace('{{ROOT}}', $RootIndex)
+$catDir = Join-Path $Site 'catalogue'
+if (-not (Test-Path $catDir)) { New-Item -ItemType Directory $catDir | Out-Null }
+Write-Utf8 (Join-Path $catDir 'index.html') $cat
 
 # 404: generated like everything else, so its stylesheet carries the same
 # content hash and a returning visitor cannot render it against a stale one.
@@ -1207,7 +1281,8 @@ if ($tenantCfg.indexed -eq $false) {
 } else {
   $secUrls = @("$tenantBase/")
   if ($tenantCfg.slug -eq 'owner') {
-    $secUrls += @("$tenantBase/about/", "$tenantBase/albums/", "$tenantBase/available/", "$tenantBase/sold/")
+    $secUrls += @("$tenantBase/about/", "$tenantBase/albums/", "$tenantBase/available/", "$tenantBase/sold/",
+      "$tenantBase/client-collection/", "$tenantBase/catalogue/")
   } else {
     foreach ($ix in @($tenantCfg.indexes)) { $secUrls += "$tenantBase/$(([string]$ix.path).Trim('/'))/" }
   }

@@ -1,27 +1,29 @@
 /* Vinyl Curator archive site — single stylesheet, no frameworks. */
 
+/* Always-dark "streaming" theme (2026-08-28 redesign). The whole site now
+   ships one dark palette regardless of the visitor's OS setting - the
+   collection surfaces are meant to read like a streaming library. Print forces
+   white/ink (see the @media print block), so a dark page never reaches paper.
+   The tokens below are the design-handoff values; the old light theme and its
+   prefers-color-scheme override are retired. */
 :root {
-  --paper: #faf7f2;
-  --card: #ffffff;
-  --ink: #211d18;
-  --muted: #6d655a;
-  --line: #e4ddd2;
-  --accent: #a4581c;
-  --accent-ink: #7c3f10;
+  --paper: #17150f;      /* page background (service / landing / about) */
+  --deep: #0c0b0a;       /* deeper background for the library + album surfaces */
+  --card: #201d16;       /* raised card */
+  --card2: #141210;      /* library tile / inset panel */
+  --ink: #ece7de;
+  --muted: #a89d8d;
+  --faint: #7a7062;      /* mono meta lines, quietest text */
+  --line: #38332a;       /* primary rule */
+  --line2: #221e18;      /* tile / inset border */
+  --line3: #2a2620;      /* control border */
+  --accent: #d98b4a;     /* amber accent */
+  --accent-ink: #e8a266; /* links */
+  --accent-hover: #f0a15f;
+  --ok: #6fd97e;
   --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
   --serif: Georgia, "Times New Roman", serif;
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #17150f;
-    --card: #201d16;
-    --ink: #ece7de;
-    --muted: #a89d8d;
-    --line: #38332a;
-    --accent: #d98b4a;
-    --accent-ink: #e8a266;
-  }
 }
 
 * { box-sizing: border-box; }
@@ -36,10 +38,19 @@ body {
 }
 img { max-width: 100%; height: auto; display: block; }
 a { color: var(--accent-ink); }
-a:hover { color: var(--accent); }
+a:hover { color: var(--accent-hover); }
+
+/* Library + album surfaces sit on the deeper background. Set on <body> by the
+   archive-index and album templates (and every per-client collection). */
+body.lib { background: var(--deep); }
 
 /* header / footer */
-.site-head { border-bottom: 1px solid var(--line); }
+.site-head {
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(12, 11, 10, 0.86);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
 .site-head nav {
   max-width: 62rem; margin: 0 auto; padding: 0.9rem 1.25rem;
   display: flex; gap: 1.5rem; align-items: baseline;
@@ -134,53 +145,128 @@ h2 {
 }
 .about-back { margin-top: 2.4rem; font-size: 0.9rem; }
 
-/* archive index */
-.archive-head { padding-top: 2.5rem; }
-.archive-head h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); }
-.filter-row { margin: 1.2rem 0 0; }
+/* archive index — the streaming-style collection library */
+.archive-head { padding-top: 3rem; }
+.archive-head .eyebrow {
+  margin: 0 0 0.6rem; font-family: var(--mono); font-size: 0.72rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+}
+.archive-head h1 { font-size: clamp(1.25rem, 2.2vw, 1.6rem); margin: 0 0 0.7rem; }
+.archive-head .lede { color: var(--muted); font-size: 0.98rem; line-height: 1.55; max-width: 44rem; }
+
+/* controls: search + count, then the view toggle + order-by */
+.controls { margin: 1.6rem 0 0; }
+.searchrow { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 #filter {
-  width: 100%; max-width: 26rem; padding: 0.55rem 0.9rem;
-  border: 1px solid var(--line); border-radius: 999px;
-  background: var(--card); color: var(--ink); font: inherit; font-size: 0.95rem;
+  flex: 1; min-width: 14rem; padding: 0.6rem 1.1rem;
+  border: 1px solid var(--line3); border-radius: 999px;
+  background: var(--paper); color: var(--ink); font: inherit; font-size: 0.92rem;
 }
 #filter:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.count {
+  font-family: var(--mono); font-size: 0.72rem; color: var(--faint);
+  letter-spacing: 0.06em; white-space: nowrap;
+}
+.viewrow {
+  display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap;
+  margin-top: 1rem;
+}
+.viewbar {
+  display: inline-flex; background: var(--card2); border: 1px solid var(--line3);
+  border-radius: 999px; padding: 3px;
+}
+.viewbar button {
+  background: transparent; color: var(--muted); border: 0; border-radius: 999px;
+  padding: 0.35rem 1.1rem; font: inherit; font-size: 0.82rem; cursor: pointer;
+}
+.viewbar button[aria-pressed="true"] { background: var(--accent); color: var(--deep); }
+.orderby { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--faint); }
+.orderby-label {
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.orderby select {
+  background: var(--card2); border: 1px solid var(--line3); color: var(--ink);
+  border-radius: 8px; padding: 0.4rem 0.7rem; font: inherit; font-size: 0.85rem; cursor: pointer;
+}
+
 .card-grid {
-  margin-top: 1.8rem;
-  display: grid; gap: 1.25rem;
-  grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+  margin-top: 1.9rem;
+  display: grid; gap: 1.2rem;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
 }
 .card {
-  text-decoration: none; color: inherit;
-  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
-  overflow: hidden; transition: border-color 120ms ease;
+  text-decoration: none; color: var(--ink);
+  background: var(--card2); border: 1px solid var(--line2); border-radius: 12px;
+  padding: 0.7rem; transition: background 150ms ease, border-color 150ms ease;
 }
-.card:hover { border-color: var(--accent); }
-.card .cover { aspect-ratio: 1; background: var(--line); }
+.card:hover { background: #1c1915; border-color: var(--line); }
+.card .cover {
+  aspect-ratio: 1; background: var(--line2); border-radius: 8px; overflow: hidden;
+  margin-bottom: 0.7rem; box-shadow: 0 10px 26px -14px rgba(0, 0, 0, 0.8);
+}
 .card .cover img { width: 100%; height: 100%; object-fit: cover; }
-.card .meta { padding: 0.65rem 0.8rem 0.8rem; }
-.card .a { font-size: 0.8rem; color: var(--muted); margin: 0; }
-.card .t { font-family: var(--serif); font-size: 0.98rem; line-height: 1.3; margin: 0.1rem 0 0.25rem; }
-.card .y { font-size: 0.78rem; color: var(--muted); margin: 0; }
-/* Sold cards only. Set apart from the pressing details above it by a rule -
-   when the record sold is a fact about this copy's passage through the
-   archive, not about the pressing. */
+.card .meta { min-width: 0; }
+.card .t {
+  font-family: var(--sans); font-size: 0.92rem; font-weight: 600; line-height: 1.3;
+  margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.card .a {
+  font-size: 0.82rem; color: var(--muted); margin: 0.15rem 0 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.card .y {
+  font-family: var(--mono); font-size: 0.66rem; color: var(--faint);
+  letter-spacing: 0.04em; margin: 0.45rem 0 0;
+}
+/* Sold cards only. Set apart from the meta above it by a rule - when the record
+   sold is a fact about this copy's passage through the archive. */
 .card .sold {
   font-size: 0.72rem; color: var(--muted); letter-spacing: 0.02em;
-  margin: 0.45rem 0 0; padding-top: 0.4rem; border-top: 1px solid var(--line);
+  margin: 0.45rem 0 0; padding-top: 0.4rem; border-top: 1px solid var(--line2);
 }
+
+/* List view: rows instead of tiles. Toggled on the grid container by site.js. */
+.card-grid.is-list {
+  grid-template-columns: 1fr; gap: 0.4rem;
+}
+.card-grid.is-list .card {
+  display: flex; align-items: center; gap: 0.9rem; padding: 0.55rem 0.85rem; border-radius: 10px;
+}
+.card-grid.is-list .cover {
+  width: 2.8rem; height: 2.8rem; flex: none; aspect-ratio: 1;
+  border-radius: 5px; margin-bottom: 0; box-shadow: none;
+}
+.card-grid.is-list .meta {
+  flex: 1; min-width: 0; display: grid; align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto); column-gap: 0.9rem;
+}
+.card-grid.is-list .t { grid-column: 1; grid-row: 1; }
+.card-grid.is-list .a { grid-column: 1; grid-row: 2; margin: 0; }
+.card-grid.is-list .y {
+  grid-column: 2; grid-row: 1 / span 2; margin: 0; text-align: right;
+  /* The year field can carry a long provenance note; keep it from crowding out
+     the title/artist by capping and truncating it in the row. */
+  max-width: 22rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card-grid.is-list .sold { grid-column: 1 / -1; }
+
 .no-match { color: var(--muted); padding: 2rem 0; }
 .card-wrap { display: flex; flex-direction: column; }
 .card-wrap .card { flex: 1; }
 .listing-link { margin: 0.35rem 0 0; font-size: 0.8rem; text-align: center; }
+.archive-foot {
+  margin: 3rem 0 0; color: var(--faint); font-size: 0.8rem; font-family: var(--mono);
+}
 
 /* album page */
 .album-head { padding-top: 2.5rem; }
 .album-head .artist {
-  margin: 0; color: var(--muted); font-size: 0.95rem;
-  text-transform: uppercase; letter-spacing: 0.08em;
+  margin: 0 0 0.4rem; color: var(--accent-ink); font-size: 0.78rem;
+  font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em;
 }
-.album-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); }
-.album-head .subtitle { color: var(--muted); margin: 0; }
+.album-head h1 { font-size: clamp(1.5rem, 3.4vw, 2.2rem); margin: 0 0 0.7rem; }
+.album-head .subtitle { color: var(--muted); margin: 0; font-size: 0.98rem; }
 
 .gallery { margin-top: 1.8rem; }
 .gallery .hero-shot { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
@@ -193,6 +279,52 @@ h2 {
   cursor: zoom-in; flex: 0 0 auto;
 }
 .gallery .hero-shot img { cursor: zoom-in; width: 100%; }
+
+/* Desktop: the album becomes a two-column stage - a vertical 35mm film-strip of
+   the record's photos on the left, the documentation scrolling on the right.
+   Scoped to `screen` so the print layout (which floats the gallery, front cover
+   only) is completely unaffected. */
+@media screen and (min-width: 60rem) {
+  .album {
+    display: grid; grid-template-columns: 20rem minmax(0, 1fr);
+    gap: 2rem; align-items: start;
+  }
+  .album > * { grid-column: 2; min-width: 0; }
+  .album-head {
+    grid-column: 1 / -1; padding-bottom: 1.6rem; margin-bottom: 0.4rem;
+    border-bottom: 1px solid var(--line2);
+  }
+  /* The film strip occupies column 1 across the full height of the content, so
+     it can sit sticky beside the scrolling documentation. */
+  .album .gallery {
+    grid-column: 1; grid-row: 2 / 999; margin-top: 0;
+    position: sticky; top: 4.8rem; align-self: start;
+    max-height: calc(100vh - 6rem); overflow-y: auto;
+    border-radius: 6px; padding: 14px 22px;
+    background-color: var(--deep);
+    background-image:
+      repeating-linear-gradient(180deg, #efe8da 0 9px, transparent 9px 20px),
+      repeating-linear-gradient(180deg, #efe8da 0 9px, transparent 9px 20px);
+    background-position: 8px 6px, right 8px top 6px;
+    background-size: 10px calc(100% - 12px), 10px calc(100% - 12px);
+    background-repeat: no-repeat;
+    scrollbar-width: thin;
+  }
+  /* Hero and the thumbnail strip stack into one vertical column of framed cels. */
+  .album .gallery .hero-shot,
+  .album .gallery .strip img {
+    background: #000; padding: 4px; border-radius: 2px; border: 0;
+    box-shadow: inset 0 0 0 1px #262019; margin: 0 0 10px;
+  }
+  .album .gallery .hero-shot { overflow: visible; }
+  .album .gallery .hero-shot img { border-radius: 0; }
+  .album .gallery .strip {
+    display: flex; flex-direction: column; gap: 0; margin-top: 0; overflow: visible;
+  }
+  .album .gallery .strip img {
+    height: auto; width: 100%; border-radius: 0; aspect-ratio: 1; object-fit: cover;
+  }
+}
 
 .details table { border-collapse: collapse; width: 100%; max-width: 40rem; }
 .details th, .details td {

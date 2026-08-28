@@ -108,23 +108,67 @@
     });
   }
 
-  // Archive index: filter cards on artist / title / label / year / genre.
+  // Archive index: filter cards on artist / title / label / year / genre, plus
+  // the streaming Tiled/List toggle and Order-by control (library pages only).
   var filter = document.getElementById('filter');
-  if (filter) {
-    var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var grid = document.getElementById('cards');
+  if (filter && grid) {
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('.card'));
     var nomatch = document.getElementById('nomatch');
-    filter.addEventListener('input', function () {
+    var countEl = document.getElementById('count');
+    var total = cards.length;
+
+    // On the Available page each card sits in a wrapper with its listing link -
+    // the sortable / hideable unit is the wrapper, not the bare card.
+    function unit(c) { return c.closest('.card-wrap') || c; }
+
+    function applyFilter() {
       var q = filter.value.trim().toLowerCase();
       var shown = 0;
       cards.forEach(function (c) {
         var hit = !q || (c.getAttribute('data-search') || '').indexOf(q) !== -1;
-        // On the Available page each card sits in a wrapper with its
-        // listing link - hide the wrapper, not just the card.
-        (c.closest('.card-wrap') || c).hidden = !hit;
+        unit(c).hidden = !hit;
         if (hit) shown++;
       });
       if (nomatch) nomatch.hidden = shown > 0;
+      if (countEl) countEl.textContent = shown + ' of ' + total;
+    }
+    filter.addEventListener('input', applyFilter);
+
+    // Tiled <-> List view.
+    var viewBtns = Array.prototype.slice.call(document.querySelectorAll('.viewbar button'));
+    viewBtns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        grid.classList.toggle('is-list', b.getAttribute('data-view') === 'list');
+        viewBtns.forEach(function (o) {
+          o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
+        });
+      });
     });
+
+    // Order-by: re-sort the cards in place. Year parses the 4-digit key; every
+    // other key falls back to artist then title so ties are stable.
+    var order = document.getElementById('orderby');
+    if (order) {
+      var collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
+      var attr = function (el, k) { return el.getAttribute('data-' + k) || ''; };
+      var sortBy = function (key) {
+        cards.slice().sort(function (a, b) {
+          if (key === 'year') {
+            var d = (parseInt(attr(a, 'year'), 10) || 9999) - (parseInt(attr(b, 'year'), 10) || 9999);
+            if (d) return d;
+          } else {
+            var c = collator.compare(attr(a, key), attr(b, key));
+            if (c) return c;
+          }
+          var ca = collator.compare(attr(a, 'artist'), attr(b, 'artist'));
+          return ca || collator.compare(attr(a, 'title'), attr(b, 'title'));
+        }).forEach(function (c) { grid.appendChild(unit(c)); });
+      };
+      order.addEventListener('change', function () { sortBy(order.value); });
+      // Match the control to what is shown: order by the default (Artist) once.
+      sortBy(order.value);
+    }
   }
 
   // Album page: click any gallery image to open the lightbox, then step
@@ -291,6 +335,80 @@
         else { clearTimeout(tNext); clearTimeout(tPhase); clearInterval(tSay); beat = -1; }
       });
     }, { threshold: 0.15 }).observe(film);
+  } else {
+    go(0);
+  }
+})();
+
+/* ============================================================
+   Catalogue page — the "build the book" laptop film.
+   Drives #cat-film on the catalogue page only; exits elsewhere.
+   ============================================================ */
+(function () {
+  var film = document.getElementById('cat-film');
+  if (!film) return;
+
+  var scrs = [].slice.call(film.querySelectorAll('.scr'));
+  var steps = [].slice.call(document.querySelectorAll('.cat-step'));
+  var caption = document.getElementById('cat-caption');
+  var genBar = document.getElementById('cat-genbar');
+  var genLine = document.getElementById('cat-genline');
+
+  var CAPTIONS = [
+    '01 · Vinyl Curator ▸ Create catalogue book…',
+    '02 · Layout, records, prices and order',
+    '03 · Laid out plate by plate',
+    '04 · A print-ready PDF, saved to your Drive'
+  ];
+  var GEN = [
+    ['Reading 16 records…', '18%'],
+    ['Placing photos · plate 4 of 12', '46%'],
+    ['Typesetting · plate 9 of 12', '78%'],
+    ['Writing PDF…', '96%']
+  ];
+
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var beat = -1, tNext, tGen;
+
+  function go(i) {
+    clearTimeout(tNext); clearInterval(tGen);
+    beat = i;
+    scrs.forEach(function (s, n) {
+      if (n === i) { s.setAttribute('data-on', ''); } else { s.removeAttribute('data-on'); }
+    });
+    steps.forEach(function (b, n) {
+      if (n === i) { b.setAttribute('aria-current', 'step'); } else { b.removeAttribute('aria-current'); }
+    });
+    if (caption) caption.textContent = CAPTIONS[i];
+    if (i === 2) {
+      var g = 0;
+      if (genBar) genBar.style.width = GEN[0][1];
+      if (genLine) genLine.textContent = GEN[0][0];
+      if (!still) {
+        tGen = setInterval(function () {
+          g++;
+          if (g >= GEN.length) { clearInterval(tGen); return; }
+          if (genBar) genBar.style.width = GEN[g][1];
+          if (genLine) genLine.textContent = GEN[g][0];
+        }, 800);
+      }
+    }
+    if (!still) {
+      tNext = setTimeout(function () { go((beat + 1) % scrs.length); }, i === 2 ? 3600 : 3000);
+    }
+  }
+
+  steps.forEach(function (b, n) {
+    b.addEventListener('click', function () { go(n); });
+  });
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { if (beat < 0) go(0); }
+        else { clearTimeout(tNext); clearInterval(tGen); beat = -1; }
+      });
+    }, { threshold: 0.2 }).observe(film);
   } else {
     go(0);
   }

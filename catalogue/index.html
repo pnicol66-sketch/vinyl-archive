@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catalogue Books · Vinyl Curator</title>
+<meta name="description" content="Coffee-table catalogue books built from the Vinyl Curator sheet — 1-up, 2-up and 4-up plate layouts.">
+<link rel="canonical" href="https://vinylcurator.net/catalogue/">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css?v=5a2ea6b7">
+<style>
+  /* Catalogue-book showcase (self-contained; not loaded by album pages). */
+  .cat { max-width: 66rem; }
+  .cat h1, .cat h2, .cat h3 { border-top: 0; padding-top: 0; }
+  .cat .eyebrow { margin: 0 0 0.9rem; font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.11em; text-transform: uppercase; color: var(--accent); }
+  .cat .h2 { font-family: var(--serif); font-weight: 500; font-size: 1.5rem; margin: 0 0 0.4rem; }
+  .cat .sub { color: var(--muted); margin: 0 0 1.6rem; max-width: 40rem; }
+
+  /* ---- desk + plate (letter landscape) ---- */
+  .desk { display: flex; justify-content: center; }
+  .plate { position: relative; width: 100%; max-width: 42rem; aspect-ratio: 255.4/191.9; background: #fff; color: #222; font-family: var(--serif); box-shadow: 0 28px 64px -28px rgba(0,0,0,.75), 0 2px 8px rgba(0,0,0,.4); overflow: hidden; container-type: inline-size; display: flex; flex-direction: column; padding: 3.1cqw; }
+  .plate .lab { margin: 0 0 0.5cqw; font-size: 0.82cqw; letter-spacing: 0.14em; text-transform: uppercase; color: #9a9a9a; }
+  .plate .fig { margin: 0; border: 0.4pt solid #dcdcdc; overflow: hidden; background: #eee; }
+  .plate .fig.label { border: none; }
+  .plate .fig img { width: 100%; height: 100%; object-fit: cover; }
+  .plate .rail { writing-mode: vertical-rl; font-size: 0.72cqw; letter-spacing: 0.2em; text-transform: uppercase; color: #9a9a9a; white-space: nowrap; }
+  .pfoot { flex: none; margin-top: 1.6cqw; padding-top: 1cqw; border-top: 0.4pt solid #e4e4e4; display: flex; justify-content: space-between; align-items: baseline; font-size: 0.85cqw; letter-spacing: 0.14em; text-transform: uppercase; color: #a0a0a0; }
+  .plate .matrix { margin: 0; font-family: 'Courier New', monospace; color: #555; }
+  .plate .mus { color: #185FA5; margin: 0; }
+  .plate .body { margin: 0; color: #666; text-wrap: pretty; }
+
+  /* 1-up */
+  .p1 { flex-direction: row; gap: 3cqw; }
+  .p1-photos { width: 42%; flex: none; display: flex; flex-direction: column; gap: 1.6cqw; }
+  .p1-hero { aspect-ratio: 1; }
+  .p1-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.4cqw; }
+  .p1-row .fig { aspect-ratio: 1; }
+  .p1-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .p1-title { margin: 0; font-size: 3cqw; font-weight: 700; line-height: 1.1; }
+  .p1-press { margin: 1.4cqw 0 0; font-size: 1.4cqw; color: #444; line-height: 1.3; }
+  .p1-text .matrix { font-size: 1.25cqw; line-height: 1.4; }
+  .p1-text .mus { font-size: 1.25cqw; line-height: 1.35; }
+  .p1-photos .mus { font-size: 1.25cqw; line-height: 1.35; }
+  .p1-text .body { font-size: 1.3cqw; line-height: 1.4; }
+  .p1-sec { margin-top: 1.8cqw; }
+
+  /* 2-up */
+  .p2-band { flex: 1; display: flex; gap: 2cqw; min-height: 0; overflow: hidden; }
+  .p2-div { flex: none; margin: 1.6cqw 0; border-top: 0.4pt solid #e4e4e4; }
+  .p2-photocol { width: 21cqw; flex: none; }
+  .p2-grid { display: grid; grid-template-columns: 10cqw 10cqw; grid-auto-rows: 10cqw; gap: 0.8cqw; }
+  .p2-grid .fig { width: 10cqw; height: 10cqw; }
+  .p2-meta { flex: 1; min-width: 0; }
+  .p2-title { margin: 0; font-size: 1.8cqw; font-weight: 700; line-height: 1.16; }
+  .p2-press { margin: 1cqw 0 0; font-size: 1.05cqw; color: #444; }
+  .p2-cols { display: flex; gap: 2cqw; margin-top: 1.2cqw; align-items: flex-start; }
+  .p2-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1.1cqw; }
+  .p2 .matrix { font-size: 1cqw; line-height: 1.36; }
+  .p2 .mus { font-size: 1cqw; line-height: 1.3; margin-top: 1cqw; }
+  .p2 .body { font-size: 1.05cqw; line-height: 1.3; }
+  .variant { margin: 0; font-size: 0.95cqw; line-height: 1.3; color: #666; display: grid; grid-template-columns: auto 1fr; column-gap: 1.2cqw; row-gap: 0.3cqw; }
+  .p1 .variant { font-size: 1.2cqw; column-gap: 1.6cqw; row-gap: 0.4cqw; }
+  .variant dt { color: #888; white-space: nowrap; } .variant dd { margin: 0; }
+  .thiscopy { color: #185FA5; }
+  .p2-rail { width: 4%; flex: none; display: flex; justify-content: center; }
+
+  /* 4-up */
+  .p4-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; min-height: 0; }
+  .p4-q { min-width: 0; min-height: 0; display: flex; gap: 1.6cqw; overflow: hidden; }
+  .p4-q1 { padding: 0 2.2cqw 2.2cqw 0; border-right: 0.4pt solid #ececec; border-bottom: 0.4pt solid #ececec; }
+  .p4-q2 { padding: 0 0 2.2cqw 2.2cqw; border-bottom: 0.4pt solid #ececec; }
+  .p4-q3 { padding: 2.2cqw 2.2cqw 0 0; border-right: 0.4pt solid #ececec; }
+  .p4-q4 { padding: 2.2cqw 0 0 2.2cqw; }
+  .p4-left { width: 34%; flex: none; }
+  .p4-grid2 { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 0.7cqw; }
+  .p4-grid2 .fig { aspect-ratio: 1; }
+  .p4-text { flex: 1; min-width: 0; }
+  .p4-title { margin: 0; font-size: 1.5cqw; font-weight: 700; line-height: 1.16; }
+  .p4-press { margin: 0.7cqw 0 0; font-size: 1.02cqw; color: #444; line-height: 1.28; }
+  .p4 .matrix { font-size: 0.95cqw; line-height: 1.3; }
+  .p4 .mus { font-size: 0.95cqw; line-height: 1.28; }
+  .p4 .body { font-size: 1cqw; line-height: 1.26; }
+  .p4-rail { width: 3.5%; flex: none; display: flex; justify-content: center; }
+  .p4 .lab { margin-top: 1.1cqw; }
+
+  /* ---- builder film ---- */
+  .cat-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2.8rem 2.2rem; align-items: start; }
+  .laptop { max-width: 34rem; margin: 0 auto; }
+  .laptop-screen { position: relative; background: #0f0f12; border: 12px solid #1c1c20; border-radius: 16px 16px 0 0; aspect-ratio: 16/10; overflow: hidden; box-shadow: 0 20px 50px -24px rgba(0,0,0,.7); }
+  .laptop-base { height: 0.9rem; background: linear-gradient(#1c1c20,#101013); border-radius: 0 0 14px 14px; margin: 0 -1.4rem; box-shadow: 0 8px 14px -8px rgba(0,0,0,.6); }
+  .laptop-notch { height: 0.5rem; background: #1c1c20; border-radius: 0 0 6px 6px; width: 22%; margin: 0 auto; }
+  .scr { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease; }
+  .scr[data-on] { opacity: 1; }
+  .cat-steps { list-style: none; margin: 1.6rem auto 0; padding: 0; max-width: 44rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.6rem; }
+  .cat-step { width: 100%; text-align: left; background: none; border: 0; border-left: 2px solid var(--line); padding: 0.3rem 0 0.3rem 0.7rem; cursor: pointer; font: inherit; color: var(--muted); font-size: 0.82rem; }
+  .cat-step[aria-current] { border-left-color: var(--accent); color: var(--ink); }
+  .cat-caption { text-align: center; color: var(--muted); font-size: 0.85rem; font-family: var(--mono); margin: 1rem 0 0; }
+
+  @media (max-width: 52rem) { .cat-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="site-head">
+  <nav>
+    <a class="brand" href="../">Vinyl Curator</a>
+    <a href="../albums/">Personal Archive</a>
+    <span class="nav-sec"><a href="../available/">Available</a></span>
+    <a href="../client-collection/">Client Collection Service</a>
+    <a href="../about/">About</a>
+  </nav>
+</header>
+
+<main class="cat">
+
+  <section style="margin:2.4rem 0 3.4rem">
+    <p class="eyebrow">Designed from the sheet menu</p>
+    <h1 style="font-family:Georgia,serif;font-weight:500;font-size:clamp(1.25rem,2.2vw,1.6rem);line-height:1.15;margin:0 0 0.8rem;max-width:32rem">Turn the collection into a coffee-table book.</h1>
+    <p style="color:var(--muted);font-size:1.08rem;line-height:1.6;max-width:40rem;margin:0 0 0">From the <strong>Vinyl Curator ▸ Create catalogue book…</strong> menu you choose a layout, which records, whether to print prices, and the order — and it lays out a print-ready PDF, plate by plate.</p>
+  </section>
+
+  <div class="cat-grid">
+    <!-- ===== builder film ===== -->
+    <div>
+    <div class="laptop" id="cat-film">
+      <div class="laptop-screen">
+        <!-- beat 0: Google Sheets + Vinyl Curator menu -->
+        <div class="scr" data-scr="0" style="background:#fff;color:#222;font-family:'Segoe UI',Roboto,Arial,sans-serif;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.7rem 0.15rem">
+            <span style="width:0.85rem;height:1.15rem;background:#188038;border-radius:2px;position:relative;flex:none"></span>
+            <span style="font-size:0.8rem;color:#3c4043">The Hartley Collection</span>
+            <span style="margin-left:auto;background:#188038;color:#fff;border-radius:999px;padding:0.18rem 0.7rem;font-size:0.62rem">⧉ Share</span>
+          </div>
+          <div style="display:flex;gap:0.75rem;padding:0 0.9rem 0.4rem;font-size:0.66rem;color:#5f6368;border-bottom:1px solid #e0e0e0">
+            <span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Data</span><span>Tools</span><span>Extensions</span><span>Help</span>
+            <span style="color:#188038;font-weight:600">Vinyl Curator</span><span>Vinyl Research</span><span>Vinyl Values</span><span>Vinyl Sales</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1.4rem 1.4fr 1fr 0.5fr 0.7fr;font-size:0.6rem;color:#80868b;background:#f8f9fa;border-bottom:1px solid #e0e0e0">
+            <span style="border-right:1px solid #e0e0e0"></span>
+            <span style="text-align:center;border-right:1px solid #e0e0e0;padding:0.14rem">A</span>
+            <span style="text-align:center;border-right:1px solid #e0e0e0;padding:0.14rem">B</span>
+            <span style="text-align:center;border-right:1px solid #e0e0e0;padding:0.14rem">C</span>
+            <span style="text-align:center;padding:0.14rem">D</span>
+          </div>
+          <div style="font-size:0.63rem;color:#3c4043">
+            <div style="display:grid;grid-template-columns:1.4rem 1.4fr 1fr 0.5fr 0.7fr;background:#f8f9fa;font-weight:700;color:#3c4043"><span style="text-align:center;color:#80868b;border-right:1px solid #e0e0e0;padding:0.26rem 0">1</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e0e0e0">Artist</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e0e0e0">Title</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e0e0e0">Year</span><span style="padding:0.26rem 0.5rem;border-bottom:1px solid #e0e0e0">Value</span></div>
+            <div style="display:grid;grid-template-columns:1.4rem 1.4fr 1fr 0.5fr 0.7fr"><span style="text-align:center;color:#80868b;background:#f8f9fa;border-right:1px solid #e0e0e0;padding:0.26rem 0">2</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed">Miles Davis</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed">Round About Midnight</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed">1957</span><span style="padding:0.26rem 0.5rem;border-bottom:1px solid #e8eaed">$420</span></div>
+            <div style="display:grid;grid-template-columns:1.4rem 1.4fr 1fr 0.5fr 0.7fr"><span style="text-align:center;color:#80868b;background:#f8f9fa;border-right:1px solid #e0e0e0;padding:0.26rem 0">3</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed">Carole King</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed">Tapestry</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed">1971</span><span style="padding:0.26rem 0.5rem;border-bottom:1px solid #e8eaed">$95</span></div>
+            <div style="display:grid;grid-template-columns:1.4rem 1.4fr 1fr 0.5fr 0.7fr"><span style="text-align:center;color:#80868b;background:#f8f9fa;border-right:1px solid #e0e0e0;padding:0.26rem 0">4</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed">Herbie Hancock</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed">Head Hunters</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed">1973</span><span style="padding:0.26rem 0.5rem;border-bottom:1px solid #e8eaed">$60</span></div>
+            <div style="display:grid;grid-template-columns:1.4rem 1.4fr 1fr 0.5fr 0.7fr"><span style="text-align:center;color:#80868b;background:#f8f9fa;border-right:1px solid #e0e0e0;padding:0.26rem 0">5</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed">Freddie Hubbard</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed">Night of the Cookers</span><span style="padding:0.26rem 0.5rem;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed">1966</span><span style="padding:0.26rem 0.5rem;border-bottom:1px solid #e8eaed">$140</span></div>
+          </div>
+          <div style="position:absolute;top:2.55rem;left:56%;width:13rem;background:#fff;border:1px solid #dadce0;border-radius:8px;box-shadow:0 14px 28px -10px rgba(0,0,0,.35);font-size:0.68rem;color:#3c4043;overflow:hidden;padding:0.3rem 0">
+            <div style="padding:0.38rem 0.9rem">Open collection webpage…</div>
+            <div style="padding:0.38rem 0.9rem">Print insurance schedule…</div>
+            <div style="padding:0.42rem 0.9rem;background:#e8f0fe;color:#1967d2;font-weight:600">Create catalogue book…</div>
+            <div style="padding:0.38rem 0.9rem">Bring an album back into the app…</div>
+          </div>
+        </div>
+
+        <!-- beat 1: dialog -->
+        <div class="scr" data-scr="1" style="background:rgba(10,10,12,0.55);display:flex;align-items:center;justify-content:center;padding:1rem">
+          <div style="width:15rem;max-width:92%;background:#fff;color:#3c4043;border-radius:9px;overflow:hidden;font-family:'Segoe UI',Roboto,Arial,sans-serif;box-shadow:0 24px 50px -18px rgba(0,0,0,.6)">
+            <div style="padding:0.5rem 0.75rem;border-bottom:1px solid #e6e9ec;font-weight:600;font-size:0.72rem;color:#202124">Create catalogue book</div>
+            <div style="padding:0.6rem 0.75rem;font-size:0.6rem;display:flex;flex-direction:column;gap:0.55rem">
+              <div><p style="margin:0 0 0.35rem;color:#5f6368;font-size:0.64rem;text-transform:uppercase;letter-spacing:0.08em">Records per page</p>
+                <div style="display:flex;gap:0.4rem">
+                  <span style="flex:1;text-align:center;border:1px solid #dadce0;border-radius:6px;padding:0.35rem">1</span>
+                  <span style="flex:1;text-align:center;border:1px solid #1a73e8;background:#e8f0fe;color:#1967d2;font-weight:600;border-radius:6px;padding:0.35rem">2</span>
+                  <span style="flex:1;text-align:center;border:1px solid #dadce0;border-radius:6px;padding:0.35rem">4</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:1rem">
+                <div style="flex:1"><p style="margin:0 0 0.3rem;color:#5f6368;font-size:0.64rem;text-transform:uppercase;letter-spacing:0.08em">Orientation</p>
+                  <div style="display:flex;gap:0.4rem">
+                    <span style="flex:1;text-align:center;border:1px solid #dadce0;border-radius:6px;padding:0.35rem">Portrait</span>
+                    <span style="flex:1;text-align:center;border:1px solid #1a73e8;background:#e8f0fe;color:#1967d2;font-weight:600;border-radius:6px;padding:0.35rem">Landscape</span>
+                  </div>
+                </div>
+                <div style="flex:1"><p style="margin:0 0 0.3rem;color:#5f6368;font-size:0.64rem;text-transform:uppercase;letter-spacing:0.08em">Order by</p><div style="border:1px solid #dadce0;border-radius:6px;padding:0.35rem 0.5rem;color:#202124">Artist ▾</div></div>
+              </div>
+              <div><p style="margin:0 0 0.35rem;color:#5f6368;font-size:0.64rem;text-transform:uppercase;letter-spacing:0.08em">Prices</p>
+                <div style="display:flex;gap:0.4rem">
+                  <span style="flex:1;text-align:center;border:1px solid #dadce0;border-radius:6px;padding:0.35rem">None</span>
+                  <span style="flex:1;text-align:center;border:1px solid #dadce0;border-radius:6px;padding:0.35rem">Asking</span>
+                  <span style="flex:1;text-align:center;border:1px solid #1a73e8;background:#e8f0fe;color:#1967d2;font-weight:600;border-radius:6px;padding:0.35rem">Value estimate</span>
+                </div>
+              </div>
+            </div>
+            <div style="padding:0.5rem 0.75rem;border-top:1px solid #e6e9ec;display:flex;justify-content:flex-end;gap:0.6rem;align-items:center">
+              <span style="font-size:0.62rem;color:#1a73e8;font-weight:600">Cancel</span>
+              <span style="padding:0.3rem 0.85rem;background:#1a73e8;color:#fff;border-radius:5px;font-size:0.62rem;font-weight:600">Create</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- beat 2: generating -->
+        <div class="scr" data-scr="2" style="background:#12100b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.9rem;padding:2rem;text-align:center">
+          <p style="margin:0;font-family:Georgia,serif;font-size:1.15rem;color:#f0d9bd">Laying out the catalogue…</p>
+          <div style="width:70%;height:5px;border-radius:999px;background:#2a2620;overflow:hidden"><div id="cat-genbar" style="height:100%;width:18%;background:#d98b4a;transition:width .5s linear"></div></div>
+          <p id="cat-genline" style="margin:0;font-family:ui-monospace,Consolas,monospace;font-size:0.72rem;color:#a89d8d">Reading 16 records…</p>
+        </div>
+
+        <!-- beat 3: book ready -->
+        <div class="scr" data-scr="3" style="background:#c8ccd2;display:flex;align-items:center;justify-content:center;padding:1.3rem">
+          <div style="position:relative;width:78%;aspect-ratio:255.4/191.9;background:#fff;box-shadow:0 10px 26px -10px rgba(0,0,0,.5);container-type:inline-size;padding:3cqw;display:flex;flex-direction:column;font-family:Georgia,serif;color:#222">
+            <p style="margin:0;text-align:center;font-size:2.4cqw;letter-spacing:0.12em;text-transform:uppercase;color:#8a8072">The Hartley Collection</p>
+            <p style="margin:1cqw 0 0;text-align:center;font-size:5cqw;font-family:Georgia,serif">The Vinyl Catalogue</p>
+            <p style="margin:0.6cqw 0 0;text-align:center;font-size:2.2cqw;color:#666;font-style:italic">Volume One</p>
+            <div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:1.4cqw;align-content:center;margin-top:2cqw">
+              <img src="https://img.vinylcurator.net/albums/miles-davis-round-about-midnight/img/t/01-front-cover.jpg" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,.3)">
+              <img src="https://img.vinylcurator.net/albums/carole-king-tapestry/img/t/01-front-cover.jpg" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,.3)">
+              <img src="https://img.vinylcurator.net/albums/herbie-hancock-head-hunters/img/t/01-front-cover.jpg" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,.3)">
+              <img src="https://img.vinylcurator.net/albums/bob-dylan-oh-mercy/img/t/01-front-cover.jpg" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,.3)">
+            </div>
+            <p style="margin:0;text-align:center;font-size:1.9cqw;color:#9a9a9a">Saved to Drive · Hartley Collection — The Vinyl Catalogue.pdf</p>
+          </div>
+        </div>
+      </div>
+      <div class="laptop-notch"></div>
+      <div class="laptop-base"></div>
+      <p class="cat-caption" id="cat-caption">01 · Vinyl Curator ▸ Create catalogue book…</p>
+    </div>
+
+    <ol class="cat-steps">
+      <li><button type="button" class="cat-step" data-beat="0">1 · Open the menu</button></li>
+      <li><button type="button" class="cat-step" data-beat="1">2 · Choose layout &amp; options</button></li>
+      <li><button type="button" class="cat-step" data-beat="2">3 · It lays out the plates</button></li>
+      <li><button type="button" class="cat-step" data-beat="3">4 · Print-ready PDF</button></li>
+    </ol>
+    </div>
+
+  <!-- ================= 1-up ================= -->
+  <section>
+    <h2 class="h2">One record per page — 1-up</h2>
+    <p class="sub">The whole plate given to a single album: the full photo set, pressing detail, matrix, variant chronology and the essays.</p>
+    <div class="desk">
+      <div class="plate p1">
+        <div class="p1-photos">
+          <figure class="fig p1-hero"><img src="https://img.vinylcurator.net/albums/miles-davis-jazz-on-the-screen/img/01-front-cover.jpg" alt="Front cover"></figure>
+          <div class="p1-row">
+            <figure class="fig"><img src="https://img.vinylcurator.net/albums/miles-davis-jazz-on-the-screen/img/03-back-cover.jpg" alt="Back cover"></figure>
+            <figure class="fig label"><img src="https://img.vinylcurator.net/albums/miles-davis-jazz-on-the-screen/img/06-side-1-label.jpg" alt="Side 1 label"></figure>
+            <figure class="fig label"><img src="https://img.vinylcurator.net/albums/miles-davis-jazz-on-the-screen/img/08-side-2-label.jpg" alt="Side 2 label"></figure>
+          </div>
+          <div class="p1-sec"><p class="lab">Musicians</p><p class="mus">Miles Davis (tpt), John Coltrane (ts), Cannonball Adderley (as), Bill Evans (p), Paul Chambers (b), Jimmy Cobb (d)</p></div>
+        </div>
+        <div class="p1-text">
+          <p class="lab">Jazz · Hard Bop</p>
+          <h2 class="p1-title">Miles Davis — Jazz On The Screen</h2>
+          <p class="p1-press">1959 · Columbia CL 1355 · LP · 33⅓ RPM · Mono · US · Cover VG+ · Vinyl NM · $180</p>
+          <div class="p1-sec"><p class="lab">Matrix / Runout</p><p class="matrix">Side A&nbsp;&nbsp;XLP 44601-2AE III<br>Side B&nbsp;&nbsp;XLP 44602-2G</p></div>
+          <div class="p1-sec"><p class="lab">Variant Chronology</p><dl class="variant"><dt>1959</dt><dd>Six-eye red/black, deep groove, no plant letter — NY pressing <span class="thiscopy">— this copy</span></dd><dt>1959–60</dt><dd>Six-eye, Terre Haute (TA / TC suffix)</dd><dt>c. 1960–62</dt><dd>Six-eye, Pitman / Hollywood (P / H suffix)</dd><dt>c. 1962–63</dt><dd>"Guaranteed High-Fidelity" red label</dd><dt>c. 1963–70</dt><dd>"360 Sound" red label</dd><dt>2013</dt><dd>RSD numbered 180g mono reissue</dd></dl></div>
+          <div class="p1-sec"><p class="lab">Notes</p><p class="body">Original first pressing. Red/black six-eye deep-groove labels; the runout carries none of the TA / P / H plant suffixes of the later Terre Haute, Pitman and Hollywood repressings, placing it among the earliest New York-plant stampers. No promo or club markings.</p></div>
+          <div class="p1-sec"><p class="lab">Fidelity</p><p class="body">Mastered from the original Columbia tapes for the first six-eye mono pressing. Columbia's late-1950s New York pressings are prized for quiet vinyl and a warm, present mono — original six-eyes rate consistently above the later 360 Sound reissues.</p></div>
+          <div class="p1-sec"><p class="lab">The Album</p><p class="body">Pairs the improvised Paris score for Louis Malle's Ascenseur pour l'échafaud (Dec 1957) with three New York standards (May 1958) — the first studio meeting of Davis and Bill Evans, caught at the hinge just before Kind of Blue.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 2-up ================= -->
+  <section>
+    <h2 class="h2">Two per page — 2-up</h2>
+    <p class="sub">Two albums to a plate, each keeping matrix, a variant chronology, notes, fidelity and the album essay.</p>
+    <div class="desk">
+      <div class="plate p2">
+        <div class="p2-band">
+          <div class="p2-photocol">
+            <div class="p2-grid">
+              <figure class="fig"><img src="https://img.vinylcurator.net/albums/miles-davis-jazz-on-the-screen/img/t/01-front-cover.jpg" alt="Front cover"></figure>
+              <figure class="fig"><img src="https://img.vinylcurator.net/albums/miles-davis-jazz-on-the-screen/img/t/03-back-cover.jpg" alt="Back cover"></figure>
+              <figure class="fig label"><img src="https://img.vinylcurator.net/albums/miles-davis-jazz-on-the-screen/img/t/06-side-1-label.jpg" alt="Side 1 label"></figure>
+              <figure class="fig label"><img src="https://img.vinylcurator.net/albums/miles-davis-jazz-on-the-screen/img/t/08-side-2-label.jpg" alt="Side 2 label"></figure>
+            </div>
+            <div class="mus" style="margin-top:1.2cqw"><p class="lab">Musicians</p><p class="mus" style="margin:0">Miles Davis (tpt), John Coltrane (ts), Cannonball Adderley (as), Bill Evans (p), Paul Chambers (b), Jimmy Cobb (d)</p></div>
+          </div>
+          <div class="p2-meta">
+            <h2 class="p2-title">Miles Davis — Jazz On The Screen</h2>
+            <p class="p2-press">1959 · Columbia CL 1355 · LP · 33⅓ RPM · Mono · US · Cover VG+ · Vinyl NM · $180</p>
+            <div class="p2-cols">
+              <div class="p2-col">
+                <div><p class="lab">Matrix / Runout</p><p class="matrix">Side A&nbsp;&nbsp;XLP 44601-2AE III<br>Side B&nbsp;&nbsp;XLP 44602-2G</p></div>
+                <div><p class="lab">Variant Chronology</p><dl class="variant"><dt>1959</dt><dd>Six-eye red/black, deep groove, no plant letter — NY <span class="thiscopy">— this copy</span></dd><dt>1959–60</dt><dd>Six-eye, Terre Haute (TA / TC)</dd><dt>c. 1960–62</dt><dd>Six-eye, Pitman / Hollywood (P / H)</dd><dt>c. 1963–70</dt><dd>"360 Sound" red label</dd><dt>2013</dt><dd>RSD numbered 180g mono</dd></dl></div>
+              </div>
+              <div class="p2-col">
+                <div><p class="lab">Notes</p><p class="body">Original first pressing. Red/black six-eye deep-groove labels; the runout carries none of the later plant suffixes, placing it among the earliest New York-plant stampers.</p></div>
+                <div><p class="lab">Fidelity</p><p class="body">Mastered from the original Columbia tapes for the first six-eye mono — prized for quiet vinyl and a warm, present mono, above the later 360 Sound reissues.</p></div>
+                <div><p class="lab">The Album</p><p class="body">The improvised Paris score for Malle's Ascenseur pour l'échafaud with three 1958 New York standards — Davis and Bill Evans' first studio meeting.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="p2-rail"><div class="rail">Jazz · Hard Bop</div></div>
+        </div>
+
+        <div class="p2-div"></div>
+
+        <div class="p2-band">
+          <div class="p2-photocol">
+            <div class="p2-grid">
+              <figure class="fig"><img src="https://img.vinylcurator.net/albums/miles-davis-relaxin/img/t/01-front-cover.jpg" alt="Front cover"></figure>
+              <figure class="fig"><img src="https://img.vinylcurator.net/albums/miles-davis-relaxin/img/t/03-back-cover.jpg" alt="Back cover"></figure>
+              <figure class="fig label"><img src="https://img.vinylcurator.net/albums/miles-davis-relaxin/img/t/06-side-1-label.jpg" alt="Side 1 label"></figure>
+              <figure class="fig label"><img src="https://img.vinylcurator.net/albums/miles-davis-relaxin/img/t/08-side-2-label.jpg" alt="Side 2 label"></figure>
+            </div>
+            <div class="mus" style="margin-top:1.2cqw"><p class="lab">Musicians</p><p class="mus" style="margin:0">Miles Davis (tpt), John Coltrane (ts), Red Garland (p), Paul Chambers (b), Philly Joe Jones (d)</p></div>
+          </div>
+          <div class="p2-meta">
+            <h2 class="p2-title">The Miles Davis Quintet — Relaxin'</h2>
+            <p class="p2-press">1958 · Prestige PRLP 7129 · LP · 33⅓ RPM · Mono · US · Cover NM- · Vinyl NM- Deep Groove · $220</p>
+            <div class="p2-cols">
+              <div class="p2-col">
+                <div><p class="lab">Matrix / Runout</p><p class="matrix">Side A&nbsp;&nbsp;PRLP-7129-A C RVG<br>Side B&nbsp;&nbsp;PRLP-7129-B C RVG</p></div>
+                <div><p class="lab">Variant Chronology</p><dl class="variant"><dt>1958</dt><dd>Fireworks label, 446 W. 50th St. NYC, deep groove, RVG etch <span class="thiscopy">— this copy</span></dd><dt>1958–62</dt><dd>Fireworks, Bergenfield N.J.</dd><dt>1962–64</dt><dd>Blue / silver-print label</dd><dt>1970s–80s</dt><dd>Prestige / Fantasy reissue</dd><dt>2000s–</dt><dd>OJC / audiophile reissues</dd></dl></div>
+              </div>
+              <div class="p2-col">
+                <div><p class="lab">Notes</p><p class="body">First-issue label variant: 446 W. 50th St. NYC address (pre-Bergenfield), deep-groove labels both sides, RVG hand-etched in the runout.</p></div>
+                <div><p class="lab">Fidelity</p><p class="body">Cut by Rudy Van Gelder from his Hackensack tapes — the sound closest to source, ranking above the Bergenfield pressings and the RVG CD.</p></div>
+                <div><p class="lab">The Album</p><p class="body">From the two 1956 marathon sessions that closed Davis's Prestige contract — the First Great Quintet in relaxed, near-first-take form.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="p2-rail"><div class="rail">Jazz · Hard Bop</div></div>
+        </div>
+
+        <div class="pfoot"><span>The Vinyl Catalogue</span><span>Plates 7–8</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 4-up ================= -->
+  <section>
+    <h2 class="h2">Four per page — 4-up</h2>
+    <p class="sub">A denser plate for larger collections — four albums, each still carrying its photos, matrix, notes and fidelity.</p>
+    <div class="desk">
+      <div class="plate p4">
+        <div class="p4-grid">
+          <div class="p4-q p4-q1">
+            <div class="p4-left">
+              <div class="p4-grid2">
+                <figure class="fig"><img src="https://img.vinylcurator.net/albums/miles-davis-jazz-on-the-screen/img/t/01-front-cover.jpg" alt=""></figure>
+                <figure class="fig"><img src="https://img.vinylcurator.net/albums/miles-davis-jazz-on-the-screen/img/t/03-back-cover.jpg" alt=""></figure>
+                <figure class="fig label"><img src="https://img.vinylcurator.net/albums/miles-davis-jazz-on-the-screen/img/t/06-side-1-label.jpg" alt=""></figure>
+                <figure class="fig label"><img src="https://img.vinylcurator.net/albums/miles-davis-jazz-on-the-screen/img/t/08-side-2-label.jpg" alt=""></figure>
+              </div>
+              <p class="lab">Musicians</p><p class="mus">Miles Davis (tpt), John Coltrane (ts), Cannonball Adderley (as), Bill Evans (p), Paul Chambers (b), Jimmy Cobb (d)</p>
+            </div>
+            <div class="p4-text">
+              <h2 class="p4-title">Miles Davis — Jazz On The Screen</h2>
+              <p class="p4-press">1959 · Columbia CL 1355 · Mono · US · Cover VG+ · Vinyl NM · $180</p>
+              <p class="lab">Matrix / Runout</p><p class="matrix">A&nbsp;&nbsp;XLP 44601-2AE III<br>B&nbsp;&nbsp;XLP 44602-2G</p>
+              <p class="lab">Notes</p><p class="body">Original first pressing; six-eye deep-groove, no plant suffix — earliest NY stampers.</p>
+              <p class="lab">Fidelity</p><p class="body">Original Columbia tapes, first six-eye mono — above the later 360 Sound reissues.</p>
+              <p class="lab">The Album</p><p class="body">The improvised Paris score for Malle's Ascenseur with three 1958 NY standards — Davis and Bill Evans' first studio meeting.</p>
+            </div>
+            <div class="p4-rail"><div class="rail">Jazz</div></div>
+          </div>
+
+          <div class="p4-q p4-q2">
+            <div class="p4-left">
+              <div class="p4-grid2">
+                <figure class="fig"><img src="https://img.vinylcurator.net/albums/miles-davis-relaxin/img/t/01-front-cover.jpg" alt=""></figure>
+                <figure class="fig"><img src="https://img.vinylcurator.net/albums/miles-davis-relaxin/img/t/03-back-cover.jpg" alt=""></figure>
+                <figure class="fig label"><img src="https://img.vinylcurator.net/albums/miles-davis-relaxin/img/t/06-side-1-label.jpg" alt=""></figure>
+                <figure class="fig label"><img src="https://img.vinylcurator.net/albums/miles-davis-relaxin/img/t/08-side-2-label.jpg" alt=""></figure>
+              </div>
+              <p class="lab">Musicians</p><p class="mus">Miles Davis (tpt), John Coltrane (ts), Red Garland (p), Paul Chambers (b), Philly Joe Jones (d)</p>
+            </div>
+            <div class="p4-text">
+              <h2 class="p4-title">The Miles Davis Quintet — Relaxin'</h2>
+              <p class="p4-press">1958 · Prestige PRLP 7129 · Mono · US · Cover NM- · Vinyl NM-</p>
+              <p class="lab">Matrix / Runout</p><p class="matrix">A&nbsp;&nbsp;PRLP-7129-A C RVG<br>B&nbsp;&nbsp;PRLP-7129-B C RVG</p>
+              <p class="lab">Notes</p><p class="body">First-issue 446 W. 50th St. NYC address, deep-groove, RVG etch.</p>
+              <p class="lab">Fidelity</p><p class="body">RVG cut from the Hackensack tapes — above Bergenfield and the RVG CD.</p>
+              <p class="lab">The Album</p><p class="body">From the 1956 marathon sessions that closed Davis's Prestige contract — the First Great Quintet, near-first-take.</p>
+            </div>
+            <div class="p4-rail"><div class="rail">Jazz</div></div>
+          </div>
+
+          <div class="p4-q p4-q3">
+            <div class="p4-left">
+              <div class="p4-grid2">
+                <figure class="fig"><img src="https://img.vinylcurator.net/albums/miles-davis-round-about-midnight/img/t/01-front-cover.jpg" alt=""></figure>
+                <figure class="fig"><img src="https://img.vinylcurator.net/albums/miles-davis-round-about-midnight/img/t/03-back-cover.jpg" alt=""></figure>
+                <figure class="fig label"><img src="https://img.vinylcurator.net/albums/miles-davis-round-about-midnight/img/t/06-side-1-label.jpg" alt=""></figure>
+                <figure class="fig label"><img src="https://img.vinylcurator.net/albums/miles-davis-round-about-midnight/img/t/08-side-2-label.jpg" alt=""></figure>
+              </div>
+              <p class="lab">Musicians</p><p class="mus">Miles Davis (tpt), John Coltrane (ts), Red Garland (p), Paul Chambers (b), Philly Joe Jones (d)</p>
+            </div>
+            <div class="p4-text">
+              <h2 class="p4-title">Miles Davis — Round About Midnight</h2>
+              <p class="p4-press">1957 · Columbia CL 949 · Mono · US · Cover EX · Vinyl VG+</p>
+              <p class="lab">Matrix / Runout</p><p class="matrix">A&nbsp;&nbsp;XLP39109-1A<br>B&nbsp;&nbsp;XLP39110-1A H1</p>
+              <p class="lab">Notes</p><p class="body">Six-eye deep-groove, single-line label; 1A/1A stampers, early in the run.</p>
+              <p class="lab">Fidelity</p><p class="body">Original mono cut; early six-eye deep-groove sits at the top of the title's hierarchy.</p>
+              <p class="lab">The Album</p><p class="body">Davis's Columbia debut, introducing the first great quintet — a cornerstone of hard bop.</p>
+            </div>
+            <div class="p4-rail"><div class="rail">Jazz</div></div>
+          </div>
+
+          <div class="p4-q p4-q4">
+            <div class="p4-left">
+              <div class="p4-grid2">
+                <figure class="fig"><img src="https://img.vinylcurator.net/albums/carole-king-tapestry/img/t/01-front-cover.jpg" alt=""></figure>
+                <figure class="fig"><img src="https://img.vinylcurator.net/albums/carole-king-tapestry/img/t/03-back-cover.jpg" alt=""></figure>
+                <figure class="fig label"><img src="https://img.vinylcurator.net/albums/carole-king-tapestry/img/t/06-side-1-label.jpg" alt=""></figure>
+                <figure class="fig label"><img src="https://img.vinylcurator.net/albums/carole-king-tapestry/img/t/08-side-2-label.jpg" alt=""></figure>
+              </div>
+              <p class="lab">Musicians</p><p class="mus">Carole King (p, voc), Danny Kortchmar (gtr), Charles Larkey (b), James Taylor (gtr), Russ Kunkel (d)</p>
+            </div>
+            <div class="p4-text">
+              <h2 class="p4-title">Carole King — Tapestry</h2>
+              <p class="p4-press">1971 · Ode SP-77009 · Stereo · US · Cover EX · Vinyl NM</p>
+              <p class="lab">Matrix / Runout</p><p class="matrix">A&nbsp;&nbsp;ODE 177017 PM</p>
+              <p class="lab">Notes</p><p class="body">First issue — Ode 70 logo with the 1416 N. La Brea rim text.</p>
+              <p class="lab">Fidelity</p><p class="body">Bernie Grundman lacquers; a clean early Ode pressing is the benchmark.</p>
+              <p class="lab">The Album</p><p class="body">Recorded January 1971 at A&amp;M; topped the chart 15 weeks and swept the 1972 Grammys.</p>
+            </div>
+            <div class="p4-rail"><div class="rail">Singer-Songwriter</div></div>
+          </div>
+        </div>
+        <div class="pfoot"><span>The Vinyl Catalogue · Volume One</span><span>Plates 07–10</span></div>
+      </div>
+    </div>
+  </section>
+  </div>
+
+</main>
+
+<footer class="site-foot">
+  <p class="colophon">Documented with <a href="../">Vinyl Curator</a> ·
+  <a class="mail" data-u="contact" data-d="vinylcurator.net">contact</a> ·
+  © 2026 Vinyl Curator</p>
+</footer>
+<script src="../assets/site.js?v=9227f734"></script>
+</body>
+</html>
