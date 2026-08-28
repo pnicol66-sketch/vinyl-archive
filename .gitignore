@@ -1,6 +1,7 @@
 _removed/
 Thumbs.db
 build.config.json
+cf-api.local.json
 .autopublish-state.json
 autopublish.log
 .foldercache.json
