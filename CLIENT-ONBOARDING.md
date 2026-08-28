@@ -133,9 +133,11 @@ nothing of theirs was ever in the public repo — a total takedown.
 | DNS per client | `<slug>` AAAA `100::` **Proxied** |
 | Bucket key layout | `<slug>/albums/…`, `<slug>/assets/…`, `<slug>/index.html` |
 
-## Notes / known gaps
-- **`-All` does not publish private tenants** — its loop syncs only the owner
-  site + git. Publish each private client individually with `-Tenant <slug> -Push`.
+## Notes
+- **`build.ps1 -All -Push`** republishes the owner site AND every private client
+  in one command (each private tenant syncs itself to its bucket; the owner gets
+  the image-sync + git push). Use it to push a site-wide change to everyone; use
+  `-Tenant <slug> -Push` to publish just one client.
 - **Login domain wording**: Google's sign-in shows "continue to
   cloudflareaccess.com" (Google shows the registrable domain; a custom Access
   domain to change it needs a paid plan). Reassure in the invite; it's standard.
