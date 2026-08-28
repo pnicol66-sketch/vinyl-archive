@@ -7,7 +7,7 @@
 <meta name="description" content="Coffee-table catalogue books built from the Vinyl Curator sheet — 1-up, 2-up and 4-up plate layouts.">
 <link rel="canonical" href="https://vinylcurator.net/catalogue/">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../assets/site.css?v=ad643ebd">
+<link rel="stylesheet" href="../assets/site.css?v=dee5df29">
 <style>
   /* Catalogue-book showcase (self-contained; not loaded by album pages). */
   .cat { max-width: 66rem; }
@@ -96,7 +96,11 @@
   .cat-step[aria-current] { border-left-color: var(--accent); color: var(--ink); }
   .cat-caption { text-align: center; color: var(--muted); font-size: 0.85rem; font-family: var(--mono); margin: 1rem 0 0; }
 
-  @media (max-width: 52rem) { .cat-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 52rem) {
+    .cat-grid { grid-template-columns: minmax(0, 1fr); }
+    .cat { max-width: 100%; }
+    .laptop { max-width: 100%; }
+  }
 </style>
 </head>
 <body>

@@ -258,6 +258,13 @@ h2 {
 .archive-foot {
   margin: 3rem 0 0; color: var(--faint); font-size: 0.8rem; font-family: var(--mono);
 }
+/* Phones: the 11rem min tile only fits one per row on a narrow screen, which
+   reads as one giant card. Force a proper two-up streaming grid instead. */
+@media (max-width: 34rem) {
+  .card-grid:not(.is-list) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
+  .card .t { font-size: 0.85rem; }
+  .card .a { font-size: 0.76rem; }
+}
 
 /* album page */
 .album-head { padding-top: 2.5rem; }
@@ -280,26 +287,14 @@ h2 {
 }
 .gallery .hero-shot img { cursor: zoom-in; width: 100%; }
 
-/* Desktop: the album becomes a two-column stage - a vertical 35mm film-strip of
-   the record's photos on the left, the documentation scrolling on the right.
-   Scoped to `screen` so the print layout (which floats the gallery, front cover
-   only) is completely unaffected. */
-@media screen and (min-width: 60rem) {
-  .album {
-    display: grid; grid-template-columns: 20rem minmax(0, 1fr);
-    gap: 2rem; align-items: start;
-  }
-  .album > * { grid-column: 2; min-width: 0; }
-  .album-head {
-    grid-column: 1 / -1; padding-bottom: 1.6rem; margin-bottom: 0.4rem;
-    border-bottom: 1px solid var(--line2);
-  }
-  /* The film strip occupies column 1 across the full height of the content, so
-     it can sit sticky beside the scrolling documentation. */
+/* The record's photos render as a vertical 35mm film strip on every screen size
+   (a dark base with sprocket-hole dashes down both edges, each photo a framed
+   cel). On phones it is a capped-height scroll above the documentation; on
+   desktop it becomes the left column of a two-column stage. Scoped to `screen`
+   so the print layout (which floats the gallery, front cover only) is untouched. */
+@media screen {
   .album .gallery {
-    grid-column: 1; grid-row: 2 / 999; margin-top: 0;
-    position: sticky; top: 4.8rem; align-self: start;
-    max-height: calc(100vh - 6rem); overflow-y: auto;
+    margin-top: 1.4rem;
     border-radius: 6px; padding: 14px 22px;
     background-color: var(--deep);
     background-image:
@@ -308,7 +303,7 @@ h2 {
     background-position: 8px 6px, right 8px top 6px;
     background-size: 10px calc(100% - 12px), 10px calc(100% - 12px);
     background-repeat: no-repeat;
-    scrollbar-width: thin;
+    max-height: 62vh; overflow-y: auto; scrollbar-width: thin;
   }
   /* Hero and the thumbnail strip stack into one vertical column of framed cels. */
   .album .gallery .hero-shot,
@@ -322,7 +317,26 @@ h2 {
     display: flex; flex-direction: column; gap: 0; margin-top: 0; overflow: visible;
   }
   .album .gallery .strip img {
-    height: auto; width: 100%; border-radius: 0; aspect-ratio: 1; object-fit: cover;
+    height: auto; width: 100%; border-radius: 0; aspect-ratio: 1; object-fit: cover; flex: none;
+  }
+}
+
+/* Desktop: the film strip becomes a sticky left column beside the scrolling
+   documentation. */
+@media screen and (min-width: 60rem) {
+  .album {
+    display: grid; grid-template-columns: 20rem minmax(0, 1fr);
+    gap: 2rem; align-items: start;
+  }
+  .album > * { grid-column: 2; min-width: 0; }
+  .album-head {
+    grid-column: 1 / -1; padding-bottom: 1.6rem; margin-bottom: 0.4rem;
+    border-bottom: 1px solid var(--line2);
+  }
+  .album .gallery {
+    grid-column: 1; grid-row: 2 / 999; margin-top: 0;
+    position: sticky; top: 4.8rem; align-self: start;
+    max-height: calc(100vh - 6rem);
   }
 }
 

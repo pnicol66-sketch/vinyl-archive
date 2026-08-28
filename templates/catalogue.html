@@ -96,7 +96,11 @@
   .cat-step[aria-current] { border-left-color: var(--accent); color: var(--ink); }
   .cat-caption { text-align: center; color: var(--muted); font-size: 0.85rem; font-family: var(--mono); margin: 1rem 0 0; }
 
-  @media (max-width: 52rem) { .cat-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 52rem) {
+    .cat-grid { grid-template-columns: minmax(0, 1fr); }
+    .cat { max-width: 100%; }
+    .laptop { max-width: 100%; }
+  }
 </style>
 </head>
 <body>
