@@ -245,29 +245,21 @@
 })();
 
 /* ============================================================
-   Landing page film — append to assets/site.js
-   Drives the phone mock on the landing page only; every other page
-   has no #film, so this exits immediately.
+   Landing page film — drives the phone mock on the landing page.
+   Ported from the design handoff (Homepage.dc.html): a 7-beat state
+   machine with per-beat sub-state (shot / cropping / taps / said) that
+   sets inline styles + text on [data-k] / [data-panel] / [data-step]
+   hooks. Every other page has no #film, so this exits immediately.
    ============================================================ */
 (function () {
   var film = document.getElementById('film');
   if (!film) return;
 
-  var steps = [].slice.call(film.querySelectorAll('.lp-steps button'));
-  var scrs = [].slice.call(film.querySelectorAll('.lp-scr'));
-  var title = film.querySelector('.lp-apptitle');
-  var back = film.querySelector('.lp-back');
-  var caption = film.querySelector('.lp-caption');
-  var note = film.querySelector('.lp-beatnote');
-  var dict = film.querySelector('.lp-dict');
-
-  var TITLES = ['New Album', 'Miles Davis — Kind of Blue', 'Take photo', 'Crop photo',
-                '14 Side 1 Matrix/Runout', 'Save to Drive', 'Uploaded albums'];
-  var CAPTIONS = [
+  var BEATS = [
     '01 · New album — two fields and a disc count',
     '02 · The checklist does the remembering',
-    '03 · Shoot the cover — it auto-crops',
-    '04 · Tap 5 points around the rim',
+    '03 · Shoot — the cover auto-crops',
+    '04 · Tap the rim — the shape fits itself',
     '05 · Typing or dictating the matrix',
     '06 · Into your own Google Drive',
     '07 · Shared read-only — work begins'
@@ -275,64 +267,132 @@
   var NOTES = [
     'Label artist, album title, one disc or two. That is the entire setup — no account with us.',
     'Thirteen entries for a single LP — front and back cover, a typed grade for each, both labels, both disc faces, a typed grade per side, and the matrix for each side. Photo rows open the camera; ⌨ rows open a text screen. Optional entries carry a Skip.',
-    'Torch, zoom and autofocus if you want them; otherwise just shoot. Covers are cropped for you on the phone — you just drag a corner to fix it, with a 3× magnifier under your fingertip, and Save.',
-    'Centre the label or disc and fill the frame, then tap five points around its rim — the app fits an ellipse through them and deskews a tilted disc to a true circle. ⟳ rotates the saved photo in 90° steps.',
+    'Take the photo and the app auto-crops the sleeve for you — an on-device model finds the four corners, no account and no connection needed. It hands you the frame to nudge: drag any corner or side, with a 3× magnifier under your fingertip. If it ever misses, you just tap the four corners yourself.',
+    "Labels and full-disc LP shots are even quicker: take the photo, then tap five points anywhere around the disc's edge and the app fits the exact shape through them — no dragging — so it stays true even when the disc is shot at a slight angle.",
     'The matrix is typed, or simply read out loud character by character — dictation converts spoken symbol words as you say them. Dead-wax photos have their own four slots if you want them, but they are optional: the transcription is what the identification runs on.',
     'Straight into My Drive / Vinyl Curator / Artist_Album, updating in place if you re-shoot.',
     'You share that one folder, read-only. Nothing else in your Drive is visible, and you can revoke it any time.'
   ];
-  var SAID = ['CS 8163', 'CS 8163-A', 'CS 8163-A T', 'CS 8163-A T BG'];
-  var HOLD = [1, 1.8, 1.7, 1.2, 1.7, 1.1, 1.3];
-  var PHASE = { 1: 1600, 2: 1400, 3: 900 };   // ms into the beat when the second phase fires
-  var BEAT = 3000;
+  var TITLES = ['New Album', 'Miles Davis — Kind of Blue', 'Take photo', 'Crop photo',
+                '14 Side 1 Matrix/Runout', 'Save to Drive', 'Uploaded albums'];
+  var DICT = ['CS 8163', 'CS 8163-A', 'CS 8163-A T', 'CS 8163-A T BG'];
+  var TAPPOS = [[50, 2], [95, 27], [88, 82], [15, 86], [4, 40]];
+  // Beat 3 (label/LP capture) holds longest: the 5 taps take ~2.6s to place,
+  // then the fitted circle needs time to read before the film moves on.
+  var HOLD = [1.5, 2.4, 2.3, 3.3, 2.3, 1.6, 1.9];
+  var TAP_MS = 520;   // per-tap cadence on beat 3
+  var BEAT_MS = 3000;
+
+  function k(name) { return film.querySelector('[data-k="' + name + '"]'); }
+  var panels = [].slice.call(film.querySelectorAll('[data-panel]'));
+  var steps = [].slice.call(film.querySelectorAll('[data-step]'));
+  var taps = [].slice.call(film.querySelectorAll('[data-k="tap"]'));
+  var pips = [].slice.call(film.querySelectorAll('[data-k="pip"]'));
+  var elTitle = k('title'), elBack = k('back'), elCap = k('caption'), elNote = k('note'),
+      elCam = k('cam'), elReview = k('review'), elCrop = k('crop'), elAuto = k('autocrop'),
+      elCoverMsg = k('coverMsg'), elShutter = k('shutter'), elList = k('list'),
+      elCircle = k('circle'), elLine = k('line'), elPoly = k('poly'), elTapMsg = k('tapMsg'),
+      elUndo = k('undo'), elSave = k('save'), elDict = k('dictated'),
+      elUploaded = k('uploaded'), elProgress = k('progress');
 
   var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var beat = -1, tNext, tPhase, tSay;
+  var state = { beat: 0, shot: false, said: DICT.length - 1, taps: 5, cropping: false };
+  var t, t2, t3, t4, started = false;
 
-  function go(i, manual) {
-    clearTimeout(tNext); clearTimeout(tPhase); clearInterval(tSay);
-    beat = i;
-
-    scrs.forEach(function (s, n) {
-      if (n === i) { s.setAttribute('data-on', ''); } else { s.removeAttribute('data-on'); }
-      s.removeAttribute('data-shot');
+  function render() {
+    var b = state.beat;
+    panels.forEach(function (p) { p.style.opacity = (+p.getAttribute('data-panel') === b) ? '1' : '0'; });
+    steps.forEach(function (s) {
+      var on = (+s.getAttribute('data-step') === b);
+      s.style.borderLeftColor = on ? '#d98b4a' : '#38332a';
+      var eye = s.querySelector('[data-sk="eye"]'), ti = s.querySelector('[data-sk="title"]');
+      if (eye) eye.style.color = on ? '#d98b4a' : '#a89d8d';
+      if (ti) { ti.style.color = on ? '#ece7de' : '#a89d8d'; ti.style.fontWeight = on ? '600' : '400'; }
     });
-    steps.forEach(function (b, n) {
-      if (n === i) { b.setAttribute('aria-current', 'step'); } else { b.removeAttribute('aria-current'); }
+    if (elTitle) elTitle.textContent = (b === 2 && !state.shot) ? 'Take photo' : TITLES[b];
+    if (elBack) elBack.style.color = b === 0 ? '#9a9aa5' : '#ececf0';
+    if (elCap) elCap.textContent = BEATS[b];
+    if (elNote) elNote.textContent = NOTES[b];
+    if (elList) elList.style.transform = (b === 1 && state.shot) ? 'translateY(-7.5rem)' : 'translateY(0rem)';
+    // beat 2 — cover auto-crop + adjust
+    if (elCam) elCam.style.opacity = (b === 2 && !state.shot) ? '1' : '0';
+    if (elReview) elReview.style.opacity = (b === 2 && state.shot) ? '1' : '0';
+    if (elCrop) elCrop.style.inset = (b === 2 && state.shot) ? '0px' : '-26px';
+    if (elAuto) elAuto.style.opacity = state.cropping ? '1' : '0';
+    if (elCoverMsg) elCoverMsg.style.opacity = state.cropping ? '0' : '1';
+    if (elShutter) elShutter.style.background = state.shot ? '#fff' : 'rgba(255,255,255,.25)';
+    // beat 3 — tap 5 points on the rim
+    if (elCircle) elCircle.style.opacity = (b === 3 && state.shot) ? '1' : '0';
+    taps.forEach(function (el) {
+      el.style.opacity = (b === 3 && state.taps >= +el.getAttribute('data-n') && !state.shot) ? '1' : '0';
     });
-
-    title.textContent = TITLES[i];
-    back.style.color = i === 0 ? '#9a9aa5' : '#ececf0';
-    caption.textContent = CAPTIONS[i];
-    note.textContent = NOTES[i];
-    if (dict) dict.textContent = i === 4 ? SAID[0] : SAID[SAID.length - 1];
-
-    if (PHASE[i]) {
-      tPhase = setTimeout(function () { scrs[i].setAttribute('data-shot', ''); }, still ? 0 : PHASE[i]);
+    pips.forEach(function (el) {
+      el.style.background = (state.taps >= +el.getAttribute('data-n')) ? '#f0a832' : '#3a3a42';
+    });
+    if (elPoly) elPoly.setAttribute('points', TAPPOS.slice(0, state.taps).map(function (p) { return p.join(','); }).join(' '));
+    if (elLine) elLine.style.opacity = (b === 3 && state.taps >= 2 && !state.shot) ? '1' : '0';
+    if (elUndo) elUndo.textContent = (b === 3 && state.shot) ? '↶ Retap' : '↶ Undo';
+    if (elTapMsg) elTapMsg.textContent = (b === 3 && state.shot)
+      ? 'Drag to fit the rim, then Save (deskews round) — or ○ Circle'
+      : (state.taps === 0 ? '👆 Tap 5 points around the edge' : 'Tap the next edge point — ' + (5 - state.taps) + ' to go');
+    if (elSave) {
+      var done = (b === 3 && state.shot);
+      elSave.style.borderColor = done ? '#f0a832' : '#2a2a31';
+      elSave.style.background = done ? '#f0a832' : '#1b1b20';
+      elSave.style.color = done ? '#191204' : '#6a6558';
     }
-    if (i === 4 && dict && !still) {
-      var n = 0;
-      tSay = setInterval(function () {
-        n++;
-        dict.textContent = SAID[n];
-        if (n >= SAID.length - 1) clearInterval(tSay);
-      }, 750);
-    }
-    if (!still || manual) {
-      if (!still) tNext = setTimeout(function () { go((beat + 1) % scrs.length); }, BEAT * HOLD[i]);
-    }
+    if (elDict) elDict.textContent = DICT[state.said];
+    if (elUploaded) elUploaded.textContent = (b >= 6) ? '14' : '9';
+    if (elProgress) elProgress.style.width = (b >= 6) ? '100%' : '64%';
   }
 
-  steps.forEach(function (b, n) {
-    b.addEventListener('click', function () { go(n, true); });
+  function schedule() {
+    clearTimeout(t);
+    if (still) return;
+    t = setTimeout(function () { go((state.beat + 1) % 7); }, BEAT_MS * HOLD[state.beat]);
+  }
+
+  function go(i) {
+    clearTimeout(t2); clearInterval(t3); clearTimeout(t4);
+    state.beat = i;
+    state.shot = false;
+    state.said = (i === 4) ? 0 : DICT.length - 1;
+    state.taps = (i === 3) ? 0 : 5;
+    state.cropping = false;
+    render();
+    if (still) {
+      // Static end-state for reduced motion: settle the animated beats.
+      if (i === 1 || i === 2) state.shot = true;
+      if (i === 3) { state.taps = 5; state.shot = true; }
+      render();
+      return;
+    }
+    if (i === 1) t2 = setTimeout(function () { state.shot = true; render(); }, 1600);
+    if (i === 2) t2 = setTimeout(function () {
+      state.shot = true; state.cropping = true; render();
+      t4 = setTimeout(function () { state.cropping = false; render(); }, 850);
+    }, 1200);
+    if (i === 3) t3 = setInterval(function () {
+      if (state.taps >= 5) { clearInterval(t3); state.shot = true; render(); return; }
+      state.taps++; render();
+    }, TAP_MS);
+    if (i === 4) t3 = setInterval(function () {
+      if (state.said >= DICT.length - 1) { clearInterval(t3); return; }
+      state.said++; render();
+    }, 750);
+    schedule();
+  }
+
+  steps.forEach(function (s) {
+    s.addEventListener('click', function () { go(+s.getAttribute('data-step')); });
   });
 
-  // Only run while the film is actually on screen.
+  render();
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (e.isIntersecting) { if (beat < 0) go(0); }
-        else { clearTimeout(tNext); clearTimeout(tPhase); clearInterval(tSay); beat = -1; }
+        if (e.isIntersecting) { if (!started) { started = true; go(0); } }
+        else { clearTimeout(t); clearTimeout(t2); clearInterval(t3); clearTimeout(t4); started = false; }
       });
     }, { threshold: 0.15 }).observe(film);
   } else {

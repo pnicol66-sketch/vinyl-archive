@@ -1022,6 +1022,9 @@ h2 {
   .lp-hero { align-items: start; padding-top: 3rem; }
   .lp-hero-shot { max-width: 22rem; }
   .lp-phone-col { position: static; }
+  /* The app-film uses an inline grid (ported from the design), so override it
+     with !important to stack on narrow screens. */
+  .lp-filmgrid { grid-template-columns: 1fr !important; gap: 2.2rem !important; }
 }
 
 /* Motion is decorative: the phone holds its first beat if the visitor
