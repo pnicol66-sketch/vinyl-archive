@@ -8,6 +8,94 @@
 <link rel="canonical" href="{{CANONICAL}}">
 <link rel="icon" href="{{ROOT}}favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="{{ROOT}}assets/site.css?v={{VCSS}}">
+<style>
+  /* About / the story — a single narrow reading column with three embeds:
+     the hand-written ledger flip-book, the spreadsheet it became, and the
+     iPad render of where it ended up. Self-contained; not loaded elsewhere. */
+  .ab { max-width: 44rem; margin: 0 auto; padding: 0 1.25rem; }
+  .ab-sec { padding: 3.5rem 0 4rem; }
+  .ab-eyebrow {
+    margin: 0 0 0.8rem; font-family: var(--mono); font-size: 0.74rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+  }
+  .ab-h1 {
+    font-family: var(--serif); font-weight: 500; line-height: 1.14;
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem); margin: 0 0 1.8rem; text-wrap: pretty;
+  }
+
+  /* embedded figures */
+  .ab-fig { margin: 0 0 2.4rem; }
+  .ab-fig-cap {
+    margin: 0 0 0.75rem; font-family: var(--mono); font-size: 0.72rem;
+    letter-spacing: 0.11em; text-transform: uppercase; color: var(--accent);
+  }
+  .ab-flip {
+    width: 100%; height: clamp(520px, 62vh, 660px); border: 1px solid var(--line);
+    border-radius: 10px; background: #16130f; display: block;
+  }
+  .ab-figcaption {
+    margin-top: 0.7rem; color: var(--muted); font-size: 0.9rem; line-height: 1.55;
+    font-family: var(--serif); text-wrap: pretty;
+  }
+
+  /* prose */
+  .ab-prose {
+    font-family: var(--serif); font-size: 1.12rem; line-height: 1.75;
+    color: #d8cebf; text-wrap: pretty;
+  }
+  .ab-prose p { margin: 0 0 1.3rem; }
+  .ab-prose em { font-style: italic; }
+  .ab-close {
+    margin: 0; padding-top: 1.4rem; border-top: 1px solid var(--line); color: #c3b9aa;
+  }
+
+  /* spreadsheet screenshot */
+  .ab-sheet { margin: 0.4rem 0 1.3rem; }
+  .ab-sheet img {
+    width: 100%; border: 1px solid var(--line); border-radius: 8px; display: block;
+  }
+  .ab-sheet figcaption {
+    margin-top: 0.6rem; color: var(--muted); font-size: 0.86rem; line-height: 1.5;
+    font-family: var(--mono);
+  }
+
+  /* iPad render — dark bezel wrapping two cross-fading live previews
+     (collection grid <-> album page), links through to the service page.
+     Same component as /client-collection/, tuned to the reading column. */
+  .ab-render { margin: 1.6rem 0; }
+  .ab-ipad {
+    position: relative; background: linear-gradient(155deg, #2b2b30, #141416);
+    border-radius: 32px; padding: 2.4rem 2rem;
+    box-shadow: 0 36px 84px -32px rgba(0, 0, 0, 0.9); border: 1px solid #34333a;
+  }
+  .ab-cam {
+    position: absolute; top: 1.2rem; left: 50%; transform: translateX(-50%);
+    width: 8px; height: 8px; border-radius: 50%; background: #0c0c10;
+    box-shadow: inset 0 0 0 1px #47474e;
+  }
+  .ab-screen {
+    display: block; position: relative; border-radius: 8px; overflow: hidden;
+    background: var(--deep); aspect-ratio: 4/3; box-shadow: inset 0 0 0 2px #0a0a0c;
+  }
+  .ab-pv {
+    position: absolute; top: 0; left: 0; width: 167%; height: 167%;
+    transform: scale(0.6); transform-origin: top left; border: 0; pointer-events: none;
+  }
+  .ab-pv-b { opacity: 0; }
+  .ab-screen-hit { position: absolute; inset: 0; }
+  @keyframes ccFadeA { 0%, 44% { opacity: 1; } 56%, 94% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes ccFadeB { 0%, 44% { opacity: 0; } 56%, 94% { opacity: 1; } 100% { opacity: 0; } }
+  .ab-pv-a { animation: ccFadeA 9s ease-in-out infinite; }
+  .ab-pv-b { animation: ccFadeB 9s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .ab-pv-a, .ab-pv-b { animation: none; }
+    .ab-pv-b { opacity: 0; }
+  }
+
+  @media (max-width: 40rem) {
+    .ab-ipad { padding: 1.4rem 1.1rem; border-radius: 22px; }
+  }
+</style>
 </head>
 <body>
 <header class="site-head">
@@ -19,56 +107,84 @@
     <a href="{{ROOT}}about/" aria-current="page">About</a>
   </nav>
 </header>
-<main class="about">
-  <section class="about-head">
-    <h1>The Story Behind Vinyl Curator</h1>
-    <div class="story-prose">
-      <p>Coming on 30 years ago I owned a jazz bar and café in Japan. The records weren't
-      the point — but they became a focus as I caught the analog bug. Original pressings
-      from the '50s and '60s — records that carry a real aura for Japanese collectors, one
-      I came to feel myself. What began as trading increasingly rare jazz originals slowly
-      inverted itself: I bought more than I sold, then I mostly stopped selling at all.
-      That's how collections begin — not with a decision, but with a deepening reverence for
-      the music and the medium, the art on the covers and the history in the grooves.</p>
+<main class="ab">
+  <section class="ab-sec">
+    <p class="ab-eyebrow">About</p>
+    <h1 class="ab-h1">The Story Behind Vinyl Curator</h1>
 
-      <p>The collection has since crossed the Pacific twice. Japan to New Zealand, where I'm
-      from, then on to Chicago, with stops in more cities along the way than my record boxes
-      would care to remember. It grew broader as it travelled, too. Jazz may have been the
-      gateway, but my taste runs eclectic, and the shelves now range across almost every
-      genre — if it's good on vinyl, it has a place here. I always kept it insured, along
-      with the equipment, but an insurance policy only answers half the question. The other
-      half kept nagging at me: if the worst happened — fire, flood, theft — how would I ever
-      prove what I actually had? Not "about 2,000 records." <em>These</em> records.
-      <em>These</em> pressings. I kept a written ledger of everything I bought, and some years
-      ago moved it into a spreadsheet. Better. Not enough.</p>
+    <figure class="ab-fig">
+      <p class="ab-fig-cap">Where it started · the original catalogue, including coffee stains…</p>
+      <iframe class="ab-flip" src="{{ROOT}}ledger/index.html" title="The original hand-written LP catalogue — a flip-through of two notebooks, 91 pages" loading="lazy"></iframe>
+      <figcaption class="ab-figcaption">The hand-written ledger I kept of every record as it came in — two books, 91 pages, before any of this became a spreadsheet. Turn the pages.</figcaption>
+    </figure>
 
-      <p>Lately I've become more forensic about it. New arrivals get the full treatment:
-      matrix numbers pulled from the deadwax, pressing research, the lot. Then I pulled out a
-      stack of duplicates to sell, and every frustration arrived at once. Two thousand albums,
-      most without that research behind them. Photographing and listing records is slow,
-      tedious work. Getting complete, correct information onto a listing is neither easy nor
-      intuitive. And underneath it all, the old worry with a new face: what would my wife or
-      kids ever do with this collection? How would they assess it, understand it, and get fair
-      value for it if I weren't here to explain what a Plastylite ear means?</p>
+    <div class="ab-prose">
+      <p>Coming on 30 years ago I opened a bar and café at a mountain ski resort in Japan.
+      It was going to be a sports bar — that was the whole plan — until I discovered jazz and
+      fell hard for it, and the place quietly morphed into a jazz bar and café instead. My taste
+      was eclectic and stayed that way, but the addition of jazz started a passion for original
+      pressings from the '50s and '60s — records that carry a real aura for Japanese collectors.
+      What began as trading increasingly rare jazz originals slowly inverted itself: I bought more
+      than I sold, then I mostly stopped selling at all. That's how collections begin — not with a
+      decision, but with a deepening reverence for the music and the medium, the art on the covers
+      and the history in the grooves.</p>
 
-      <p>There was one more thread. When friends come over for a listening session, someone
-      always asks to see the cover of what's playing. It gets passed around the room, and I
-      found myself thinking: how much better if I could hand them the real thing — everything
-      a streaming service gives you, plus the pressing history and the performance and
-      fidelity notes — right on their phone.</p>
+      <p>The collection has since crossed the Pacific twice. Japan to New Zealand, where I'm from,
+      then on to Chicago, with stops in more cities along the way than my record boxes would care
+      to remember. Like me, it's grown with the miles — more titles, more genres, more shelves —
+      and there's an ever-present voice telling me to buy more vinyl. There are worse addictions.</p>
 
-      <p>All of that led down the rabbit hole you've just landed in. Vinyl Curator started as
-      me solving my own conundrum. It grew past the original problem, as these things tend to,
-      and became a set of tools and services I wanted other collectors — and dealers, and the
-      families of collectors — to have too.</p>
+      <p>I always kept it insured, along with the equipment, but an insurance policy only answers
+      half the question. The other half kept nagging at me: if the worst happened — fire, flood,
+      theft — how would I ever prove what I actually had? Not "about 2,000 records." <em>These</em>
+      records. <em>These</em> pressings. I kept a written ledger of everything I bought, and some
+      years ago moved it into a spreadsheet. Better. Not enough.</p>
 
-      <p class="closing">Wherever you sit — a collector who needs a collection documented to
+      <figure class="ab-sheet">
+        <img src="{{ROOT}}assets/vinyl-collection-sheet.png" alt="A selection of rows from the Vinyl Collection spreadsheet — artist, title, label and label number columns" loading="lazy">
+        <figcaption>The ledger, moved into a spreadsheet — two thousand rows, and still only names and numbers.</figcaption>
+      </figure>
+
+      <p>Lately I've become more forensic about it. New arrivals get the full treatment: matrix
+      numbers pulled from the deadwax, pressing research, the lot. Then I pulled out a stack of
+      duplicates to sell, and every frustration arrived at once. Two thousand albums, most without
+      that research behind them. Photographing and listing records is slow, tedious work. Getting
+      complete, correct information onto a listing is neither easy nor intuitive. And underneath it
+      all, the old worry with a new face: what would my wife or kids ever do with this collection?
+      How would they assess it, understand it, and get fair value for it if I weren't here to
+      explain what a Plastylite ear means?</p>
+
+      <p>There was one more thread. When friends come over for a listening session, someone always
+      asks to see the cover of what's playing. It gets passed around the room, and I found myself
+      thinking: how much better if I could hand them the real thing — everything a streaming service
+      gives you, plus the pressing history and the performance and fidelity notes — right on their
+      phone.</p>
+
+      <p>All of that led down the rabbit hole you've just landed in. Vinyl Curator started as me
+      solving my own conundrum. It grew past the original problem, as these things tend to, and
+      became a set of tools and services I wanted other collectors — and dealers, and the families
+      of collectors — to have too.</p>
+
+      <figure class="ab-render">
+        <div class="ab-ipad">
+          <span class="ab-cam"></span>
+          <a class="ab-screen" href="{{ROOT}}client-collection/">
+            <iframe class="ab-pv ab-pv-a" src="{{ROOT}}albums/" title="Collection grid preview" loading="lazy" scrolling="no"></iframe>
+            <iframe class="ab-pv ab-pv-b" src="{{ROOT}}albums/miles-davis-round-about-midnight/" title="Album page preview" loading="lazy" scrolling="no"></iframe>
+            <span class="ab-screen-hit"></span>
+          </a>
+        </div>
+        <figcaption class="ab-figcaption" style="font-family:var(--mono);font-size:0.86rem">Where it ended up — the same collection, hosted privately and browsable like a streaming library.</figcaption>
+      </figure>
+
+      <p class="ab-close">Wherever you sit — a collector who needs a collection documented to
       insure it or settle a claim, an insurance broker or valuer who has to substantiate what's
-      actually there, or a dealer, trader, or record store that lives or dies by accurate,
-      detailed listings — the problem is the same: a collection is only as good as your ability
-      to prove and explain what's in it. That's what Vinyl Curator is here to solve — right
-      down to bulk-listing straight to eBay and Discogs.</p>
+      actually there, or a dealer, trader, or record store that lives or dies by accurate, detailed
+      listings — the problem is the same: a collection is only as good as your ability to prove and
+      explain what's in it. That's what Vinyl Curator is here to solve — right down to bulk-listing
+      straight to eBay and Discogs.</p>
     </div>
+
     <p class="about-back"><a href="{{ROOT}}">← Back to Vinyl Curator</a></p>
   </section>
 </main>
