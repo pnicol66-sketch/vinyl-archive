@@ -75,10 +75,26 @@ body.lib { background: var(--deep); }
 }
 .site-head nav .nav-sec .sub { font-size: 0.85rem; }
 .site-head a { text-decoration: none; color: var(--muted); font-size: 1.075rem; }
+.site-head a:hover { color: var(--ink); }
 .site-head a[aria-current] { color: var(--ink); }
 .site-head .brand {
   font-family: var(--serif); font-size: 1.15rem; color: var(--ink);
   letter-spacing: 0.01em; margin-right: auto;
+}
+/* The service offer is the commercial call-to-action: an amber pill so it
+   reads as the primary action beside the plain section links, on every page
+   and at every width. aria-current fills it in when it IS the current page. */
+.site-head .nav-cta {
+  color: var(--accent-ink); border: 1px solid var(--line3);
+  border-radius: 999px; padding: 0.3rem 0.85rem; line-height: 1.2;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.site-head .nav-cta:hover {
+  color: var(--accent-hover); border-color: var(--accent);
+  background: rgba(217, 139, 74, 0.12);
+}
+.site-head .nav-cta[aria-current] {
+  color: var(--deep); background: var(--accent); border-color: var(--accent);
 }
 .site-foot { border-top: 1px solid var(--line); margin-top: 4rem; }
 .site-foot p {
@@ -405,7 +421,20 @@ h2 {
   width: 2.4rem; height: 2.4rem; font-size: 1.4rem; line-height: 1;
 }
 @media (max-width: 40rem) {
-  .site-head nav { gap: 1.1rem; }
+  /* Two-tier header: brand centred on its own line, the links (Services still
+     a visible pill) in one tidy centred row beneath - never a ragged 3-row
+     wrap, and never hidden behind a menu, so the service CTA stays one tap
+     away on a phone. Shortened nav labels (Archive / Services) keep it to a
+     single row at 375px. */
+  .site-head nav {
+    padding: 0.7rem 1rem; gap: 0.4rem 1.05rem;
+    justify-content: center; align-items: center;
+  }
+  .site-head .brand {
+    margin-right: 0; flex-basis: 100%; text-align: center; font-size: 1.2rem;
+  }
+  .site-head a { font-size: 1rem; }
+  .site-head .nav-cta { padding: 0.28rem 0.8rem; }
   .lightbox { padding: 0.5rem 3.2rem; }
   .lb-btn { width: 2.4rem; height: 2.4rem; font-size: 1.6rem; }
 }
