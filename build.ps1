@@ -467,7 +467,7 @@ function Build-Nav([string]$current, [string]$root, [string]$albumTab) {
       '    <a class="brand" href="' + $root + '">Vinyl Curator</a>' + $nl +
       '    <a href="' + $root + 'albums/"' + $curA + '>Archive</a>' + $nl +
       '    <span class="nav-sec"><a href="' + $root + 'available/"' + $curV + '>Available</a>' + $sold + '</span>' + $nl +
-      '    <a class="nav-cta" href="' + $root + 'client-collection/"' + $curC + '>Services</a>' + $nl +
+      '    <a href="' + $root + 'client-collection/"' + $curC + '>Services</a>' + $nl +
       '    <a href="' + $root + 'about/">About</a>' + $nl +
       '  </nav>'
   }
