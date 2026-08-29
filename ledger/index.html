@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LP Catalogue — 91 pages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16130f;        /* matte record-sleeve black */
+    --ink-2:#221e19;      /* raised panel */
+    --paper:#efe9dc;      /* light text */
+    --muted:#9a917f;      /* secondary text */
+    --brass:#c89b3c;      /* tonearm brass accent */
+    --leaf-ms:650ms;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Mono',monospace;
+    display:flex;flex-direction:column;
+    overflow:hidden;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    display:flex;align-items:center;gap:14px;
+    padding:14px 22px;
+    border-bottom:1px solid rgba(239,233,220,.12);
+    flex:0 0 auto;
+  }
+  .disc{
+    width:30px;height:30px;border-radius:50%;
+    background:
+      radial-gradient(circle at center, var(--brass) 0 18%, var(--ink) 19% 24%,
+        #0c0a08 25% 100%);
+    box-shadow:inset 0 0 0 1px rgba(239,233,220,.15);
+    position:relative;
+    animation:spin 1.8s linear infinite;
+    animation-play-state:paused;
+    flex:0 0 auto;
+  }
+  .disc::after{ /* groove sheen */
+    content:"";position:absolute;inset:3px;border-radius:50%;
+    background:repeating-radial-gradient(circle at center,
+      transparent 0 2px, rgba(239,233,220,.05) 2px 3px);
+  }
+  .disc.spin{animation-play-state:running}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  h1{
+    font-family:'Big Shoulders Display',sans-serif;
+    font-weight:700;font-size:clamp(18px,2.6vw,26px);
+    letter-spacing:.06em;text-transform:uppercase;line-height:1;
+  }
+  .sub{color:var(--muted);font-size:11px;letter-spacing:.08em;margin-left:auto;text-transform:uppercase}
+
+  /* ---------- stage ---------- */
+  main{
+    flex:1 1 auto;min-height:0;
+    display:flex;align-items:center;justify-content:center;
+    padding:22px;
+    perspective:2400px;
+  }
+  #book{
+    position:relative;
+    display:flex;
+    height:100%;
+    max-height:100%;
+    filter:drop-shadow(0 18px 40px rgba(0,0,0,.55));
+    transform-style:preserve-3d;
+  }
+  .half{
+    position:relative;height:100%;
+    background:var(--ink-2);
+    overflow:hidden;
+  }
+  .half img{height:100%;width:auto;display:block;user-select:none;-webkit-user-drag:none}
+  .half.left{border-radius:6px 0 0 6px}
+  .half.right{border-radius:0 6px 6px 0}
+  .half.single{border-radius:6px}
+  .half.blank{background:transparent}
+  /* spine shading */
+  .half.left::after,.half.right::after{
+    content:"";position:absolute;top:0;bottom:0;width:7%;pointer-events:none;
+  }
+  .half.left::after{right:0;background:linear-gradient(to left,rgba(0,0,0,.28),transparent)}
+  .half.right::after{left:0;background:linear-gradient(to right,rgba(0,0,0,.28),transparent)}
+
+  /* ---------- turning leaf ---------- */
+  #leaf{
+    position:absolute;top:0;height:100%;right:0;
+    transform-style:preserve-3d;
+    transform-origin:left center;
+    display:none;z-index:5;
+  }
+  #leaf.turning{display:block}
+  #leaf .face{
+    position:absolute;inset:0;overflow:hidden;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    background:var(--ink-2);
+  }
+  #leaf .face img{height:100%;width:auto;display:block}
+  #leaf .face.back{transform:rotateY(180deg)}
+  #leaf.fwd{animation:turnF var(--leaf-ms) ease-in-out forwards}
+  #leaf.bwd{transform-origin:right center;left:0;right:auto;animation:turnB var(--leaf-ms) ease-in-out forwards}
+  @keyframes turnF{from{transform:rotateY(0)}to{transform:rotateY(-180deg)}}
+  @keyframes turnB{from{transform:rotateY(0)}to{transform:rotateY(180deg)}}
+  @media (prefers-reduced-motion: reduce){
+    :root{--leaf-ms:1ms}
+    .disc{animation:none}
+  }
+
+  /* click zones */
+  .zone{position:absolute;top:0;bottom:0;width:50%;cursor:pointer;z-index:8;background:none;border:0}
+  .zone:focus-visible{outline:2px solid var(--brass);outline-offset:-4px}
+  #zonePrev{left:0}#zoneNext{right:0}
+
+  /* ---------- controls ---------- */
+  footer{
+    flex:0 0 auto;
+    display:flex;align-items:center;gap:16px;
+    padding:12px 22px 16px;
+  }
+  .nav{
+    background:none;border:1px solid rgba(239,233,220,.25);color:var(--paper);
+    font-family:inherit;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+    padding:8px 14px;border-radius:3px;cursor:pointer;
+  }
+  .nav:hover{border-color:var(--brass);color:var(--brass)}
+  .nav:disabled{opacity:.3;cursor:default}
+  .nav:disabled:hover{border-color:rgba(239,233,220,.25);color:var(--paper)}
+  #counter{font-size:12px;color:var(--muted);min-width:110px;text-align:center;letter-spacing:.05em}
+  #slider{
+    flex:1;appearance:none;height:2px;border-radius:1px;
+    background:rgba(239,233,220,.18);outline:none;
+  }
+  #slider::-webkit-slider-thumb{
+    appearance:none;width:14px;height:14px;border-radius:50%;
+    background:var(--brass);cursor:pointer;border:none;
+  }
+  #slider::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;
+    background:var(--brass);cursor:pointer;border:none;
+  }
+  #slider:focus-visible{box-shadow:0 0 0 2px rgba(200,155,60,.5)}
+  .hint{font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+  @media (max-width:720px){
+    .sub,.hint{display:none}
+    footer{gap:10px;padding:10px 14px 14px}
+    main{padding:12px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="disc" id="disc" aria-hidden="true"></div>
+  <h1>LP Catalogue</h1>
+  <span class="sub">Books 1 &amp; 2 &middot; 91 pages</span>
+</header>
+
+<main>
+  <div id="book" aria-live="polite">
+    <div class="half left"  id="halfL"></div>
+    <div class="half right" id="halfR"></div>
+    <div id="leaf" aria-hidden="true">
+      <div class="face front" id="leafFront"></div>
+      <div class="face back"  id="leafBack"></div>
+    </div>
+    <button class="zone" id="zonePrev" aria-label="Previous page"></button>
+    <button class="zone" id="zoneNext" aria-label="Next page"></button>
+  </div>
+</main>
+
+<footer>
+  <button class="nav" id="btnPrev">&larr; Prev</button>
+  <span id="counter">&nbsp;</span>
+  <input type="range" id="slider" min="0" value="0" step="1" aria-label="Go to page">
+  <button class="nav" id="btnNext">Next &rarr;</button>
+  <span class="hint">&larr; &rarr; keys / tap edges</span>
+</footer>
+
+<script>
+(function(){
+  const TOTAL = 91;
+  const src = n => (n>=1 && n<=TOTAL) ? `pages/page-${String(n).padStart(2,"0")}.jpg` : null;
+
+  // Spread model (book layout): spread 0 = [null, 1] (cover),
+  // spread k = [2k, 2k+1], last may have a blank right.
+  const SPREADS = [];
+  SPREADS.push([null,1]);
+  for(let p=2; p<=TOTAL; p+=2) SPREADS.push([p, p+1<=TOTAL ? p+1 : null]);
+  const LAST = SPREADS.length-1;
+
+  let cur = 0;              // current spread index
+  let single = false;       // single-page mode (small screens)
+  let animating = false;
+
+  const halfL = document.getElementById('halfL');
+  const halfR = document.getElementById('halfR');
+  const leaf  = document.getElementById('leaf');
+  const leafFront = document.getElementById('leafFront');
+  const leafBack  = document.getElementById('leafBack');
+  const counter = document.getElementById('counter');
+  const slider = document.getElementById('slider');
+  const disc = document.getElementById('disc');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const book = document.getElementById('book');
+
+  // ----- single-page model -----
+  let curPage = 1; // for single mode
+
+  function imgEl(n){
+    if(n===null) return null;
+    const img = new Image();
+    img.src = src(n);
+    img.alt = `Catalogue page ${n}`;
+    img.draggable = false;
+    return img;
+  }
+  function fill(el, n, cls){
+    el.innerHTML = '';
+    el.classList.toggle('blank', n===null);
+    if(n!==null){ el.appendChild(imgEl(n)); }
+  }
+  function preload(ns){ ns.forEach(n=>{ const s=src(n); if(s){ const i=new Image(); i.src=s; }}); }
+
+  function layoutMode(){
+    const wasSingle = single;
+    single = window.innerWidth < 720 || window.innerWidth < window.innerHeight*0.9;
+    if(single !== wasSingle) render(true);
+  }
+
+  function render(reset){
+    if(single){
+      halfL.style.display='none';
+      halfR.classList.remove('right'); halfR.classList.add('single');
+      fill(halfR, curPage);
+      counter.textContent = `Page ${curPage} / ${TOTAL}`;
+      slider.max = TOTAL-1; slider.value = curPage-1;
+      btnPrev.disabled = curPage<=1;
+      btnNext.disabled = curPage>=TOTAL;
+      preload([curPage-1, curPage+1, curPage+2]);
+    }else{
+      halfL.style.display='';
+      halfR.classList.add('right'); halfR.classList.remove('single');
+      const [l,r] = SPREADS[cur];
+      fill(halfL,l); fill(halfR,r);
+      const label = (l&&r)?`Pages ${l}–${r}`:(l?`Page ${l}`:`Page ${r}`);
+      counter.textContent = `${label} / ${TOTAL}`;
+      slider.max = LAST; slider.value = cur;
+      btnPrev.disabled = cur<=0;
+      btnNext.disabled = cur>=LAST;
+      const nxt = SPREADS[Math.min(cur+1,LAST)], prv = SPREADS[Math.max(cur-1,0)];
+      preload([...nxt, ...prv].filter(Boolean));
+    }
+  }
+
+  function spinFor(ms){
+    disc.classList.add('spin');
+    clearTimeout(spinFor._t);
+    spinFor._t = setTimeout(()=>disc.classList.remove('spin'), ms);
+  }
+
+  const LEAF_MS = matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 650;
+
+  function go(dir){ // dir: +1 next, -1 prev
+    if(animating) return;
+    if(single){
+      const target = curPage + dir;
+      if(target<1 || target>TOTAL) return;
+      curPage = target; spinFor(500); render(); return;
+    }
+    const target = cur + dir;
+    if(target<0 || target>LAST) return;
+    animating = true; spinFor(LEAF_MS+150);
+
+    const from = SPREADS[cur], to = SPREADS[target];
+    // leaf geometry: match the right/left half width
+    const ref = dir>0 ? halfR : halfL;
+    leaf.style.width = ref.offsetWidth + 'px';
+
+    leafFront.innerHTML=''; leafBack.innerHTML='';
+    if(dir>0){
+      // right page flips left: front = current right, back = next left
+      if(from[1]) leafFront.appendChild(imgEl(from[1]));
+      if(to[0])   leafBack.appendChild(imgEl(to[0]));
+      fill(halfR, to[1]);                 // underneath: next right
+      leaf.className='turning fwd';
+    }else{
+      // left page flips right: front = current left, back = prev right
+      if(from[0]) leafFront.appendChild(imgEl(from[0]));
+      if(to[1])   leafBack.appendChild(imgEl(to[1]));
+      fill(halfL, to[0]);                 // underneath: prev left
+      leaf.className='turning bwd';
+    }
+    setTimeout(()=>{
+      leaf.className=''; leaf.removeAttribute('style');
+      cur = target; animating=false; render();
+    }, LEAF_MS+30);
+  }
+
+  // controls
+  btnNext.onclick = ()=>go(1);
+  btnPrev.onclick = ()=>go(-1);
+  document.getElementById('zoneNext').onclick = ()=>go(1);
+  document.getElementById('zonePrev').onclick = ()=>go(-1);
+  slider.oninput = ()=>{
+    const v = +slider.value;
+    if(single){ curPage = v+1; } else { cur = v; }
+    spinFor(400); render();
+  };
+  addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight') go(1);
+    if(e.key==='ArrowLeft')  go(-1);
+  });
+  // swipe
+  let tx=null;
+  book.addEventListener('touchstart', e=>{ tx=e.touches[0].clientX; }, {passive:true});
+  book.addEventListener('touchend', e=>{
+    if(tx===null) return;
+    const dx = e.changedTouches[0].clientX - tx; tx=null;
+    if(Math.abs(dx)>40) go(dx<0?1:-1);
+  }, {passive:true});
+
+  addEventListener('resize', layoutMode);
+  layoutMode(); render(true);
+})();
+</script>
+</body>
+</html>
