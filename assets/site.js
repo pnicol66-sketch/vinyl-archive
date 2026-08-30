@@ -171,9 +171,9 @@
     }
   }
 
-  // Album page: click any gallery image to open the lightbox, then step
-  // through every photo with the arrows, arrow keys, or a swipe.
-  var gallery = document.querySelector('.gallery');
+  // Album page gallery / Services report slider: click any image to open
+  // the lightbox, then step through with the arrows, arrow keys, or a swipe.
+  var gallery = document.querySelector('.gallery, .cc-reports');
   if (gallery) {
     var thumbs = Array.prototype.slice.call(gallery.querySelectorAll('img'));
     var items = thumbs.map(function (img) {
