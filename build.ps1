@@ -1216,6 +1216,7 @@ $cc = $cc.Replace('{{NAV}}', (Build-Nav 'client' $RootIndex ''))
 $cc = $cc.Replace('{{GENERATED}}', $genDate).Replace('{{YEAR}}', "$year")
 $cc = $cc.Replace('{{MAIL_U}}', $MailUser).Replace('{{MAIL_D}}', $MailDomain)
 $cc = $cc.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
+$cc = $cc.Replace('{{IMG}}', $assetBase)
 $cc = $cc.Replace('{{ROOT}}', $RootIndex)
 $ccDir = Join-Path $Site 'client-collection'
 if (-not (Test-Path $ccDir)) { New-Item -ItemType Directory $ccDir | Out-Null }

@@ -89,6 +89,48 @@
   }
   .cc-reports-note { margin: 0.4rem 0 0; font-size: 0.8rem; color: var(--muted); }
 
+  /* eBay listing flow */
+  .eb-steps {
+    list-style: none; margin: 0; padding: 0; display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1.6rem 2.2rem;
+  }
+  .eb-num { margin: 0 0 0.4rem; font-family: var(--mono); font-size: 0.78rem; color: var(--accent); }
+  .eb-fig {
+    height: 7.5rem; border-radius: 8px; border: 1px solid var(--line);
+    margin-bottom: 0.85rem; padding: 0.5rem; overflow: hidden;
+  }
+  .eb-fig-pick { background: #101013; display: flex; flex-direction: column; gap: 0.28rem; padding: 0.45rem; }
+  .eb-row { display: flex; align-items: center; gap: 0.4rem; background: #1b1b20; border: 1px solid #2a2a31; border-radius: 0.35rem; padding: 0.24rem 0.4rem; font-size: 0.6rem; color: #ececf0; }
+  .eb-row-t { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .eb-tick { color: var(--ok); font-size: 0.62rem; }
+  .eb-row-dim { opacity: 0.45; }
+  .eb-fig-csv { background: var(--card); display: flex; align-items: center; justify-content: center; gap: 0.7rem; }
+  .eb-doc { width: 2.6rem; height: 3.4rem; background: #fff; border-radius: 2px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,.5); padding: 0.32rem 0.28rem; }
+  .eb-doc-l { display: block; height: 2px; background: #e0dacd; margin-bottom: 2.5px; }
+  .eb-doc-l:first-child { background: #c9c2b4; }
+  .eb-doc-tag { position: absolute; bottom: 0.2rem; right: 0.22rem; font-size: 0.42rem; font-weight: 700; color: #1e8e3e; }
+  .eb-csv-t { font-size: 0.6rem; color: var(--muted); line-height: 1.45; font-family: var(--mono); }
+  .eb-fig-drafts { background: #101013; display: flex; flex-direction: column; gap: 0.3rem; padding: 0.45rem; }
+  .eb-draft { display: flex; align-items: center; gap: 0.4rem; background: #1b1b20; border: 1px solid #2a2a31; border-radius: 0.35rem; padding: 0.22rem 0.35rem; }
+  .eb-draft img { width: 1.15rem; height: 1.15rem; object-fit: cover; border-radius: 2px; flex: none; }
+  .eb-draft-l { flex: 1; height: 3px; background: #34343c; border-radius: 2px; }
+  .eb-chip { font-size: 0.5rem; font-family: var(--mono); color: #f0a832; border: 1px solid #4a4438; border-radius: 999px; padding: 0.08rem 0.4rem; flex: none; }
+  .eb-fig-listing { background: #fff; display: flex; gap: 0.5rem; padding: 0.55rem; }
+  .eb-fig-listing img { width: 42%; height: 100%; object-fit: cover; border-radius: 3px; flex: none; }
+  .eb-listing-body { min-width: 0; display: flex; flex-direction: column; gap: 0.22rem; color: #222; }
+  .eb-listing-t { font-size: 0.58rem; font-weight: 700; line-height: 1.3; }
+  .eb-listing-m { font-size: 0.5rem; font-family: var(--mono); color: #555; line-height: 1.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .eb-price { margin-top: auto; align-self: flex-start; font-size: 0.62rem; font-weight: 700; color: #222; filter: blur(4px); user-select: none; }
+
+  /* Discogs listing flow (shares .eb-steps/.eb-num/.eb-fig) */
+  .dg-fig-match { background: #141210; font-family: var(--mono); font-size: 0.56rem; line-height: 1.6; color: var(--muted); padding: 0.55rem 0.6rem; }
+  .dg-hit { color: #e8dfd0; }
+  .dg-this { color: var(--accent); }
+  .dg-live { font-size: 0.5rem; font-family: var(--mono); color: var(--ok); border: 1px solid #2c4a33; border-radius: 999px; padding: 0.08rem 0.4rem; flex: none; }
+  .dg-fig-comment { background: #f7f6f2; display: flex; flex-direction: column; justify-content: center; gap: 0.35rem; padding: 0.6rem 0.65rem; }
+  .dg-comment-t { font-size: 0.55rem; font-family: var(--mono); color: #3a3a3a; line-height: 1.55; }
+  .dg-comment-link { font-size: 0.55rem; font-family: var(--mono); color: #3778b7; text-decoration: underline; word-break: break-all; }
+
   /* close + contact */
   .cc-close { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 2rem 3rem; align-items: start; }
   .cc-story { font-family: var(--serif); font-size: 1.06rem; line-height: 1.7; margin: 0; color: var(--muted); text-wrap: pretty; }
@@ -119,7 +161,7 @@
     <p class="cc-lede">Every record is photographed, transcribed and identified to a fixed standard, then turned into whatever you need it to be:</p>
     <ul class="cc-bullets">
       <li><span class="cc-dash">—</span><span>An individual record page and archive for every album, hostable privately on the web, exactly as shown here.</span></li>
-      <li><span class="cc-dash">—</span><span>A working sheet that prints individual album summaries, full collection schedules, and a collection schedule with researched values for insurance.</span></li>
+      <li><span class="cc-dash">—</span><span>A working sheet that prints individual album summaries, full collection schedules, and an insurance schedule with researched values.</span></li>
       <li><span class="cc-dash">—</span><span>Coffee-table catalogue books you design yourself, straight from the sheet menu — choose the layout and records, and export a print-ready book of your collection.</span></li>
       <li><span class="cc-dash">—</span><span>Private by default — no prices are published, and the files stay in your own Google Drive.</span></li>
     </ul>
@@ -167,8 +209,8 @@
         <figcaption>Every copy placed among its variants</figcaption>
       </figure>
       <figure class="cc-report-pg">
-        <img src="{{ROOT}}reports/price-estimate-p4.jpg" data-full="{{ROOT}}reports/price-estimate-p4-full.jpg" data-caption="Promos &amp; first pressings argued, not asserted" alt="Researched price estimate — a promo pressing identified from its label overprint and matrix suffixes" loading="lazy">
-        <figcaption>Promos &amp; first pressings argued, not asserted</figcaption>
+        <img src="{{ROOT}}reports/price-estimate-p4.jpg" data-full="{{ROOT}}reports/price-estimate-p4-full.jpg" data-caption="Promos &amp; first pressings identified from the evidence" alt="Researched price estimate — a promo pressing identified from its label overprint and matrix suffixes" loading="lazy">
+        <figcaption>Promos &amp; first pressings identified from the evidence</figcaption>
       </figure>
       <figure class="cc-report-pg">
         <img src="{{ROOT}}reports/price-estimate-p5.jpg" data-full="{{ROOT}}reports/price-estimate-p5-full.jpg" data-caption="Closes with the owner's declaration" alt="Researched price estimate — final entry and the owner's declaration block for signing" loading="lazy">
@@ -178,10 +220,105 @@
     <p class="cc-reports-note">Exportable from your sheet whenever you need them — for insurance, a sale, or your own records.</p>
   </section>
 
+  <section class="cc-sec">
+    <h2 class="cc-h2">Selling? Listings, straight from the archive</h2>
+    <p class="cc-sub">When it's time to sell, the documentation becomes the listing. Tell me which records, and I prepare a ready-to-upload eBay draft file — every description already carrying the matrix transcription and the pressing story, with the documented photos in gallery order.</p>
+    <ol class="eb-steps">
+      <li>
+        <div class="eb-fig eb-fig-pick">
+          <div class="eb-row"><span class="eb-row-t">Kind Of Blue · 1959 6-eye</span><span class="eb-tick">✓</span></div>
+          <div class="eb-row"><span class="eb-row-t">Round About Midnight · CL 949</span><span class="eb-tick">✓</span></div>
+          <div class="eb-row eb-row-dim"><span class="eb-row-t">Porgy And Bess · CL 1274</span><span></span></div>
+        </div>
+        <p class="eb-num">01</p>
+        <h3 class="cc-h3">Choose the records</h3>
+        <p class="cc-p">One, a batch, or the whole collection — you decide what's for sale and the price you want for each.</p>
+      </li>
+      <li>
+        <div class="eb-fig eb-fig-csv">
+          <div class="eb-doc"><span class="eb-doc-l" style="width:60%"></span><span class="eb-doc-l"></span><span class="eb-doc-l"></span><span class="eb-doc-l" style="width:85%"></span><span class="eb-doc-tag">CSV</span></div>
+          <span class="eb-csv-t">ebay-drafts.csv<br>12 records · one file</span>
+        </div>
+        <p class="eb-num">02</p>
+        <h3 class="cc-h3">The drafts are prepared</h3>
+        <p class="cc-p">I build one eBay bulk-draft file from your records' documentation — titles to a fixed formula, full descriptions, your photos in gallery order. Nothing for you to write.</p>
+      </li>
+      <li>
+        <div class="eb-fig eb-fig-drafts">
+          <div class="eb-draft"><img src="{{IMG}}/albums/miles-davis-kind-of-blue/img/t/01-front-cover.jpg" alt="" loading="lazy"><span class="eb-draft-l"></span><span class="eb-chip">Draft</span></div>
+          <div class="eb-draft"><img src="{{IMG}}/albums/miles-davis-round-about-midnight/img/t/01-front-cover.jpg" alt="" loading="lazy"><span class="eb-draft-l"></span><span class="eb-chip">Draft</span></div>
+          <div class="eb-draft"><img src="{{IMG}}/albums/miles-davis-porgy-and-bess/img/t/01-front-cover.jpg" alt="" loading="lazy"><span class="eb-draft-l"></span><span class="eb-chip">Draft</span></div>
+        </div>
+        <p class="eb-num">03</p>
+        <h3 class="cc-h3">Into your own Seller Hub</h3>
+        <p class="cc-p">One upload creates every draft in your own eBay account — auction and/or Buy It Now, at your prices. Review and publish when ready; the sales are yours.</p>
+      </li>
+      <li>
+        <div class="eb-fig eb-fig-listing">
+          <img src="{{IMG}}/albums/miles-davis-kind-of-blue/img/t/01-front-cover.jpg" alt="" loading="lazy">
+          <div class="eb-listing-body">
+            <span class="eb-listing-t">MILES DAVIS Kind Of Blue LP 1959 Columbia 6-eye</span>
+            <span class="eb-listing-m">Matrix A: XLP 47324-1D</span>
+            <span class="eb-listing-m">Cover VG+ · Vinyl NM-</span>
+            <span class="eb-price">$000.00</span>
+          </div>
+        </div>
+        <p class="eb-num">04</p>
+        <h3 class="cc-h3">Listings backed by the research</h3>
+        <p class="cc-p">Serious buyers pay for confidence. Each description carries the dead-wax transcription, the variant chronology placing your copy among every pressing of its title, label notes, the album's story and its fidelity reputation. When buyers can see exactly what's on offer, they bid with confidence — the best result for both sides of the sale.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="cc-sec">
+    <h2 class="cc-h2">And Discogs — listed against the exact pressing</h2>
+    <p class="cc-sub">Discogs listings are prepared the same way — each record against the exact release the research identified, so your copy sells as what it actually is, with the evidence in the listing.</p>
+    <ol class="eb-steps">
+      <li>
+        <div class="eb-fig dg-fig-match">
+          <div class="dg-hit">1959 — US 6-eye mono <span class="dg-this">— this copy</span></div>
+          <div>1959 — US 6-eye stereo</div>
+          <div>1962 — 2-eye 'Guaranteed Hi-Fi'</div>
+          <div>1997 — 200g audiophile reissue</div>
+        </div>
+        <p class="eb-num">01</p>
+        <h3 class="cc-h3">Matched, not guessed</h3>
+        <p class="cc-p">Your copy is listed against the exact Discogs release the research identified — not a lookalike pressing from the same year.</p>
+      </li>
+      <li>
+        <div class="eb-fig eb-fig-pick">
+          <div class="eb-row"><span class="eb-row-t">Kind Of Blue · 1959 6-eye</span><span class="dg-live">For Sale</span></div>
+          <div class="eb-row"><span class="eb-row-t">Round About Midnight · CL 949</span><span class="dg-live">For Sale</span></div>
+          <div class="eb-row eb-row-dim"><span class="eb-row-t">Porgy And Bess · CL 1274</span><span></span></div>
+        </div>
+        <p class="eb-num">02</p>
+        <h3 class="cc-h3">One upload, listed</h3>
+        <p class="cc-p">You get one file for your own Discogs account — exact release, your price, grades and comments all in place. Approve it, upload it, and every record is live. Nothing retyped.</p>
+      </li>
+      <li>
+        <div class="eb-fig dg-fig-comment">
+          <span class="dg-comment-t">Vinyl: NM-. Cover: VG+.<br>Matrix/runout — A: XLP 47324-1D,<br>B: XLP 47325-1E.</span>
+        </div>
+        <p class="eb-num">03</p>
+        <h3 class="cc-h3">The evidence rides along</h3>
+        <p class="cc-p">The listing comments carry your grades and the hand-transcribed matrix / runout — the details serious buyers filter for.</p>
+      </li>
+      <li>
+        <div class="eb-fig dg-fig-comment">
+          <span class="dg-comment-t">Copy and paste this link for full album details including actual item photos:</span>
+          <span class="dg-comment-link">yourname.vinylcurator.net/albums/kind-of-blue/</span>
+        </div>
+        <p class="eb-num">04</p>
+        <h3 class="cc-h3">Linked to your own archive</h3>
+        <p class="cc-p">With your collection hosted here, each listing links back to the record's page on your own site — full documentation, every photograph, and the rest of what you have available one click away.</p>
+      </li>
+    </ol>
+  </section>
+
   <section class="cc-close">
     <div>
       <h2 class="cc-h2">Private, and yours</h2>
-      <p class="cc-story">Your collection is never published publicly, it's hosted as your private collection behind your login. The photographs and files live in your own Google Drive, shared read-only for as long as you choose, and nothing about what you own is put on this site. The documentation is made for you — to insure, to sell, or simply to keep.</p>
+      <p class="cc-story">Your collection is never published publicly — it's hosted as your private collection behind your login. If you choose to sell, you can open just the records you're offering, a page for buyers to browse, while the rest of the collection stays private. The photographs and files live in your own Google Drive, shared read-only for as long as you choose, and nothing about what you own is put on this site. The documentation is made for you — to insure, to sell, or simply to keep.</p>
     </div>
     <div class="cc-start">
       <h3 class="cc-h3">Start your collection</h3>
