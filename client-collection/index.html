@@ -72,6 +72,23 @@
   }
   .cc-catframe iframe { width: 100%; height: 100%; border: 0; }
 
+  /* report page slider */
+  .cc-reports {
+    display: flex; gap: 1.4rem; overflow-x: auto; scroll-snap-type: x mandatory;
+    padding: 0.3rem 0.2rem 1.1rem; -webkit-overflow-scrolling: touch;
+  }
+  .cc-report-pg { flex: 0 0 auto; width: min(24rem, 80vw); scroll-snap-align: start; margin: 0; }
+  .cc-report-pg img {
+    display: block; width: 100%; height: auto; background: #fff;
+    border: 1px solid #26262b; border-radius: 4px;
+    box-shadow: 0 20px 48px -20px rgba(0, 0, 0, 0.85);
+  }
+  .cc-report-pg figcaption {
+    margin-top: 0.55rem; font-family: var(--mono); font-size: 0.68rem;
+    letter-spacing: 0.05em; color: var(--muted);
+  }
+  .cc-reports-note { margin: 0.4rem 0 0; font-size: 0.8rem; color: var(--muted); }
+
   /* close + contact */
   .cc-close { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 2rem 3rem; align-items: start; }
   .cc-story { font-family: var(--serif); font-size: 1.06rem; line-height: 1.7; margin: 0; color: var(--muted); text-wrap: pretty; }
@@ -135,6 +152,38 @@
     </div>
   </section>
 
+  <section class="cc-sec">
+    <h2 class="cc-h2">The reports</h2>
+    <p class="cc-sub">A one-page collection schedule and a record-by-record researched price estimate — the documents a broker, valuer or buyer works from. These are sample pages from a real report; the values are blurred here because the numbers are for you, never for this site.</p>
+    <div class="cc-reports">
+      <figure class="cc-report-pg">
+        <img src="../reports/collection-schedule-p1.jpg" data-full="../reports/collection-schedule-p1-full.jpg" data-caption="Collection schedule — every record on one page" alt="Collection schedule — one page listing every record with label, year, condition and insured value (values blurred)" loading="lazy">
+        <figcaption>Collection schedule · every record on one page</figcaption>
+      </figure>
+      <figure class="cc-report-pg">
+        <img src="../reports/price-estimate-p1.jpg" data-full="../reports/price-estimate-p1-full.jpg" data-caption="Price estimate — value, guide &amp; pressing chronology" alt="Researched price estimate — first page: insured value, price guide, condition and pressing chronology for one record (values blurred)" loading="lazy">
+        <figcaption>Price estimate · value, guide &amp; pressing chronology</figcaption>
+      </figure>
+      <figure class="cc-report-pg">
+        <img src="../reports/price-estimate-p2.jpg" data-full="../reports/price-estimate-p2-full.jpg" data-caption="Label notes, provenance &amp; fidelity — per record" alt="Researched price estimate — label notes, provenance, fidelity and album story for one record" loading="lazy">
+        <figcaption>Label notes, provenance &amp; fidelity — per record</figcaption>
+      </figure>
+      <figure class="cc-report-pg">
+        <img src="../reports/price-estimate-p3.jpg" data-full="../reports/price-estimate-p3-full.jpg" data-caption="Every copy placed among its variants" alt="Researched price estimate — a second record's entry with condition, variants and label notes (values blurred)" loading="lazy">
+        <figcaption>Every copy placed among its variants</figcaption>
+      </figure>
+      <figure class="cc-report-pg">
+        <img src="../reports/price-estimate-p4.jpg" data-full="../reports/price-estimate-p4-full.jpg" data-caption="Promos &amp; first pressings argued, not asserted" alt="Researched price estimate — a promo pressing identified from its label overprint and matrix suffixes" loading="lazy">
+        <figcaption>Promos &amp; first pressings argued, not asserted</figcaption>
+      </figure>
+      <figure class="cc-report-pg">
+        <img src="../reports/price-estimate-p5.jpg" data-full="../reports/price-estimate-p5-full.jpg" data-caption="Closes with the owner's declaration" alt="Researched price estimate — final entry and the owner's declaration block for signing" loading="lazy">
+        <figcaption>Closes with the owner's declaration</figcaption>
+      </figure>
+    </div>
+    <p class="cc-reports-note">Exportable from your sheet whenever you need them — for insurance, a sale, or your own records.</p>
+  </section>
+
   <section class="cc-close">
     <div>
       <h2 class="cc-h2">Private, and yours</h2>
@@ -155,6 +204,6 @@
   <a class="mail" data-u="contact" data-d="vinylcurator.net">contact</a> ·
   © 2026 Vinyl Curator</p>
 </footer>
-<script src="../assets/site.js?v=797ef806"></script>
+<script src="../assets/site.js?v=6dca385b"></script>
 </body>
 </html>
