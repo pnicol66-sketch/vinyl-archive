@@ -8,6 +8,35 @@
 <link rel="canonical" href="https://vinylcurator.net/">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/site.css?v=b8c231a7">
+<style>
+  /* "How your collection is built" step figures (shared markup with the
+     Client Collection page; keep the .cc-fig* rules in sync with
+     templates/client-collection.html). */
+  .cc-fig {
+    height: 6.5rem; border-radius: 8px; border: 1px solid var(--line);
+    margin-bottom: 0.85rem; padding: 0.5rem; overflow: hidden;
+  }
+  .cc-fig-capture { background: #101013; display: flex; flex-direction: column; gap: 0.28rem; padding: 0.45rem; }
+  .cc-chk { display: flex; align-items: center; gap: 0.35rem; background: #1b1b20; border: 1px solid #2a2a31; border-radius: 0.35rem; padding: 0.22rem 0.35rem; font-size: 0.6rem; }
+  .cc-chk-t { flex: 1; color: #ececf0; }
+  .cc-chk-ok { color: var(--ok); font-size: 0.62rem; }
+  .cc-chk-now { color: #f0a832; font-size: 0.55rem; }
+  .cc-chk-save { margin-top: auto; background: #f0a832; color: #191204; text-align: center; font-size: 0.56rem; font-weight: 700; border-radius: 0.35rem; padding: 0.24rem; }
+  .cc-fig-drive { background: var(--card); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.45rem; }
+  .cc-dots { display: flex; gap: 0.28rem; }
+  .cc-dots i { width: 0.5rem; height: 0.5rem; border-radius: 50%; display: block; }
+  .cc-drive-t { font-size: 0.62rem; color: var(--ink); text-align: center; }
+  .cc-drive-ro { font-size: 0.56rem; color: var(--ok); }
+  .cc-fig-chron { background: #141210; font-family: var(--mono); font-size: 0.56rem; line-height: 1.5; color: var(--muted); padding: 0.5rem 0.55rem; }
+  .cc-chron-hit { color: #e8dfd0; }
+  .cc-thiscopy { color: var(--accent); }
+  .cc-fig-deliver { background: var(--card); display: flex; align-items: center; justify-content: center; gap: 0.7rem; }
+  .cc-doc { width: 2.6rem; height: 3.4rem; background: #fff; border-radius: 2px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,.5); padding: 0.32rem 0.28rem; }
+  .cc-doc-l { display: block; height: 2px; background: #e0dacd; margin-bottom: 2.5px; }
+  .cc-doc-l:first-child { background: #c9c2b4; }
+  .cc-doc-pdf { position: absolute; bottom: 0.2rem; right: 0.22rem; font-size: 0.42rem; font-weight: 700; color: #c0392b; }
+  .cc-deliver-t { font-size: 0.6rem; color: var(--muted); line-height: 1.4; }
+</style>
 </head>
 <body>
 <header class="site-head">
@@ -250,6 +279,49 @@
     </div>
   </section>
 
+  <section class="lp-how">
+    <h2>One system, four steps</h2>
+    <ol class="lp-grid4 lp-numbered">
+      <li>
+        <div class="cc-fig cc-fig-capture">
+          <div class="cc-chk"><span>📷</span><span class="cc-chk-t">06 Side 1 Label</span><span class="cc-chk-ok">✓</span></div>
+          <div class="cc-chk"><span>⌨</span><span class="cc-chk-t">14 Matrix/Runout</span><span class="cc-chk-now">now</span></div>
+          <div class="cc-chk-save">Save to Google Drive</div>
+        </div>
+        <p class="lp-num">01</p><h3>Capture</h3><p class="lp-who-tag">You · in the app</p>
+        <p>A fixed multi-entry checklist: front and back cover, every label, every disc face — covers auto-cropped, labels and discs cropped round with a few taps. In the same pass you <strong>type the condition grades</strong> for the cover and each side, and <strong>type or dictate the matrix / runout</strong> straight off the disc.</p>
+      </li>
+      <li>
+        <div class="cc-fig cc-fig-drive">
+          <span class="cc-dots"><i style="background:#1a73e8"></i><i style="background:#1e8e3e"></i><i style="background:#fbbc04"></i></span>
+          <span class="cc-drive-t">Google Drive · your folder</span>
+          <span class="cc-drive-ro">Shared · read-only</span>
+        </div>
+        <p class="lp-num">02</p><h3>Upload</h3><p class="lp-who-tag">You · one tap</p>
+        <p>The set uploads to a folder in your own Google Drive, named from the artist and album, and you share that one folder read-only. Nothing else in your Drive is touched — you stay the owner, and access can be revoked any time.</p>
+      </li>
+      <li>
+        <div class="cc-fig cc-fig-chron">
+          <div class="cc-chron-hit">1957 — six-eye deep-groove <span class="cc-thiscopy">— this copy</span></div>
+          <div>1958–61 — deep groove removed</div>
+          <div>1962–64 — 2-eye 'Guaranteed Hi-Fi'</div>
+          <div>1963–70 — 360 Sound red label</div>
+          <div>2013 — 180g mono reissue</div>
+        </div>
+        <p class="lp-num">03</p><h3>Researched</h3><p class="lp-who-tag">The archive · remotely</p>
+        <p>Your matrix transcription and label shots go through deep research — pressing-plant and label archives, dating references, recorded sales — until the exact pressing is identified, and its market history gathered, evaluated and compared.</p>
+      </li>
+      <li>
+        <div class="cc-fig cc-fig-deliver">
+          <div class="cc-doc"><span class="cc-doc-l" style="width:60%"></span><span class="cc-doc-l"></span><span class="cc-doc-l"></span><span class="cc-doc-l" style="width:85%"></span><span class="cc-doc-pdf">PDF</span></div>
+          <span class="cc-deliver-t">Catalogue<br>&amp; schedule</span>
+        </div>
+        <p class="lp-num">04</p><h3>Delivered</h3><p class="lp-who-tag">The archive · back to you</p>
+        <p>Your grades are set beside recorded sales of that exact variant, so the market history sits with the record. Out comes whatever you need — a private catalogue and record pages, an exportable schedule for a broker or buyer, or bulk listings for eBay and Discogs.</p>
+      </li>
+    </ol>
+  </section>
+
   <section class="lp-proof">
     <h2>What “documented” actually means</h2>
     <p class="lp-sublede">One record from the archive, in the detail every record gets.</p>
@@ -287,7 +359,7 @@ Side B: CS 8163-B T BG 08</pre>
   </section>
 
   <section class="lp-who">
-    <h2>Built by a collector with the same problem</h2>
+    <h2>Why I built this</h2>
     <p class="lp-story">I built this because I couldn’t prove what I owned. Thirty years and three countries of buying records, and no way to show anyone — an insurer, a valuer, a buyer — what was actually in the collection. What started as my own catalogue became a set of tools for anyone who needs to catalogue, document, insure or sell vinyl properly. <a class="more" href="about/">Read the full story →</a></p>
     <div class="lp-grid4">
       <div><h3>Collectors</h3><p>Know exactly which pressing you own, and hold the evidence for it — before you need it.</p></div>
@@ -295,29 +367,6 @@ Side B: CS 8163-B T BG 08</pre>
       <div><h3>Insurers &amp; valuers</h3><p>A schedule that identifies each item at pressing level, with photographs and condition notes recorded to a fixed checklist — the evidence your own valuer or adjuster works from.</p></div>
       <div><h3>Selling a collection</h3><p>Inherited or downsizing: find out what is actually there before someone offers you a lump sum for it.</p></div>
     </div>
-  </section>
-
-  <section class="lp-how">
-    <h2>How a record gets documented</h2>
-    <p class="lp-sublede">Everything that has to happen with the record in your hands happens in the app, in one pass. Everything after that happens without you.</p>
-    <ol class="lp-grid4 lp-numbered">
-      <li>
-        <p class="lp-num">01</p><h3>Capture</h3><p class="lp-who-tag">You · in the app</p>
-        <p>A fixed 13-entry checklist: front and back cover, every label, every disc face — covers auto-cropped, labels and discs cropped round with a few taps. In the same pass you <strong>type the condition grades</strong> for the cover and each side, and <strong>type or dictate the matrix / runout</strong> straight off the disc.</p>
-      </li>
-      <li>
-        <p class="lp-num">02</p><h3>Upload</h3><p class="lp-who-tag">You · one tap</p>
-        <p>The set uploads to a folder in your own Google Drive, named from the artist and album, and you share that one folder read-only. Nothing else in your Drive is touched.</p>
-      </li>
-      <li>
-        <p class="lp-num">03</p><h3>Identify</h3><p class="lp-who-tag">The archive · remotely</p>
-        <p>Your matrix transcription and label shots go through deep research — pressing-plant and label archives, dating references, decades of auction and dealer sale records — read against thirty years of handling these records first-hand.</p>
-      </li>
-      <li>
-        <p class="lp-num">04</p><h3>Research &amp; deliver</h3><p class="lp-who-tag">The archive · delivered</p>
-        <p>Your grades are set beside recorded sales of that exact variant, so the market history sits with the record. Out comes a documentation pack for a broker or buyer, a private record page, or bulk listings for eBay and Discogs.</p>
-      </li>
-    </ol>
   </section>
 
   <section class="lp-contact">
