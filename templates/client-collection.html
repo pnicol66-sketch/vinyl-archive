@@ -72,37 +72,6 @@
   }
   .cc-catframe iframe { width: 100%; height: 100%; border: 0; }
 
-  /* how it's built */
-  .cc-steps {
-    list-style: none; margin: 0; padding: 0; display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1.6rem 2.2rem;
-  }
-  .cc-num { margin: 0 0 0.4rem; font-family: var(--mono); font-size: 0.78rem; color: var(--accent); }
-  .cc-fig {
-    height: 6.5rem; border-radius: 8px; border: 1px solid var(--line);
-    margin-bottom: 0.85rem; padding: 0.5rem; overflow: hidden;
-  }
-  .cc-fig-capture { background: #101013; display: flex; flex-direction: column; gap: 0.28rem; padding: 0.45rem; }
-  .cc-chk { display: flex; align-items: center; gap: 0.35rem; background: #1b1b20; border: 1px solid #2a2a31; border-radius: 0.35rem; padding: 0.22rem 0.35rem; font-size: 0.6rem; }
-  .cc-chk-t { flex: 1; color: #ececf0; }
-  .cc-chk-ok { color: var(--ok); font-size: 0.62rem; }
-  .cc-chk-now { color: #f0a832; font-size: 0.55rem; }
-  .cc-chk-save { margin-top: auto; background: #f0a832; color: #191204; text-align: center; font-size: 0.56rem; font-weight: 700; border-radius: 0.35rem; padding: 0.24rem; }
-  .cc-fig-drive { background: var(--card); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.45rem; }
-  .cc-dots { display: flex; gap: 0.28rem; }
-  .cc-dots i { width: 0.5rem; height: 0.5rem; border-radius: 50%; display: block; }
-  .cc-drive-t { font-size: 0.62rem; color: var(--ink); text-align: center; }
-  .cc-drive-ro { font-size: 0.56rem; color: var(--ok); }
-  .cc-fig-chron { background: #141210; font-family: var(--mono); font-size: 0.56rem; line-height: 1.5; color: var(--muted); padding: 0.5rem 0.55rem; }
-  .cc-chron-hit { color: #e8dfd0; }
-  .cc-thiscopy { color: var(--accent); }
-  .cc-fig-deliver { background: var(--card); display: flex; align-items: center; justify-content: center; gap: 0.7rem; }
-  .cc-doc { width: 2.6rem; height: 3.4rem; background: #fff; border-radius: 2px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,.5); padding: 0.32rem 0.28rem; }
-  .cc-doc-l { display: block; height: 2px; background: #e0dacd; margin-bottom: 2.5px; }
-  .cc-doc-l:first-child { background: #c9c2b4; }
-  .cc-doc-pdf { position: absolute; bottom: 0.2rem; right: 0.22rem; font-size: 0.42rem; font-weight: 700; color: #c0392b; }
-  .cc-deliver-t { font-size: 0.6rem; color: var(--muted); line-height: 1.4; }
-
   /* close + contact */
   .cc-close { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 2rem 3rem; align-items: start; }
   .cc-story { font-family: var(--serif); font-size: 1.06rem; line-height: 1.7; margin: 0; color: var(--muted); text-wrap: pretty; }
@@ -158,53 +127,6 @@
     <div class="cc-catframe">
       <iframe src="{{ROOT}}catalogue/" title="Catalogue book examples" loading="lazy"></iframe>
     </div>
-  </section>
-
-  <section class="cc-sec">
-    <h2 class="cc-h2">How your collection is built</h2>
-    <ol class="cc-steps">
-      <li>
-        <div class="cc-fig cc-fig-capture">
-          <div class="cc-chk"><span>📷</span><span class="cc-chk-t">06 Side 1 Label</span><span class="cc-chk-ok">✓</span></div>
-          <div class="cc-chk"><span>⌨</span><span class="cc-chk-t">14 Matrix/Runout</span><span class="cc-chk-now">now</span></div>
-          <div class="cc-chk-save">Save to Google Drive</div>
-        </div>
-        <p class="cc-num">01</p>
-        <h3 class="cc-h3">Capture</h3>
-        <p class="cc-p">Photograph each record to the checklist and type or dictate the matrix — in the app, or I can do it for you.</p>
-      </li>
-      <li>
-        <div class="cc-fig cc-fig-drive">
-          <span class="cc-dots"><i style="background:#1a73e8"></i><i style="background:#1e8e3e"></i><i style="background:#fbbc04"></i></span>
-          <span class="cc-drive-t">Google Drive · your folder</span>
-          <span class="cc-drive-ro">Shared · read-only</span>
-        </div>
-        <p class="cc-num">02</p>
-        <h3 class="cc-h3">Kept in your Drive</h3>
-        <p class="cc-p">Everything lands in a folder you own and share read-only. You stay the owner; access can be revoked any time.</p>
-      </li>
-      <li>
-        <div class="cc-fig cc-fig-chron">
-          <div class="cc-chron-hit">1957 — six-eye deep-groove <span class="cc-thiscopy">— this copy</span></div>
-          <div>1958–61 — deep groove removed</div>
-          <div>1962–64 — 2-eye 'Guaranteed Hi-Fi'</div>
-          <div>1963–70 — 360 Sound red label</div>
-          <div>2013 — 180g mono reissue</div>
-        </div>
-        <p class="cc-num">03</p>
-        <h3 class="cc-h3">Researched</h3>
-        <p class="cc-p">Each pressing identified and its market history gathered, read against thirty years of handling these records first-hand.</p>
-      </li>
-      <li>
-        <div class="cc-fig cc-fig-deliver">
-          <div class="cc-doc"><span class="cc-doc-l" style="width:60%"></span><span class="cc-doc-l"></span><span class="cc-doc-l"></span><span class="cc-doc-l" style="width:85%"></span><span class="cc-doc-pdf">PDF</span></div>
-          <span class="cc-deliver-t">Catalogue<br>&amp; schedule</span>
-        </div>
-        <p class="cc-num">04</p>
-        <h3 class="cc-h3">Delivered</h3>
-        <p class="cc-p">Your private catalogue and an exportable schedule — ready for a broker, a buyer, or your own records.</p>
-      </li>
-    </ol>
   </section>
 
   <section class="cc-close">
