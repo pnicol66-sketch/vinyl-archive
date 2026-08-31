@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-31T05:18:57.024Z",
+ "generated": "2026-08-31T05:28:04.600Z",
  "site": {
   "title": "Vinyl Curator",
   "baseUrl": "https://vinylcurator.net",
@@ -2868,50 +2868,6 @@
    "tab": "For Sale"
   },
   {
-   "artist": "Clifford Brown",
-   "title": "Clifford Brown with Strings",
-   "year": "1955",
-   "labelName": "EmArcy",
-   "labelNumber": "MG-36005",
-   "monoStereo": "Mono",
-   "countryOfOrigin": "US",
-   "format": "LP",
-   "genre": "Jazz - Orchestral Jazz / Ballads",
-   "speed": "33 1/3 RPM",
-   "producer": "Bob Shad",
-   "composer": "",
-   "conductor": "Neal Hefti",
-   "performerOrchestra": "Uncredited string nonet (six violins, two violas, cello)",
-   "musicians": "Clifford Brown (trumpet), Richie Powell (piano), Barry Galbraith (guitar), George Morrow (bass), Max Roach (drums), Neal Hefti (arranger, conductor), uncredited string nonet (six violins, two violas, cello)",
-   "coverGrade": "VG+ SMALL WRITING/VG+ NAME WITTEN",
-   "vinylGrade": "EX DEEP GROOVE/VG+ DEEP GROOVE",
-   "matrix": {
-    "a": "YMG36005A",
-    "b": "",
-    "c": "",
-    "d": ""
-   },
-   "sides": [
-    "1. Yesterdays\n2. Laura\n3. What's New\n4. Blue Moon\n5. Can't Help Lovin' Dat Man\n6. Embraceable You",
-    "1. Willow Weep For Me\n2. Memories Of You\n3. Smoke Gets In Your Eyes\n4. Portrait Of Jenny\n5. Where Or When\n6. Stardust",
-    "",
-    ""
-   ],
-   "albumStory": "Recorded over three sessions in January 1955 at Fine Sound in New York, this project paired trumpeter Clifford Brown with a nine-piece string section arranged and conducted by Neal Hefti, produced for EmArcy by Bob Shad. Rather than showcasing the fiery bebop lines that had made his reputation, Brown here plays as a melodic balladeer, drawing on twelve songbook standards by Kern, Rodgers and Hart, Gershwin, and Carmichael among others, with his working rhythm section of Max Roach, Richie Powell, George Morrow, and guitarist Barry Galbraith supporting rather than soloing. The album arrived at a creative peak for Brown, whose quintet with Roach was among the most admired working groups in jazz, and it stands as one of the defining entries in the",
-   "lpNotes": "1st press (US mono, 1955) - blue/silver EmArcy big-drummer deep-groove labels and blue-back jacket; typed YMG36005A runout.",
-   "labelNotes": "This copy carries the blue EmArcy 'big-drummer' label in silver ink, showing the drummer pouring paint onto a cymbal logo once (not the later small-drummer redesign), a deep groove pressed near the label edge, and curved rim text reading LONG PLAYING HIGH FIDELITY / MERCURY RECORD CORPORATION / MADE IN U.S.A. This large-drummer, deep-groove EmArcy design is the label company's earliest 12-inch jazz-series look, used circa 1954-56 before Mercury shrank the drummer graphic and eventually moved to the EmArcy Jazz oval-logo label in 1958. Discogs collectors confirm the blue-printed (not black) back cover as the decisive first-issue marker for MG-36000-series titles through early 1956, and this copy's back cover print matches that blue-ink first state, placing it at the top of the pressing hierarchy for this title.",
-   "fidelity": "This is an original-era mono cut from the January 1955 Fine Sound session tape; neither the jacket nor the supplied matrix identifies the cutting engineer, and the incomplete runout transcription prevents a firm mother/stamper/plant attribution. A clean first US pressing remains the fidelity benchmark, delivering strong center-image presence for Brown's trumpet and a warm, if narrow-bandwidth, mono blend with the small string group. Later 1950s drummer-label and Mercury EmArcy Jazz oval-label copies are acceptable period alternatives but rank below this blue-back first pressing among collectors. The best-documented modern alternative is Universal Japan's 2004 UCJU-9012, remastered from the original cutting-master tape by Joseph M. Palmaccio on 180g vinyl; no Tone Poet, Music Matters, Analogue Productions, or Speakers Corner edition of this title exists.",
-   "generalNotes": "1955 EmArcy MG-36005 mono - original US first pressing. The blue/silver big-drummer deep-groove labels and blue-printed back cover are the first-issue pairing; black backs mark later 1950s jackets. The typed early YMG36005A matrix supports that placement, though the supplied transcription omits complete mother/stamper and plant codes. Recorded January 18-20, 1955 and issued the same year.",
-   "discogsListingUrl": "https://www.discogs.com/sell/item/4320867354",
-   "ebayItemUrl": "https://www.ebay.com/itm/407179145262",
-   "soldDate": "",
-   "variantChronology": "1955 - US first mono: blue/silver big-drummer deep-groove labels, blue-back jacket, early YMG matrix  <- this copy\n1955 - Canada MG-36005 mono counterpart\nc. 1956-57 - US early mono repress: blue/silver deep-groove drummer labels, black-printed back\n1958 - US Mercury EmArcy Jazz oval-label mono edition\nc. 1971-74 - Japan Mercury BT-1327 mono reissue\n1972-74 - US EmArcy Clifford Brown Collection red Mercury-logo label, Masterdisk JS cut\n1974 - US Trip Jazz TLP-5502 mono reissue\n1978 - France EmArcy/Mercury 6372 484 mono reissue\n1982 - Japan EmArcy/Mercury EXPR-1011 mono reissue\n1982 - Netherlands EmArcy/Mercury 6336 711 mono reissue\n1983 - Japan EmArcy 195J-6 mono reissue\n2004 - Japan Universal Jazz The Best UCJU-9012 180g mono remaster",
-   "folderName": "Clifford Brown_Clifford Brown with Strings",
-   "folderId": "1vkOWsf7OuCx6WxxybmVO6Yn_WFSIpB8K",
-   "slug": "clifford-brown-clifford-brown-with-strings",
-   "tab": "For Sale"
-  },
-  {
    "artist": "Clifford Brown, Maynard Ferguson, Clark Terry",
    "title": "Jam Session",
    "year": "1955",
@@ -3921,6 +3877,50 @@
    "folderName": "Pink Floyd_Wish You Were Here",
    "folderId": "1TA13I8x2hZRwiHEpgFHrwYwgd0T9zeH3",
    "slug": "pink-floyd-wish-you-were-here",
+   "tab": "Sold"
+  },
+  {
+   "artist": "Clifford Brown",
+   "title": "Clifford Brown with Strings",
+   "year": "1955",
+   "labelName": "EmArcy",
+   "labelNumber": "MG-36005",
+   "monoStereo": "Mono",
+   "countryOfOrigin": "US",
+   "format": "LP",
+   "genre": "Jazz - Orchestral Jazz / Ballads",
+   "speed": "33 1/3 RPM",
+   "producer": "Bob Shad",
+   "composer": "",
+   "conductor": "Neal Hefti",
+   "performerOrchestra": "Uncredited string nonet (six violins, two violas, cello)",
+   "musicians": "Clifford Brown (trumpet), Richie Powell (piano), Barry Galbraith (guitar), George Morrow (bass), Max Roach (drums), Neal Hefti (arranger, conductor), uncredited string nonet (six violins, two violas, cello)",
+   "coverGrade": "VG+ SMALL WRITING/VG+ NAME WITTEN",
+   "vinylGrade": "EX DEEP GROOVE/VG+ DEEP GROOVE",
+   "matrix": {
+    "a": "YMG36005A",
+    "b": "",
+    "c": "",
+    "d": ""
+   },
+   "sides": [
+    "1. Yesterdays\n2. Laura\n3. What's New\n4. Blue Moon\n5. Can't Help Lovin' Dat Man\n6. Embraceable You",
+    "1. Willow Weep For Me\n2. Memories Of You\n3. Smoke Gets In Your Eyes\n4. Portrait Of Jenny\n5. Where Or When\n6. Stardust",
+    "",
+    ""
+   ],
+   "albumStory": "Recorded over three sessions in January 1955 at Fine Sound in New York, this project paired trumpeter Clifford Brown with a nine-piece string section arranged and conducted by Neal Hefti, produced for EmArcy by Bob Shad. Rather than showcasing the fiery bebop lines that had made his reputation, Brown here plays as a melodic balladeer, drawing on twelve songbook standards by Kern, Rodgers and Hart, Gershwin, and Carmichael among others, with his working rhythm section of Max Roach, Richie Powell, George Morrow, and guitarist Barry Galbraith supporting rather than soloing. The album arrived at a creative peak for Brown, whose quintet with Roach was among the most admired working groups in jazz, and it stands as one of the defining entries in the",
+   "lpNotes": "1st press (US mono, 1955) - blue/silver EmArcy big-drummer deep-groove labels and blue-back jacket; typed YMG36005A runout.",
+   "labelNotes": "This copy carries the blue EmArcy 'big-drummer' label in silver ink, showing the drummer pouring paint onto a cymbal logo once (not the later small-drummer redesign), a deep groove pressed near the label edge, and curved rim text reading LONG PLAYING HIGH FIDELITY / MERCURY RECORD CORPORATION / MADE IN U.S.A. This large-drummer, deep-groove EmArcy design is the label company's earliest 12-inch jazz-series look, used circa 1954-56 before Mercury shrank the drummer graphic and eventually moved to the EmArcy Jazz oval-logo label in 1958. Discogs collectors confirm the blue-printed (not black) back cover as the decisive first-issue marker for MG-36000-series titles through early 1956, and this copy's back cover print matches that blue-ink first state, placing it at the top of the pressing hierarchy for this title.",
+   "fidelity": "This is an original-era mono cut from the January 1955 Fine Sound session tape; neither the jacket nor the supplied matrix identifies the cutting engineer, and the incomplete runout transcription prevents a firm mother/stamper/plant attribution. A clean first US pressing remains the fidelity benchmark, delivering strong center-image presence for Brown's trumpet and a warm, if narrow-bandwidth, mono blend with the small string group. Later 1950s drummer-label and Mercury EmArcy Jazz oval-label copies are acceptable period alternatives but rank below this blue-back first pressing among collectors. The best-documented modern alternative is Universal Japan's 2004 UCJU-9012, remastered from the original cutting-master tape by Joseph M. Palmaccio on 180g vinyl; no Tone Poet, Music Matters, Analogue Productions, or Speakers Corner edition of this title exists.",
+   "generalNotes": "1955 EmArcy MG-36005 mono - original US first pressing. The blue/silver big-drummer deep-groove labels and blue-printed back cover are the first-issue pairing; black backs mark later 1950s jackets. The typed early YMG36005A matrix supports that placement, though the supplied transcription omits complete mother/stamper and plant codes. Recorded January 18-20, 1955 and issued the same year.",
+   "discogsListingUrl": "https://www.discogs.com/sell/item/4320867354",
+   "ebayItemUrl": "https://www.ebay.com/itm/407179145262",
+   "soldDate": "2026-08-31",
+   "variantChronology": "1955 - US first mono: blue/silver big-drummer deep-groove labels, blue-back jacket, early YMG matrix  <- this copy\n1955 - Canada MG-36005 mono counterpart\nc. 1956-57 - US early mono repress: blue/silver deep-groove drummer labels, black-printed back\n1958 - US Mercury EmArcy Jazz oval-label mono edition\nc. 1971-74 - Japan Mercury BT-1327 mono reissue\n1972-74 - US EmArcy Clifford Brown Collection red Mercury-logo label, Masterdisk JS cut\n1974 - US Trip Jazz TLP-5502 mono reissue\n1978 - France EmArcy/Mercury 6372 484 mono reissue\n1982 - Japan EmArcy/Mercury EXPR-1011 mono reissue\n1982 - Netherlands EmArcy/Mercury 6336 711 mono reissue\n1983 - Japan EmArcy 195J-6 mono reissue\n2004 - Japan Universal Jazz The Best UCJU-9012 180g mono remaster",
+   "folderName": "Clifford Brown_Clifford Brown with Strings",
+   "folderId": "1vkOWsf7OuCx6WxxybmVO6Yn_WFSIpB8K",
+   "slug": "clifford-brown-clifford-brown-with-strings",
    "tab": "Sold"
   }
  ]
