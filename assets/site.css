@@ -462,6 +462,29 @@ h2 {
     background: #fff !important;
     color: #000 !important;
   }
+  /* The screen palette is dark-only (see the token block at the top), and
+     the body reset above does not reach anything that reads a token directly:
+     the matrix / chronology boxes kept their near-black --card fill under the
+     forced black text, and print-color-adjust: exact below made the browser
+     honour it, so they printed as solid black slabs. Remapping the tokens for
+     paper fixes every token-driven surface at once (box fills, rules, the
+     muted labels, links) without touching what a visitor sees on screen. */
+  :root {
+    --paper: #fff;
+    --deep: #fff;
+    --card: #f3f1ec;
+    --card2: #f3f1ec;
+    --ink: #000;
+    --muted: #444;
+    --faint: #666;
+    --line: #999;
+    --line2: #bbb;
+    --line3: #bbb;
+    --accent: #000;
+    --accent-ink: #000;
+    --accent-hover: #000;
+    --ok: #000;
+  }
   body { font-size: 10.5pt; line-height: 1.45; }
   main { max-width: none; padding: 0; }
 
@@ -537,6 +560,15 @@ h2 {
     font-size: 9pt;
     white-space: pre-wrap;
     page-break-inside: avoid;
+  }
+  /* Belt and braces for the boxes themselves: a light fill and a grey rule
+     so the transcription is ink on paper even in a browser that ignores the
+     custom-property remap above. */
+  .matrix pre, .chronology pre {
+    background: #f3f1ec !important;
+    color: #000 !important;
+    border: 1px solid #999;
+    border-radius: 0;
   }
   section, .tracklist .side { page-break-inside: avoid; }
   h2 { page-break-after: avoid; }
