@@ -11,10 +11,10 @@
     if (a.textContent.trim() === 'email') a.textContent = addr;
   });
 
-  // Outbound listing clicks (eBay / Discogs). Cloudflare Web Analytics counts
-  // page views only, so a click on a listing link is recorded as a view of a
-  // virtual path - /out/<ebay|discogs>/<album slug>/ - loaded in a hidden
-  // iframe. The path does not exist: GitHub Pages answers with /404.html,
+  // Outbound clicks (eBay / Discogs listing links, the contact email link).
+  // Cloudflare Web Analytics counts page views only, so a click is recorded as
+  // a view of a virtual path - /out/<ebay|discogs>/<album slug>/ or
+  // /out/email/<page path> - loaded in a hidden iframe. The path does not exist: GitHub Pages answers with /404.html,
   // which carries the beacon, and the beacon reports the path that was
   // requested. The dashboard's Top pages, filtered to /out/, is the click
   // report. Nothing is sent about the visitor that a page view does not
@@ -26,22 +26,32 @@
       var a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
       if (!a) return;
       var host = (a.hostname || '').toLowerCase();
-      var to = /(^|\.)ebay\.[a-z.]+$/.test(host) ? 'ebay'
+      var to = (a.classList.contains('mail') || a.protocol === 'mailto:') ? 'email'
+             : /(^|\.)ebay\.[a-z.]+$/.test(host) ? 'ebay'
              : /(^|\.)discogs\.com$/.test(host) ? 'discogs' : '';
       if (!to) return;
-      // The album: this page's slug on an album page, else the card the link
-      // sits under on an index page.
-      var slug = '', m = location.pathname.match(/\/albums\/([^\/]+)\/?$/);
-      if (m) {
-        slug = m[1];
+      var path;
+      if (to === 'email') {
+        // The contact link: recorded against the page it was clicked on -
+        // /out/email/ for the home page, /out/email/about/, /out/email/albums/<slug>/.
+        var here = location.pathname.replace(/index\.html$/, '');
+        path = '/out/email' + here + (/\/$/.test(here) ? '' : '/');
       } else {
-        var wrap = a.closest('.card-wrap');
-        var card = wrap && wrap.querySelector('a.card');
-        var cm = card && (card.getAttribute('href') || '').match(/\/albums\/([^\/]+)\/?$/);
-        if (cm) slug = cm[1];
+        // The album: this page's slug on an album page, else the card the link
+        // sits under on an index page.
+        var slug = '', m = location.pathname.match(/\/albums\/([^\/]+)\/?$/);
+        if (m) {
+          slug = m[1];
+        } else {
+          var wrap = a.closest('.card-wrap');
+          var card = wrap && wrap.querySelector('a.card');
+          var cm = card && (card.getAttribute('href') || '').match(/\/albums\/([^\/]+)\/?$/);
+          if (cm) slug = cm[1];
+        }
+        path = '/out/' + to + '/' + (slug || 'page') + '/';
       }
       var f = document.createElement('iframe');
-      f.src = '/out/' + to + '/' + (slug || 'page') + '/';
+      f.src = path;
       f.setAttribute('aria-hidden', 'true');
       f.tabIndex = -1;
       f.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden';
