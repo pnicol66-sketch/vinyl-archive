@@ -596,6 +596,24 @@ function AssetVer([string]$rel) {
 $vCss = AssetVer 'assets\site.css'
 $vJs  = AssetVer 'assets\site.js'
 
+# ---------- analytics ----------
+# Cloudflare Web Analytics on the PUBLIC site only: the beacon is cookieless
+# and aggregate (page views, referrers, countries, web vitals), which is what
+# the privacy page promises. A client's private archive gets no beacon at
+# all - the placeholder is emptied for every tenant but the owner. The token
+# is public by design (it is in the served HTML); the site is
+# dash.cloudflare.com > Analytics > Web analytics. Hand-maintained pages
+# (privacy, terms) carry the tag verbatim.
+$analytics = ''
+if ($Tenant -eq 'owner') {
+  $analytics = "<!-- Cloudflare Web Analytics: cookieless, aggregate only, public site only -->`n" +
+    "<script defer src=`"https://static.cloudflareinsights.com/beacon.min.js`" " +
+    "data-cf-beacon='{`"token`": `"4e699adda94b479c8c0ebb9567167811`"}'></script>`n"
+}
+foreach ($n in 'tplAlbum','tplIndex','tplLanding','tplAbout','tplWithdrawn','tplNotFound','tplClientCollection','tplCatalogue') {
+  Set-Variable $n ((Get-Variable $n -ValueOnly).Replace('{{ANALYTICS}}', $analytics))
+}
+
 if (-not (Test-Path $Albums)) { New-Item -ItemType Directory $Albums | Out-Null }
 
 # ---------- workers ----------
