@@ -11,6 +11,45 @@
     if (a.textContent.trim() === 'email') a.textContent = addr;
   });
 
+  // Outbound listing clicks (eBay / Discogs). Cloudflare Web Analytics counts
+  // page views only, so a click on a listing link is recorded as a view of a
+  // virtual path - /out/<ebay|discogs>/<album slug>/ - loaded in a hidden
+  // iframe. The path does not exist: GitHub Pages answers with /404.html,
+  // which carries the beacon, and the beacon reports the path that was
+  // requested. The dashboard's Top pages, filtered to /out/, is the click
+  // report. Nothing is sent about the visitor that a page view does not
+  // already send, and the page's own history is untouched (a pushState would
+  // have counted the album page a second time on Chrome). Only where the
+  // beacon is on the page - the public site, never a client's private archive.
+  if (document.querySelector('script[data-cf-beacon]') && Element.prototype.closest) {
+    document.addEventListener('click', function (ev) {
+      var a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
+      if (!a) return;
+      var host = (a.hostname || '').toLowerCase();
+      var to = /(^|\.)ebay\.[a-z.]+$/.test(host) ? 'ebay'
+             : /(^|\.)discogs\.com$/.test(host) ? 'discogs' : '';
+      if (!to) return;
+      // The album: this page's slug on an album page, else the card the link
+      // sits under on an index page.
+      var slug = '', m = location.pathname.match(/\/albums\/([^\/]+)\/?$/);
+      if (m) {
+        slug = m[1];
+      } else {
+        var wrap = a.closest('.card-wrap');
+        var card = wrap && wrap.querySelector('a.card');
+        var cm = card && (card.getAttribute('href') || '').match(/\/albums\/([^\/]+)\/?$/);
+        if (cm) slug = cm[1];
+      }
+      var f = document.createElement('iframe');
+      f.src = '/out/' + to + '/' + (slug || 'page') + '/';
+      f.setAttribute('aria-hidden', 'true');
+      f.tabIndex = -1;
+      f.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden';
+      document.body.appendChild(f);
+      setTimeout(function () { if (f.parentNode) f.parentNode.removeChild(f); }, 20000);
+    }, true);
+  }
+
   // Compact one-sheet space savers: put the matrix sides on a single line, and
   // trim the variant chronology to two lines past "this copy" so the kept
   // sections land on one sheet instead of spilling and getting cut off. Both
