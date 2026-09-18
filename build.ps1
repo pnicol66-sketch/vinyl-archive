@@ -520,6 +520,33 @@ if ($violations.Count -gt 0) {
   throw 'Price guard failed - fix the export (or the sheet cells) and re-export. Nothing was built.'
 }
 
+# (removed from the public history, 2026-11-08: the guard's patterns and notes live outside this repo)
+$proseSourceRx = [regex]"(?!)"
+$proseDomainRx = [regex]"(?!)"
+$proseProcessRx = [regex]"(?!)"
+$proseFields = 'lpNotes', 'labelNotes', 'fidelity', 'generalNotes', 'variantChronology', 'albumStory'
+$proseHits = New-Object System.Collections.Generic.List[string]
+foreach ($a in $json.albums) {
+  if ([string]$a.status -eq 'withdrawn') { continue }
+  foreach ($f in $proseFields) {
+    $pt = [string]$a.$f
+    if (-not $pt) { continue }
+    foreach ($prx in @($proseSourceRx, $proseDomainRx, $proseProcessRx)) {
+      $pm = $prx.Match($pt)
+      if ($pm.Success) {
+        $ps = [Math]::Max(0, $pm.Index - 30); $pe = [Math]::Min($pt.Length, $pm.Index + $pm.Length + 30)
+        $proseHits.Add(("{0}.{1}: ...{2}..." -f $a.slug, $f, $pt.Substring($ps, $pe - $ps).Replace("`n", ' ')))
+        break
+      }
+    }
+  }
+}
+if ($proseHits.Count -gt 0) {
+  $proseHits | ForEach-Object { Write-Host "PROSE: $_" -ForegroundColor Red }
+  throw ("Prose guard failed - " + $proseHits.Count + " field(s) say where a fact came from or how it was checked. " +
+    "Rewrite the listed fields in the sheet and re-export. Nothing was built.")
+}
+
 # EMPTY-EXPORT GUARD: an export carrying zero albums is almost always a failed
 # or half-synced export, not a deliberate decision to unpublish everything.
 # Building one would regenerate empty index pages AND stage every existing
