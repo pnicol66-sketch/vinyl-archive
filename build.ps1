@@ -520,6 +520,42 @@ if ($violations.Count -gt 0) {
   throw 'Price guard failed - fix the export (or the sheet cells) and re-export. Nothing was built.'
 }
 
+# PROSE GUARD (rule 37, 2026-09-18): the published prose describes the record,
+# never the research. An export naming a research source (Discogs, Popsike,
+# eBay, the Steve Hoffman forum, a label-history site, a release id, a web
+# address the record does not print) or narrating the checking (the
+# photographs, the transcriptions, the collector, "not seen", "unconfirmed",
+# "flagged") in LP Notes, Label Notes, Fidelity, General Notes, the story or
+# the chronology is refused, like a price. The patterns mirror
+# VR_PROSE_SOURCE_RE_ / VR_PROSE_DOMAIN_RE_ / VR_PROSE_PROCESS_RE_ in the
+# sheet script, where "Vinyl Curator > Check catalogue prose (read only)"
+# finds and rewrites the rows - keep the two in step.
+$proseSourceRx = [regex]"(?i)\b(discogs|popsike|e-?bay|steve hoffman|stevehoffman|hoffman(?:'s)? forums?|bsnpubs|london ?jazz ?collector|45worlds|45cat|musicbrainz|analog ?planet|acoustic sounds|elusive disc|music direct|valueyourmusic|vinylbeat|cvinyl|globaldog|organissimo|wikipedia|rateyourmusic|catalogue server|evidence block|price evidence|the evidence on file|the catalogue's other cells|the sheet's)\b|\breleases?\s+#?\d{5,9}\b|\br\d{6,9}\b"
+$proseDomainRx = [regex]"(?i)(?<!(?:address|printed|prints|reads|text|barcode|contact block|carries|shows|url)[:,]?\s*(?:the\s+)?[""']?)(https?://[^\s)]+|\bwww\.[a-z0-9.-]+|\b[a-z0-9][a-z0-9-]*\.(?:com|org|net|tv|info|de|fr|co\.uk)\b)(?!\s+(?:web address|address|printed|on the (?:back|jacket|cover|label|sleeve)))"
+$proseProcessRx = [regex]"(?i)\b(the collector's|the collector\b(?! (?:hierarchy|market|world|community|base))|recorded by the collector|collector-recorded|deep groove: ?(?:seen|not seen|cannot tell|recorded)|(?:supplied|provided|attached|uploaded|available) (?:label |cover |side[- ]label |back[- ]cover |front[- ]cover )?(?:photo|photograph|scan)s?|(?:in|from|on|per) (?:the|these|both|this|any|either) (?:label |cover |side[- ]label |side |back[- ]cover |front[- ]cover |supplied |provided |available |two |four )?(?:photo|photograph|scan)s?\b(?! (?:by|credit|of the|of a|taken|shot))|(?:the|these|both) (?:label |cover |side |supplied )?(?:photo|photograph|scan)s? (?:supplied|provided|show|shows|showed|do not|does not|did not|confirm|confirms|cannot|can't|are|is|were|was)|(?:runout|matrix|dead-?wax|typed|collector's) transcriptions?|transcription (?:slip|error|variance|misread)|as transcribed|transcribed (?:here|as|by the collector)|as typed|typed (?:runout|matrix|entry|transcription|dead-?wax)s?|\bOCR\b|not (?:visible|seen|legible|shown) (?:in|on|from) (?:the|any|this|these|either)|not (?:confirmed|asserted|verified|verifiable)|un(?:confirmed|verified)|cannot (?:tell|be confirmed|be verified|be pinned|be determined|be ruled|be checked)|could not be (?:confirmed|verified|determined|pinned|ruled|measured|checked)|can't be (?:confirmed|verified|determined)|worth (?:re)?check(?:ing)?|to rule out|flagged|noted only|a question,? not|this block|the evidence block|(?:the|our|this) research(?! (?:into|by|of))|research (?:found|confirms|confirmed|shows|showed|indicates|did not|could not)|web search|was searched|search(?:es)? (?:found|returned|turned up)|no (?:[A-Za-z'-]+ ){0,5}(?:thread|consensus|reference|source|listing|shootout|review)s? (?:was|were|has been|have been|could be) (?:found|located|traced|identified)|(?:was|were) (?:found|traced|located) (?:on|at|in) (?:the (?:forums?|archive)|a (?:forum|database)))\b"
+$proseFields = 'lpNotes', 'labelNotes', 'fidelity', 'generalNotes', 'variantChronology', 'albumStory'
+$proseHits = New-Object System.Collections.Generic.List[string]
+foreach ($a in $json.albums) {
+  if ([string]$a.status -eq 'withdrawn') { continue }
+  foreach ($f in $proseFields) {
+    $pt = [string]$a.$f
+    if (-not $pt) { continue }
+    foreach ($prx in @($proseSourceRx, $proseDomainRx, $proseProcessRx)) {
+      $pm = $prx.Match($pt)
+      if ($pm.Success) {
+        $ps = [Math]::Max(0, $pm.Index - 30); $pe = [Math]::Min($pt.Length, $pm.Index + $pm.Length + 30)
+        $proseHits.Add(("{0}.{1}: ...{2}..." -f $a.slug, $f, $pt.Substring($ps, $pe - $ps).Replace("`n", ' ')))
+        break
+      }
+    }
+  }
+}
+if ($proseHits.Count -gt 0) {
+  $proseHits | ForEach-Object { Write-Host "PROSE: $_" -ForegroundColor Red }
+  throw ("Prose guard failed - " + $proseHits.Count + " field(s) name a research source or narrate the checking. " +
+    "Run 'Vinyl Curator > Check catalogue prose (read only)' in the sheet, rewrite the listed rows, re-export. Nothing was built.")
+}
+
 # EMPTY-EXPORT GUARD: an export carrying zero albums is almost always a failed
 # or half-synced export, not a deliberate decision to unpublish everything.
 # Building one would regenerate empty index pages AND stage every existing
