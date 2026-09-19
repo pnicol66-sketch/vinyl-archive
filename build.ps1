@@ -533,22 +533,50 @@ if ($violations.Count -gt 0) {
 $proseSourceRx = [regex]"(?i)\b(discogs|popsike|e-?bay|steve hoffman|stevehoffman|hoffman(?:'s)? forums?|bsnpubs|london ?jazz ?collector|45worlds|45cat|musicbrainz|analog ?planet|acoustic sounds(?!\s+series)|elusive disc|music direct|valueyourmusic|vinylbeat|cvinyl|globaldog|organissimo|wikipedia|rateyourmusic|catalogue server|evidence block|price evidence|the evidence on file|the catalogue's other cells|the sheet's)\b|\breleases?\s+#?\d{5,9}(?:\s*(?:,|and|/|&|;)\s*(?:r)?\d{5,9})*\b|\br\d{6,9}\b"
 $proseDomainRx = [regex]"(?i)(?<!(?:address|printed|prints|reads|text|barcode|contact block|carries|shows|url)[:,]?\s*(?:the\s+)?[""']?)(https?://[^\s)]+|\bwww\.[a-z0-9.-]+|\b[a-z0-9][a-z0-9-]*\.(?:com|org|net|tv|info|de|fr|co\.uk)\b)(?!\s+(?:web address|address|printed|on the (?:back|jacket|cover|label|sleeve)))"
 $proseProcessRx = [regex]"(?i)\b(the collector's|the collector\b(?! (?:hierarchy|market|world|community|base))|recorded by the collector|collector-recorded|deep groove: ?(?:seen|not seen|cannot tell|recorded)|(?:supplied|provided|attached|uploaded|available) (?:label |cover |side[- ]label |back[- ]cover |front[- ]cover )?(?:photo|photograph|scan)s?|(?:in|from|on|per) (?:the|these|both|this|any|either) (?:label |cover |side[- ]label |side |back[- ]cover |front[- ]cover |supplied |provided |available |two |four )?(?:photo|photograph|scan)s?\b(?! (?:by|credit|of the|of a|taken|shot))|(?:the|these|both) (?:label |cover |side |supplied )?(?:photo|photograph|scan)s? (?:supplied|provided|show|shows|showed|do not|does not|did not|confirm|confirms|cannot|can't|are|is|were|was)|(?:runout|matrix|dead-?wax|typed|collector's) transcriptions?|transcription (?:slip|error|variance|misread)|as transcribed|transcribed (?:here|as|by the collector)|as typed|typed (?:runout|matrix|entry|transcription|dead-?wax)s?|\bOCR\b|not (?:visible|seen|legible|shown) (?:in|on|from) (?:the|any|this|these|either)|not (?:confirmed|asserted|verified|verifiable)|un(?:confirmed|verified)|cannot (?:tell|be confirmed|be verified|be pinned|be determined|be ruled|be checked)|could not be (?:confirmed|verified|determined|pinned|ruled|measured|checked)|can't be (?:confirmed|verified|determined)|worth (?:re)?check(?:ing)?|to rule out|flagged|noted only|a question,? not|this block|the evidence block|(?:the|our|this) research(?! (?:into|by|of))|research (?:found|confirms|confirmed|shows|showed|indicates|did not|could not)|web search|was searched|search(?:es)? (?:found|returned|turned up)|no (?:[A-Za-z'-]+ ){0,5}(?:thread|consensus|reference|source|listing|shootout|review)s? (?:was|were|has been|have been|could be) (?:found|located|traced|identified)|(?:was|were) (?:found|traced|located) (?:on|at|in) (?:the (?:forums?|archive)|a (?:forum|database)))\b"
-$proseFields = 'lpNotes', 'labelNotes', 'fidelity', 'generalNotes', 'variantChronology', 'albumStory'
+# EVERY PUBLISHED STRING, NOT A NAMED LIST (2026-09-19). This guard was an
+# INCLUDE list of six fields while the price guard eight lines above walks every
+# property of every album recursively - so a model-written field that was not on
+# the list published whatever it liked. Three were: countryOfOrigin, year and
+# monoStereo, all model-written (the guide asks for country "determined from
+# label and rim text, jacket print, matrix/runout conventions" and to "add a
+# brief qualifier when it matters") and all rendered onto the album page and its
+# subtitle. Eight leaks were live on the site on 2026-09-19, among them
+# "US (Made in Mexico per Discogs pressing-plant credit)" and "not established
+# (no dated Discogs listing, bsnpubs entry, or dealer record ... was found in
+# this search)". So the guard is now structural like its neighbour, with an
+# EXCLUDE list for the fields that carry a source on purpose.
+$proseSkip = @{ 'discogsListingUrl' = $true; 'ebayItemUrl' = $true; 'discogsUrl' = $true;
+                'slug' = $true; 'folderId' = $true; 'folderName' = $true; 'albumId' = $true;
+                'images' = $true; 'photos' = $true; 'status' = $true }
 $proseHits = New-Object System.Collections.Generic.List[string]
-foreach ($a in $json.albums) {
-  if ([string]$a.status -eq 'withdrawn') { continue }
-  foreach ($f in $proseFields) {
-    $pt = [string]$a.$f
-    if (-not $pt) { continue }
+function Test-Prose($node, [string]$path, [string]$slug) {
+  if ($null -eq $node) { return }
+  if ($node -is [string]) {
     foreach ($prx in @($proseSourceRx, $proseDomainRx, $proseProcessRx)) {
-      $pm = $prx.Match($pt)
+      $pm = $prx.Match($node)
       if ($pm.Success) {
-        $ps = [Math]::Max(0, $pm.Index - 30); $pe = [Math]::Min($pt.Length, $pm.Index + $pm.Length + 30)
-        $proseHits.Add(("{0}.{1}: ...{2}..." -f $a.slug, $f, $pt.Substring($ps, $pe - $ps).Replace("`n", ' ')))
-        break
+        $ps = [Math]::Max(0, $pm.Index - 30); $pe = [Math]::Min($node.Length, $pm.Index + $pm.Length + 30)
+        $proseHits.Add(("{0}.{1}: ...{2}..." -f $slug, $path, $node.Substring($ps, $pe - $ps).Replace("`n", ' ')))
+        return
       }
     }
+    return
   }
+  if ($node -is [System.Collections.IEnumerable] -and -not ($node -is [string])) {
+    $i = 0
+    foreach ($item in $node) { Test-Prose $item "$path[$i]" $slug; $i++ }
+    return
+  }
+  if ($node -is [System.Management.Automation.PSCustomObject]) {
+    foreach ($p in $node.PSObject.Properties) {
+      if ($proseSkip.ContainsKey($p.Name)) { continue }
+      Test-Prose $p.Value $(if ($path) { "$path.$($p.Name)" } else { $p.Name }) $slug
+    }
+  }
+}
+foreach ($a in $json.albums) {
+  if ([string]$a.status -eq 'withdrawn') { continue }
+  Test-Prose $a '' ([string]$a.slug)
 }
 if ($proseHits.Count -gt 0) {
   $proseHits | ForEach-Object { Write-Host "PROSE: $_" -ForegroundColor Red }
