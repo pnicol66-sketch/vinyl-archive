@@ -552,12 +552,25 @@ $proseHits = New-Object System.Collections.Generic.List[string]
 function Test-Prose($node, [string]$path, [string]$slug) {
   if ($null -eq $node) { return }
   if ($node -is [string]) {
+    # A DEALER'S NAME IS NOT ALWAYS A CITATION (2026-09-19), and this guard has
+    # to agree with vrProseHits_ in the sheet script or the two disagree about
+    # the same album: the three specialist dealers are also EDITIONS and
+    # COMPANIES in a record's own history. "the 2023 Verve/Acoustic Sounds
+    # audiophile edition" and "the label's relaunch under Mike Ritter/Music
+    # Direct" are facts of the record, not sources.
     foreach ($prx in @($proseSourceRx, $proseDomainRx, $proseProcessRx)) {
       $pm = $prx.Match($node)
-      if ($pm.Success) {
-        $ps = [Math]::Max(0, $pm.Index - 30); $pe = [Math]::Min($node.Length, $pm.Index + $pm.Length + 30)
-        $proseHits.Add(("{0}.{1}: ...{2}..." -f $slug, $path, $node.Substring($ps, $pe - $ps).Replace("`n", ' ')))
-        return
+      while ($pm.Success -and $prx -eq $proseSourceRx -and $pm.Value -match '^(?i)(acoustic sounds|elusive disc|music direct)$') {
+        $b = $node.Substring([Math]::Max(0, $pm.Index - 40), [Math]::Min(40, $pm.Index))
+        $a2 = $node.Substring([Math]::Min($node.Length, $pm.Index + $pm.Length), [Math]::Min(24, [Math]::Max(0, $node.Length - $pm.Index - $pm.Length)))
+        if ($b -match "(?i)(?:[A-Za-z][A-Za-z.'-]*/|\b(?:under|owned by|bought by|acquired by|relaunch(?:ed)? under|part of|division of|imprint of)\s+(?:[A-Za-z][A-Za-z.'-]*[\s/])?)$" -or
+            $a2 -match '(?i)^\s*(?:series|edition|reissue|pressing|release|remaster|180 ?g|200 ?g|audiophile)\b') {
+          $pm = $prx.Match($node, $pm.Index + $pm.Length)
+          continue
+        }
+        break
+      }
+      if ($pm.Success) {        return
       }
     }
     return
