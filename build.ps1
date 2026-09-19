@@ -524,22 +524,39 @@ if ($violations.Count -gt 0) {
 $proseSourceRx = [regex]"(?!)"
 $proseDomainRx = [regex]"(?!)"
 $proseProcessRx = [regex]"(?!)"
-$proseFields = 'lpNotes', 'labelNotes', 'fidelity', 'generalNotes', 'variantChronology', 'albumStory'
+# (removed from the public history, 2026-11-08: the guard's patterns and notes live outside this repo)
+$proseSkip = @{ 'discogsListingUrl' = $true; 'ebayItemUrl' = $true; 'discogsUrl' = $true;
+                'slug' = $true; 'folderId' = $true; 'folderName' = $true; 'albumId' = $true;
+                'images' = $true; 'photos' = $true; 'status' = $true }
 $proseHits = New-Object System.Collections.Generic.List[string]
-foreach ($a in $json.albums) {
-  if ([string]$a.status -eq 'withdrawn') { continue }
-  foreach ($f in $proseFields) {
-    $pt = [string]$a.$f
-    if (-not $pt) { continue }
+function Test-Prose($node, [string]$path, [string]$slug) {
+  if ($null -eq $node) { return }
+  if ($node -is [string]) {
     foreach ($prx in @($proseSourceRx, $proseDomainRx, $proseProcessRx)) {
-      $pm = $prx.Match($pt)
+      $pm = $prx.Match($node)
       if ($pm.Success) {
-        $ps = [Math]::Max(0, $pm.Index - 30); $pe = [Math]::Min($pt.Length, $pm.Index + $pm.Length + 30)
-        $proseHits.Add(("{0}.{1}: ...{2}..." -f $a.slug, $f, $pt.Substring($ps, $pe - $ps).Replace("`n", ' ')))
-        break
+        $ps = [Math]::Max(0, $pm.Index - 30); $pe = [Math]::Min($node.Length, $pm.Index + $pm.Length + 30)
+        $proseHits.Add(("{0}.{1}: ...{2}..." -f $slug, $path, $node.Substring($ps, $pe - $ps).Replace("`n", ' ')))
+        return
       }
     }
+    return
   }
+  if ($node -is [System.Collections.IEnumerable] -and -not ($node -is [string])) {
+    $i = 0
+    foreach ($item in $node) { Test-Prose $item "$path[$i]" $slug; $i++ }
+    return
+  }
+  if ($node -is [System.Management.Automation.PSCustomObject]) {
+    foreach ($p in $node.PSObject.Properties) {
+      if ($proseSkip.ContainsKey($p.Name)) { continue }
+      Test-Prose $p.Value $(if ($path) { "$path.$($p.Name)" } else { $p.Name }) $slug
+    }
+  }
+}
+foreach ($a in $json.albums) {
+  if ([string]$a.status -eq 'withdrawn') { continue }
+  Test-Prose $a '' ([string]$a.slug)
 }
 if ($proseHits.Count -gt 0) {
   $proseHits | ForEach-Object { Write-Host "PROSE: $_" -ForegroundColor Red }
