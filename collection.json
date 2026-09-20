@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-20T05:36:12.802Z",
+ "generated": "2026-09-20T13:20:05.591Z",
  "site": {
   "title": "Vinyl Curator",
   "baseUrl": "https://vinylcurator.net",
@@ -49,7 +49,8 @@
    "folderName": "Blind Lemon Jefferson_Early Blues",
    "folderId": "1fAnw-weTvqBzQACMerFxX1Y_Vvqvgl0G",
    "slug": "blind-lemon-jefferson-early-blues",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Blind Lemon Jefferson"
   },
   {
    "artist": "Bo Diddley",
@@ -93,7 +94,8 @@
    "folderName": "Bo Diddley_I'm A Man",
    "folderId": "150SghSXX7hmRO9I_YT7pTCQBA4pBbu_x",
    "slug": "bo-diddley-i-m-a-man",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Bo Diddley"
   },
   {
    "artist": "Bo Diddley",
@@ -137,7 +139,8 @@
    "folderName": "Bo Diddley_Where It All Began",
    "folderId": "1kYhZY4YfOrzou4cxosc16lKocEK5sgLB",
    "slug": "bo-diddley-where-it-all-began",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Bo Diddley"
   },
   {
    "artist": "Bob Dylan",
@@ -181,7 +184,8 @@
    "folderName": "Bob Dylan_Oh Mercy",
    "folderId": "1RRmc-JZ1Nzifx22CzUTGi8gejE3T8omq",
    "slug": "bob-dylan-oh-mercy",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Bob Dylan"
   },
   {
    "artist": "Bobbie Gentry",
@@ -225,7 +229,8 @@
    "folderName": "Bobbie Gentry_Ode To Billy Joe",
    "folderId": "1QGnNxALZj1rAq1UArSA2ucbXY7o8oSAC",
    "slug": "bobbie-gentry-ode-to-billy-joe",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Bobbie Gentry"
   },
   {
    "artist": "Brownie McGhee & Sonny Terry",
@@ -269,7 +274,8 @@
    "folderName": "Brownie McGee And Sunny Terry_Brownie And Sunny",
    "folderId": "1mB2sr2A841wqHytOER9wtc8rKFgCBXcq",
    "slug": "brownie-mcgee-and-sunny-terry-brownie-and-sunny",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Brownie McGhee & Sonny Terry"
   },
   {
    "artist": "Buddy Miles",
@@ -313,7 +319,8 @@
    "folderName": "Buddy Miles_Them Changes",
    "folderId": "1FCVIwpyABpw2-HEiEBMrTHP6_r5tELX2",
    "slug": "buddy-miles-them-changes",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Buddy Miles"
   },
   {
    "artist": "Charles Earland",
@@ -357,7 +364,8 @@
    "folderName": "Charles Earland_Living Black! (Recorded LIVE! At The Key Club, Newark, N.J.)",
    "folderId": "1M_mTP6xG4UmX7iR10pBnMn6kjF8sa2Op",
    "slug": "charles-earland-living-black-recorded-live-at-the-key-club-newark-n-j",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Charles Earland"
   },
   {
    "artist": "Charles Lloyd Quartet",
@@ -401,7 +409,8 @@
    "folderName": "Charles Lloyd_Of Course",
    "folderId": "192c4Qj7LfGrBiC8X4zQYW5j7aZ_hdNds",
    "slug": "charles-lloyd-of-course",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Charles Lloyd"
   },
   {
    "artist": "Ella Fitzgerald And Louis Armstrong",
@@ -445,7 +454,8 @@
    "folderName": "Ella And Louie_Ella And Louie",
    "folderId": "1gQgHulLJ42-UL0a0hEjXEg-gGBsSUbdH",
    "slug": "ella-and-louie-ella-and-louie",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Ella Fitzgerald And Louis Armstrong"
   },
   {
    "artist": "Freddie Hubbard",
@@ -489,7 +499,8 @@
    "folderName": "Freddie Hubbard_The Night of the Cookers - Live at Club La Marchal, Volume 1",
    "folderId": "1Y1qOEn229WTZQspl0EqfYn32QEC8G6VJ",
    "slug": "freddie-hubbard-the-night-of-the-cookers-live-at-club-la-marchal-volume-1",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Freddie Hubbard"
   },
   {
    "artist": "Glen Hansard",
@@ -533,7 +544,8 @@
    "folderName": "Glen Hansard_All That Was East Is West Of Me Now",
    "folderId": "1K810UCQEm2Rb-VCrzVcnDvoC7WwpFWAq",
    "slug": "glen-hansard-all-that-was-east-is-west-of-me-now",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Glen Hansard"
   },
   {
    "artist": "Glen Hansard",
@@ -577,7 +589,8 @@
    "folderName": "Glen Hansard_Didn't He Ramble",
    "folderId": "1ONVi7UWFzCFEC5nVgkLqpfodiy7HJUBe",
    "slug": "glen-hansard-didn-t-he-ramble",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Glen Hansard"
   },
   {
    "artist": "Helen Merrill",
@@ -621,7 +634,8 @@
    "folderName": "Helen Merrill_Helen Merrill (2)",
    "folderId": "1KDZg-IytyyPrNqtlFAJCZNDwCN6OoZqQ",
    "slug": "helen-merrill-helen-merrill-2",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Helen Merrill"
   },
   {
    "artist": "Helen Merrill",
@@ -665,7 +679,8 @@
    "folderName": "Helen Merrill_Helen Merrill",
    "folderId": "15nekq3RiTId2jYyDMISzTG_4E7kDqNC5",
    "slug": "helen-merrill-helen-merrill",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Helen Merrill"
   },
   {
    "artist": "Helen Merrill",
@@ -709,7 +724,8 @@
    "folderName": "Helen Merrill_Merrill at Midnight",
    "folderId": "1jJ0hNOapvghthgWCOTlTCjm4zLC4dajE",
    "slug": "helen-merrill-merrill-at-midnight",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Helen Merrill"
   },
   {
    "artist": "Helen Merrill",
@@ -753,7 +769,8 @@
    "folderName": "Helen Merrill_Helen",
    "folderId": "1mKZGYlTCM7gSXwn2oxUrZ7JIJePchHdC",
    "slug": "helen-merrill-helen",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Helen Merrill"
   },
   {
    "artist": "Helen Merrill",
@@ -797,7 +814,8 @@
    "folderName": "Helen Merrill_The Nearness Of You",
    "folderId": "1OFi9tsQQnDgbVsF2bSIuh3Q6UlHGF6qG",
    "slug": "helen-merrill-the-nearness-of-you",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Helen Merrill"
   },
   {
    "artist": "Jay Jay Johnson",
@@ -841,7 +859,8 @@
    "folderName": "JJ Johnson_Volume One Blue Note 1505",
    "folderId": "1B_Dj4DjMneMMDBDUVQvqeFSGIC4J-EMz",
    "slug": "jj-johnson-volume-one-blue-note-1505",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Jay Jay Johnson"
   },
   {
    "artist": "Jay McShann",
@@ -885,7 +904,8 @@
    "folderName": "Jay McShann_The Big Apple Bash",
    "folderId": "1y14VLeG1wZhZhaSVyvqLMoLwoqWCHVY6",
    "slug": "jay-mcshann-the-big-apple-bash",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Jay McShann"
   },
   {
    "artist": "Jimmy Smith",
@@ -929,7 +949,8 @@
    "folderName": "Jimmy Smith_Grooving At Smalls Paradise",
    "folderId": "1jBQXY2toJPqDSrVZ2yrkBq0tDdwaGcM9",
    "slug": "jimmy-smith-grooving-at-smalls-paradise",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Jimmy Smith"
   },
   {
    "artist": "John Coltrane",
@@ -973,7 +994,8 @@
    "folderName": "John Coltrane_I Love Supreme",
    "folderId": "1YoAhyrz83--cF0WUIlhbu_0g3gvHERnX",
    "slug": "john-coltrane-i-love-supreme",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1017,7 +1039,8 @@
    "folderName": "John Coltrane_Ascension",
    "folderId": "11_zyO8i5zalWsxcmeuWjB9LYqoeb568A",
    "slug": "john-coltrane-ascension",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1061,7 +1084,8 @@
    "folderName": "John Coltrane_Blue Train",
    "folderId": "1Aa7WevfF-3egPUAoJeq2DPmiDFzHw3JW",
    "slug": "john-coltrane-blue-train",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1105,7 +1129,8 @@
    "folderName": "John Coltrane_Blue Train (2)",
    "folderId": "11dNWfxwkxLf_kE55Rxs2skLnr8x-57cz",
    "slug": "john-coltrane-blue-train-2",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1149,7 +1174,8 @@
    "folderName": "John Coltrane_Blue Train (3)",
    "folderId": "1RJQaCcRkR_VgBkWvZmQVWillHY7lBEnj",
    "slug": "john-coltrane-blue-train-3",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1193,7 +1219,8 @@
    "folderName": "John Coltrane_Live At The Village Vanguard",
    "folderId": "1s3oPYSM_i6Cdzk8CuaPXdXqiij3pp2LW",
    "slug": "john-coltrane-live-at-the-village-vanguard",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1237,7 +1264,8 @@
    "folderName": "John Coltrane_Coltrane Jazz",
    "folderId": "1j4lCP15jZiOdgVIcc3LYykrg32o9Mzuv",
    "slug": "john-coltrane-coltrane-jazz",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1281,7 +1309,8 @@
    "folderName": "John Coltrane_Coltrane Live At Birdland",
    "folderId": "1_DjksG3UhTmk0r3HgVMLLZFQ-_dj_F0e",
    "slug": "john-coltrane-coltrane-live-at-birdland",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1325,7 +1354,8 @@
    "folderName": "John Coltrane_Coltrane Plays The Blues",
    "folderId": "16e1aQSGK5nn0qHxVYLcWLMERtSrbhURq",
    "slug": "john-coltrane-coltrane-plays-the-blues",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1369,7 +1399,8 @@
    "folderName": "John Coltrane_Coltrane Time",
    "folderId": "1Q6oUpb2nVRIcSyN6dc8bBKy5AXa4t4F-",
    "slug": "john-coltrane-coltrane-time",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1413,7 +1444,8 @@
    "folderName": "John Coltrane_Giant Steps",
    "folderId": "1KqtS4cwhYNUwp4PF_6XoszGeKRBYtLWz",
    "slug": "john-coltrane-giant-steps",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1457,7 +1489,8 @@
    "folderName": "John Coltrane_Impressions",
    "folderId": "1IzLVAgSE3zM72_qlZmDcq6-3ndGqoxeA",
    "slug": "john-coltrane-impressions",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1501,7 +1534,8 @@
    "folderName": "John Coltrane_In The Winners Circle",
    "folderId": "1z3MqNWxQPq5UNfpyouj3t5KDkrPk8_QK",
    "slug": "john-coltrane-in-the-winners-circle",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1545,7 +1579,8 @@
    "folderName": "John Coltrane_Live At The Village Vanguard Again!",
    "folderId": "1wUARA6uh8pR-X1J9-MnBMYm0CSwVV3wY",
    "slug": "john-coltrane-live-at-the-village-vanguard-again",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1589,7 +1624,8 @@
    "folderName": "John Coltrane_Lush Life",
    "folderId": "1SRczIw_3VXapCJRFo1PnMFnWFjzN1TfC",
    "slug": "john-coltrane-lush-life",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1633,7 +1669,8 @@
    "folderName": "John Coltrane_My Favorite Things",
    "folderId": "1H9S4FkX5fa0MidzYGZNQSVbyrHDi7m8x",
    "slug": "john-coltrane-my-favorite-things",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1677,7 +1714,8 @@
    "folderName": "John Coltrane_Soultrane",
    "folderId": "1lrp_ihIhqMh9hNAM8cw177x4ITq7ZA96",
    "slug": "john-coltrane-soultrane",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1721,7 +1759,8 @@
    "folderName": "John Coltrane_Standard Coltrane",
    "folderId": "1EcbcgrYYIQrZy2u7ns5SGUBLtYZWpTMD",
    "slug": "john-coltrane-standard-coltrane",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane",
@@ -1765,7 +1804,8 @@
    "folderName": "John Coltrane_The Other Village Vanguard Tapes",
    "folderId": "1h7JX4hJ1eRK3cXMVK-Z3OY60Jr3n6VDZ",
    "slug": "john-coltrane-the-other-village-vanguard-tapes",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane Quartet",
@@ -1809,7 +1849,8 @@
    "folderName": "John Coltrane_Ballads",
    "folderId": "14aaTRiqiL0MEu1YXDZr_W27qDEnsw5X5",
    "slug": "john-coltrane-ballads",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "The John Coltrane Quartette",
@@ -1853,7 +1894,8 @@
    "folderName": "John Coltrane_Coltrane",
    "folderId": "18ogilpFj8bmHlfXuBhOyp_J0AKekaJhG",
    "slug": "john-coltrane-coltrane",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane"
   },
   {
    "artist": "John Coltrane with Eric Dolphy",
@@ -1897,7 +1939,8 @@
    "folderName": "John Coltrane With Eric Dolphy_Evenings At The Village Gate",
    "folderId": "177zcEnXCCJkQG_lH1ii5OOnh30iwsywW",
    "slug": "john-coltrane-with-eric-dolphy-evenings-at-the-village-gate",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane with Eric Dolphy"
   },
   {
    "artist": "John Coltrane, Hank Mobley, Zoot Sims, Al Cohn",
@@ -1941,7 +1984,8 @@
    "folderName": "John Coltrane_Tenor Conclave",
    "folderId": "1VZYUN88Q5eBH628W7eOFkYu4INfIsaoI",
    "slug": "john-coltrane-tenor-conclave",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane, Hank Mobley, Zoot Sims, Al Cohn"
   },
   {
    "artist": "Johnny Hodges",
@@ -1985,7 +2029,8 @@
    "folderName": "Johnny Hodges_Don't Sleep In The Subway",
    "folderId": "1rxMMXHIteQ6Baj8_EO1NB4xgDwLv7Sns",
    "slug": "johnny-hodges-don-t-sleep-in-the-subway",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Johnny Hodges"
   },
   {
    "artist": "Johnny Hodges",
@@ -2029,7 +2074,8 @@
    "folderName": "Johnny Hodges_Memories Of Ellington",
    "folderId": "1po0lW7t9aps4q91fvdBhd63oJ3YN7RNf",
    "slug": "johnny-hodges-memories-of-ellington",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Johnny Hodges"
   },
   {
    "artist": "Johnny Shines, Blind Will Dukes",
@@ -2073,7 +2119,8 @@
    "folderName": "Blind Willie Jukes_Country Blues",
    "folderId": "1CXWNTksrJ1oLSsN2od2684twBH-W8BjI",
    "slug": "blind-willie-jukes-country-blues",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Johnny Shines, Blind Will Dukes"
   },
   {
    "artist": "Kai Winding And J.J. Johnson",
@@ -2117,7 +2164,8 @@
    "folderName": "Kai Winding And JJ Johnson_K+JJ",
    "folderId": "13UOBKI9cWpqvGD--HUpeJ6tvr-7s81mk",
    "slug": "kai-winding-and-jj-johnson-k-jj",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Kai Winding And J.J. Johnson"
   },
   {
    "artist": "Keith Jarrett",
@@ -2161,7 +2209,8 @@
    "folderName": "Keith Jarrett_The Cone Concert",
    "folderId": "1uSQ_1f4CznReT6PZJHD0G-hUA97fO-CV",
    "slug": "keith-jarrett-the-cone-concert",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Keith Jarrett"
   },
   {
    "artist": "Keith Jarrett",
@@ -2205,7 +2254,8 @@
    "folderName": "Keith Jarrett_The Koln Concert",
    "folderId": "1lWH5xe4PkMshuDC_DvwNEB6J0aDAnqw_",
    "slug": "keith-jarrett-the-koln-concert",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Keith Jarrett"
   },
   {
    "artist": "Keith Jarrett",
@@ -2249,7 +2299,8 @@
    "folderName": "Keith Jarrett_The Koln Concert (2)",
    "folderId": "1QHaIb0jnz_LRYnx92Uiucu_nt0X1ogmZ",
    "slug": "keith-jarrett-the-koln-concert-2",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Keith Jarrett"
   },
   {
    "artist": "Kenny Burrell",
@@ -2293,7 +2344,8 @@
    "folderName": "Kenny Burrell_A Generation Ago Today",
    "folderId": "1barApO8C5KEivkTm-fD1hq5P6at2pjnJ",
    "slug": "kenny-burrell-a-generation-ago-today",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Kenny Burrell"
   },
   {
    "artist": "Kenny Burrell",
@@ -2337,7 +2389,8 @@
    "folderName": "Kenny Burrell_Blue Lights",
    "folderId": "1cm5oh7eYutUENGRqGH4hNUI_w5c_5VP4",
    "slug": "kenny-burrell-blue-lights",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Kenny Burrell"
   },
   {
    "artist": "Kenny Burrell",
@@ -2381,7 +2434,8 @@
    "folderName": "Kenny Burrell_Both Feet On The Ground",
    "folderId": "1WQ4U0IMfddb84OhOMJcmwNm537TFaH10",
    "slug": "kenny-burrell-both-feet-on-the-ground",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Kenny Burrell"
   },
   {
    "artist": "Kenny Burrell",
@@ -2425,7 +2479,8 @@
    "folderName": "Kenny Burrell_Kenny Burrell",
    "folderId": "13BidUH9PcBu_TqusE5Ba4hnd1YQeduIX",
    "slug": "kenny-burrell-kenny-burrell",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Kenny Burrell"
   },
   {
    "artist": "Kenny Burrell",
@@ -2469,7 +2524,8 @@
    "folderName": "Kenny Burrell_Midnight Blue",
    "folderId": "16M44z5DJaUMr5qloSTAp5MZE8wdDxH6v",
    "slug": "kenny-burrell-midnight-blue",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Kenny Burrell"
   },
   {
    "artist": "Kenny Burrell",
@@ -2513,7 +2569,8 @@
    "folderName": "Kenny Burrell_Ode To 52nd Street",
    "folderId": "1g8AalStFFNaffGp85NVatuUVYl92MhLV",
    "slug": "kenny-burrell-ode-to-52nd-street",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Kenny Burrell"
   },
   {
    "artist": "Kenny Burrell (credited as The Kenny Burrell Quartet)",
@@ -2557,7 +2614,8 @@
    "folderName": "Kenny Burrell_The Tender Gender",
    "folderId": "1ZhrDRrvcD1oUbKcEzOQUIoEaKmeoD1a5",
    "slug": "kenny-burrell-the-tender-gender",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Kenny Burrell (credited as The Kenny Burrell Quartet)"
   },
   {
    "artist": "Kenny Burrell With Coleman Hawkins",
@@ -2601,7 +2659,8 @@
    "folderName": "Kenny Burrell_Bluesey Burrell",
    "folderId": "1snz_ICEUmQ8Jt75cc8j9zPU0s_OZXpBs",
    "slug": "kenny-burrell-bluesey-burrell",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Kenny Burrell With Coleman Hawkins"
   },
   {
    "artist": "Kenny Burrell With John Coltrane",
@@ -2645,7 +2704,8 @@
    "folderName": "Kenny Burrell_Kenny Burrell With John Coltrane",
    "folderId": "1EPE0QUeTfjMkpA9V9HMDW1x24XbPbwm0",
    "slug": "kenny-burrell-kenny-burrell-with-john-coltrane",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Kenny Burrell With John Coltrane"
   },
   {
    "artist": "King Curtis",
@@ -2689,7 +2749,8 @@
    "folderName": "King Curtis_Country Soul",
    "folderId": "1Xu11QnsBv1Lrgyth1IkT1f8ocaTPDSyV",
    "slug": "king-curtis-country-soul",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "King Curtis"
   },
   {
    "artist": "King Curtis",
@@ -2733,7 +2794,8 @@
    "folderName": "King Curtis_Everybody's Talkin'",
    "folderId": "1DBlEB97fyuvwqbGxOYua7v8Rx_nowoGV",
    "slug": "king-curtis-everybody-s-talkin",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "King Curtis"
   },
   {
    "artist": "King Curtis",
@@ -2777,7 +2839,8 @@
    "folderName": "King Curtis_Live At Small's Paradise",
    "folderId": "1cJZeIgvfJvfw2j8VXd9gURj0KDppueFq",
    "slug": "king-curtis-live-at-small-s-paradise",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "King Curtis"
   },
   {
    "artist": "King Curtis",
@@ -2821,7 +2884,8 @@
    "folderName": "King Curtis_Soul Serenade",
    "folderId": "1QziJfLp_17GWSHrGXKWYNlW9oXmngk3I",
    "slug": "king-curtis-soul-serenade",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "King Curtis"
   },
   {
    "artist": "King Curtis",
@@ -2865,7 +2929,8 @@
    "folderName": "King Curtis_Soul Time (2)",
    "folderId": "1oTTJO5w8PlIxZGmsayxO_mEEauWP5eXm",
    "slug": "king-curtis-soul-time-2",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "King Curtis"
   },
   {
    "artist": "King Curtis",
@@ -2909,7 +2974,8 @@
    "folderName": "King Curtis_Trouble In Mind King Curtis Sings The Blues",
    "folderId": "1btfKYYrA2y8UtgDXdR8bUoALChRzJed3",
    "slug": "king-curtis-trouble-in-mind-king-curtis-sings-the-blues",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "King Curtis"
   },
   {
    "artist": "La Dispute",
@@ -2953,7 +3019,8 @@
    "folderName": "La Dispute_Tiny Dots",
    "folderId": "1VKX2lZRHWV8c_h4tdCTthsIk-v-cBgtm",
    "slug": "la-dispute-tiny-dots",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "La Dispute"
   },
   {
    "artist": "Lady Blackbird",
@@ -2997,7 +3064,8 @@
    "folderName": "Lady Blackbird_Black Acid Soul",
    "folderId": "14HLIkn4asi279-AeUrgeL-Zvzyzmedu0",
    "slug": "lady-blackbird-black-acid-soul",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lady Blackbird"
   },
   {
    "artist": "Lee Morgan",
@@ -3041,7 +3109,8 @@
    "folderName": "Lee Morgan_Cornbread",
    "folderId": "1OQwckvG7HntsD51wIURlGUL_IplvlGdB",
    "slug": "lee-morgan-cornbread",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lee Morgan"
   },
   {
    "artist": "Lee Morgan",
@@ -3085,7 +3154,8 @@
    "folderName": "Lee Morgan_Delightful",
    "folderId": "14_M-mr0spbshh7tTvCvXsIrjvLPQY0xv",
    "slug": "lee-morgan-delightful",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lee Morgan"
   },
   {
    "artist": "Lee Morgan",
@@ -3129,7 +3199,8 @@
    "folderName": "Lee Morgan_The Rumproller",
    "folderId": "1Yz2LbfwsHsCuU-NtBM9u2vLocK4Rdqc-",
    "slug": "lee-morgan-the-rumproller",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lee Morgan"
   },
   {
    "artist": "Lee Morgan",
@@ -3173,7 +3244,8 @@
    "folderName": "Lee Morgan_Sidewinder",
    "folderId": "1SA2WJlM0teDQgp3Uh6gu5kQ_KTYiVCzS",
    "slug": "lee-morgan-sidewinder",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lee Morgan"
   },
   {
    "artist": "Lee Morgan Sextet",
@@ -3217,7 +3289,8 @@
    "folderName": "Lee Morgan_Lee Morgan",
    "folderId": "1AFeXSr4IKXapANQaocQ8JZSj8AlehHnZ",
    "slug": "lee-morgan-lee-morgan",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lee Morgan"
   },
   {
    "artist": "Lester Young",
@@ -3261,7 +3334,8 @@
    "folderName": "Lester Young_Prez Is Blue",
    "folderId": "1ZfEkD2dADw2UJ87mLzRJv3TvPEfTie28",
    "slug": "lester-young-prez-is-blue",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lester Young"
   },
   {
    "artist": "Lester Young",
@@ -3305,7 +3379,8 @@
    "folderName": "Lester Young_Prez",
    "folderId": "1CNZDfqNIVz12m15FEkiTCDTSmKK_nQHb",
    "slug": "lester-young-prez",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lester Young"
   },
   {
    "artist": "Lester Young",
@@ -3349,7 +3424,8 @@
    "folderName": "Lester Young_The Masters Touch",
    "folderId": "1K8Ut78jxulwv5Bfvg8w3VqMsBsk6TjL0",
    "slug": "lester-young-the-masters-touch",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lester Young"
   },
   {
    "artist": "Lester Young And His Orchestra",
@@ -3393,7 +3469,8 @@
    "folderName": "Lester Young_It Don't Mean A Thing",
    "folderId": "1kVaJ98SwUa7ZF2VDJZz5nhJcTNpAo5Fx",
    "slug": "lester-young-it-don-t-mean-a-thing",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lester Young"
   },
   {
    "artist": "Lou Donaldson",
@@ -3437,7 +3514,8 @@
    "folderName": "Lou Donaldson_Blues Walk",
    "folderId": "1k9tWoDfHcYFXjjnbrB0tBbzVE7D6ZiD4",
    "slug": "lou-donaldson-blues-walk",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lou Donaldson"
   },
   {
    "artist": "Lou Donaldson",
@@ -3481,7 +3559,8 @@
    "folderName": "Lou Donaldson_Blues Walk (2)",
    "folderId": "1BVOgyQ7M9O8w6igIG1RwA82-aQiq-5a4",
    "slug": "lou-donaldson-blues-walk-2",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lou Donaldson"
   },
   {
    "artist": "Lou Donaldson",
@@ -3525,7 +3604,8 @@
    "folderName": "Lou Donaldson_Coleslaw",
    "folderId": "1Ua1q61KeTAvr6UCFBMEgkfr7UmxUhy-E",
    "slug": "lou-donaldson-coleslaw",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lou Donaldson"
   },
   {
    "artist": "Lou Donaldson",
@@ -3569,7 +3649,8 @@
    "folderName": "Lou Donaldson_Gravy Train",
    "folderId": "1SME3xVY2zCP-lfw8wTAEVxmKmaz5HhdF",
    "slug": "lou-donaldson-gravy-train",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lou Donaldson"
   },
   {
    "artist": "Lou Donaldson",
@@ -3613,7 +3694,8 @@
    "folderName": "Lou Donaldson_Here 'Tis",
    "folderId": "1aMg5S8bhoNpx6vub_qiyqQSTfLaT9B_4",
    "slug": "lou-donaldson-here-tis",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lou Donaldson"
   },
   {
    "artist": "Lou Donaldson",
@@ -3657,7 +3739,8 @@
    "folderName": "Lou Donaldson_Live Fried Buzzard",
    "folderId": "14DqQUTiBmttVX5cZi8hh4K8PIfhYwa5L",
    "slug": "lou-donaldson-live-fried-buzzard",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lou Donaldson"
   },
   {
    "artist": "Lou Donaldson",
@@ -3701,7 +3784,8 @@
    "folderName": "Lou Donaldson_Signifyin",
    "folderId": "1UVFZGjuU6E9Vfgcof4THje-hCBzD4svz",
    "slug": "lou-donaldson-signifyin",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lou Donaldson"
   },
   {
    "artist": "Lou Donaldson",
@@ -3745,7 +3829,8 @@
    "folderName": "Lou Donaldson_Sophisticated Lou",
    "folderId": "1VquAR8Vkma4A43wKrjm2hT2-1s6RR5h-",
    "slug": "lou-donaldson-sophisticated-lou",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lou Donaldson"
   },
   {
    "artist": "Lou Donaldson",
@@ -3789,7 +3874,8 @@
    "folderName": "Lou Donaldson_Sunny Side Up",
    "folderId": "16nJJ6PNS6gf-pncCtRve1CgDmAYHJ0QE",
    "slug": "lou-donaldson-sunny-side-up",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lou Donaldson"
   },
   {
    "artist": "Lou Donaldson",
@@ -3833,7 +3919,8 @@
    "folderName": "Lou Donaldson_The Natural Soul",
    "folderId": "11SWFQHgjzQoGMEUZb66XsqENwy5suUcq",
    "slug": "lou-donaldson-the-natural-soul",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lou Donaldson"
   },
   {
    "artist": "Lou Donaldson with The Three Sounds",
@@ -3877,7 +3964,8 @@
    "folderName": "Lou Donaldson_Lou Donaldson With The Three Sounds",
    "folderId": "16xJ_oBBiyYC5vwWaiilmL89LUkpzdiCD",
    "slug": "lou-donaldson-lou-donaldson-with-the-three-sounds",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Lou Donaldson with The Three Sounds"
   },
   {
    "artist": "Louis Armstrong",
@@ -3921,7 +4009,8 @@
    "folderName": "Louis Armstrong_Greatest Hits",
    "folderId": "1jQvxr3VM1sPxilnGfIP9ZK0J5LECAv11",
    "slug": "louis-armstrong-greatest-hits",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Louis Armstrong"
   },
   {
    "artist": "Louis Armstrong",
@@ -3965,7 +4054,8 @@
    "folderName": "Louis Armstrong_Satchmo Sings",
    "folderId": "1mytb76uWeLlLzC79bhp6AoHYT5c_ZTC-",
    "slug": "louis-armstrong-satchmo-sings",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Louis Armstrong"
   },
   {
    "artist": "Louis Armstrong And His All-Stars",
@@ -4009,7 +4099,8 @@
    "folderName": "Louis Armstrong_Ambassador Satch",
    "folderId": "1tE4HoTTfRD7P1SdiOn6M80AbDXv5r7Bd",
    "slug": "louis-armstrong-ambassador-satch",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Louis Armstrong"
   },
   {
    "artist": "Louis Armstrong & Duke Ellington",
@@ -4053,7 +4144,8 @@
    "folderName": "Louis Armstrong And Duke Ellington_Recording Together For The First Time",
    "folderId": "14MJRppsQxJevK-wlsUjiQ2_V6wg21mb9",
    "slug": "louis-armstrong-and-duke-ellington-recording-together-for-the-first-time",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Louis Armstrong & Duke Ellington"
   },
   {
    "artist": "Louis Armstrong & Duke Ellington",
@@ -4097,7 +4189,8 @@
    "folderName": "Louis Armstrong And Duke Ellington_The Great Reunion",
    "folderId": "1PBw5-HfSUzgIVN9GBJtbYmomif99LzT5",
    "slug": "louis-armstrong-and-duke-ellington-the-great-reunion",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Louis Armstrong & Duke Ellington"
   },
   {
    "artist": "Louis Armstrong And Eddie Condon",
@@ -4141,7 +4234,8 @@
    "folderName": "Louis Armstrong And Eddie Condon_At Newport",
    "folderId": "1NcxIYQpm4Wfn2nkegK0ufyfojR0AUR5z",
    "slug": "louis-armstrong-and-eddie-condon-at-newport",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Louis Armstrong And Eddie Condon"
   },
   {
    "artist": "Margie Joseph",
@@ -4185,7 +4279,8 @@
    "folderName": "Margie Joseph_Margie Joseph Makes A New Impression",
    "folderId": "1GtWNRjZnp3U5mQ7j0NY-Rs54_wywXcuz",
    "slug": "margie-joseph-margie-joseph-makes-a-new-impression",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Margie Joseph"
   },
   {
    "artist": "Marty Paich",
@@ -4229,7 +4324,8 @@
    "folderName": "Marty Paich_I Get A Boot Out Of You",
    "folderId": "1DgEowPNQvpKJbPGLAEP6kQKq6yHPrZ9G",
    "slug": "marty-paich-i-get-a-boot-out-of-you",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Marty Paich"
   },
   {
    "artist": "Marvin Gaye",
@@ -4273,7 +4369,8 @@
    "folderName": "Marvin Gaye_Marvin Gaye Live At The London Palladium",
    "folderId": "1BP7609BNrLeY2jYJ-CGU-xz2pEPjoSbo",
    "slug": "marvin-gaye-marvin-gaye-live-at-the-london-palladium",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Marvin Gaye"
   },
   {
    "artist": "Marvin Gaye",
@@ -4317,7 +4414,8 @@
    "folderName": "Marvin Gaye_Marvin Gaye Live!",
    "folderId": "1y3pWXHkrTmmzYrpiV_tnBEL200fNHHBO",
    "slug": "marvin-gaye-marvin-gaye-live",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Marvin Gaye"
   },
   {
    "artist": "Michel Legrand and His Orchestra Featuring Miles Davis",
@@ -4361,7 +4459,8 @@
    "folderName": "Miles Davis_Legrand Jazz",
    "folderId": "1HJZ27RpEiYD2hmjes96FdWpeBwhr4alJ",
    "slug": "miles-davis-legrand-jazz",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Michel Legrand and His Orchestra Featuring Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4405,7 +4504,8 @@
    "folderName": "Miles Davis_A Tribute To Jack Johnson",
    "folderId": "16TIc_ycZiUMYa3KVys6USLk5vY4_srNh",
    "slug": "miles-davis-a-tribute-to-jack-johnson",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4449,7 +4549,8 @@
    "folderName": "Mikes Davis_Bags Groove",
    "folderId": "1rUSDKXPWgpTUIxiVOhmeriUtDxrI8ZBE",
    "slug": "mikes-davis-bags-groove",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4493,7 +4594,8 @@
    "folderName": "Miles Davis_Birth of the cool",
    "folderId": "1z4V56fVZY-ShTds0pVZC5LbpuqRJBAN-",
    "slug": "miles-davis-birth-of-the-cool",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4537,7 +4639,8 @@
    "folderName": "Miles Davis_Bitches Brew",
    "folderId": "14CN5BDYrdVaHcuruoU-OqN9DQOXNKipm",
    "slug": "miles-davis-bitches-brew",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4581,7 +4684,8 @@
    "folderName": "Miles Davis_Blue Haze",
    "folderId": "1DUb7MyeKg7JZfXW7nZTwX7ZZw3zBugU4",
    "slug": "miles-davis-blue-haze",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4625,7 +4729,8 @@
    "folderName": "Miles Davis_Blue Moods",
    "folderId": "1-5zCPcKFnpLw60deIFzG23kALPAW9W-U",
    "slug": "miles-davis-blue-moods",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4669,7 +4774,8 @@
    "folderName": "Miles Davis_Decoy",
    "folderId": "1tZ0ncOSNCiEFt0sec6hGmD4HesNyrm7k",
    "slug": "miles-davis-decoy",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4713,7 +4819,8 @@
    "folderName": "Miles Davis_E.S.P.",
    "folderId": "1RKpiGTVJsTsQ5BjUtLQzJofqwUhcSjB0",
    "slug": "miles-davis-e-s-p",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4757,7 +4864,8 @@
    "folderName": "Miles Davis_Friday Night In Person At The Blackhawk San Francisco",
    "folderId": "1mj9m_F2NpHIPrWnTTkiDX8eKtRgx8EpL",
    "slug": "miles-davis-friday-night-in-person-at-the-blackhawk-san-francisco",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4801,7 +4909,8 @@
    "folderName": "Miles Davis_Jazz Track",
    "folderId": "1k6P3s1E90K0FGnaB3XJIdTm-un1bNeD0",
    "slug": "miles-davis-jazz-track",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4845,7 +4954,8 @@
    "folderName": "Miles Davis_Kind Of Blue (3)",
    "folderId": "1JOz3A6Gi8HHaQb9NWA-_B3pg5hXRA1V9",
    "slug": "miles-davis-kind-of-blue-3",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4889,7 +4999,8 @@
    "folderName": "Miles Davis_Miles Davis and horns",
    "folderId": "1Y-5zh3_iCHhUP6oYMcH40I8VuCF-W89v",
    "slug": "miles-davis-miles-davis-and-horns",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4933,7 +5044,8 @@
    "folderName": "Miles Davis_Miles Davis At Carnegie Hall",
    "folderId": "1KHDX7f9onJLcLWsKxiLd4lwjOSSA7Swu",
    "slug": "miles-davis-miles-davis-at-carnegie-hall",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -4977,7 +5089,8 @@
    "folderName": "Miles Davis_Porgy And Bess",
    "folderId": "10MwtqdsnmPwbMdIU5MwkvcZazHw9SExB",
    "slug": "miles-davis-porgy-and-bess",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -5021,7 +5134,8 @@
    "folderName": "Miles Davis_Round about midnight",
    "folderId": "1TNJwFUrW7j0IMIUHRbIOdlNg8Jrl_LOA",
    "slug": "miles-davis-round-about-midnight",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -5065,7 +5179,8 @@
    "folderName": "Miles Davis_Seven Steps To Heaven",
    "folderId": "1GUJmf99aTOGZHvE0qgIcDmQpfIvzebGE",
    "slug": "miles-davis-seven-steps-to-heaven",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -5109,7 +5224,8 @@
    "folderName": "Miles Davis_Sketches Of Spain (2)",
    "folderId": "1kI6piuOcit7eujgpcHWTA9-g2AA7GuaC",
    "slug": "miles-davis-sketches-of-spain-2",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -5153,7 +5269,8 @@
    "folderName": "Miles Davis_Sketches of Spain test press",
    "folderId": "1ywP5xUNfxlN8XxGkKtunLyxgAPredMo6",
    "slug": "miles-davis-sketches-of-spain-test-press",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -5197,7 +5314,8 @@
    "folderName": "Miles Davis_The Man With The Horn",
    "folderId": "1TfzmFJNR-lbtbNwujpEnzATHX1nn75z4",
    "slug": "miles-davis-the-man-with-the-horn",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -5241,7 +5359,8 @@
    "folderName": "Miles Davis_You're Under Arrest",
    "folderId": "1XwjATasQAzsoLzh4RQoeXoksaO5GdqTK",
    "slug": "miles-davis-you-re-under-arrest",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis All Stars",
@@ -5285,7 +5404,8 @@
    "folderName": "Miles Davis_All Stars",
    "folderId": "12lvCzi9KVwfW-uOW5gSXY1oTUC3OlNoO",
    "slug": "miles-davis-all-stars",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis Quartet",
@@ -5329,7 +5449,8 @@
    "folderName": "Miles Davis_Miles Davis Quartet",
    "folderId": "1I8VRJIvN0hTmzCAxU1bQDYFjzMDgIw13",
    "slug": "miles-davis-miles-davis-quartet",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis Quintet",
@@ -5373,7 +5494,8 @@
    "folderName": "Miles Davis_Cookin",
    "folderId": "1kVEqpNezlKb_uv7EyWQZUEL1RVQUnFE0",
    "slug": "miles-davis-cookin",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis Quintet",
@@ -5417,7 +5539,8 @@
    "folderName": "Miles Davis_Workin",
    "folderId": "19XO53ETzKfwqcJ4Bwwgjpz68ouAjK-h0",
    "slug": "miles-davis-workin",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis Quintet / Art Blakey And The Jazz Messengers / Barney Wilen Quintet",
@@ -5461,7 +5584,8 @@
    "folderName": "Miles Davis_Ascenseur",
    "folderId": "1_Pb82fRhZTbTBoBasAXGBk79eYnj-BoH",
    "slug": "miles-davis-ascenseur",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "The Miles Davis Quintet",
@@ -5505,7 +5629,8 @@
    "folderName": "Miles Davis_Cookin (2)",
    "folderId": "1NL0SA7cMco4cyWs1iYQ74OI9PiUmzwZV",
    "slug": "miles-davis-cookin-2",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "The Miles Davis Quintet",
@@ -5549,7 +5674,8 @@
    "folderName": "Miles Davis_Relaxin",
    "folderId": "125AXisLI6Gh5q-xUPMQ2NC_jeRJIEa_t",
    "slug": "miles-davis-relaxin",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "The Miles Davis Quintet",
@@ -5593,7 +5719,8 @@
    "folderName": "Miles Davis_Steamin",
    "folderId": "1uuHRFUMZL2ZDJOqWrn7NLn8bw4SrfQDB",
    "slug": "miles-davis-steamin",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis / Art Blakey And The Jazz Messengers",
@@ -5637,7 +5764,8 @@
    "folderName": "Miles Davis_Jazz On The Screen",
    "folderId": "1oNXVcdAurLrgpzmY8tR_b5RniNSm9W0W",
    "slug": "miles-davis-jazz-on-the-screen",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis / Art Blakey And The Jazz Messengers"
   },
   {
    "artist": "Miles Davis + 19",
@@ -5681,7 +5809,8 @@
    "folderName": "Miles Davis_Miles Ahead",
    "folderId": "1jMsSDxPVG5LdJWoG9rzDYyISRhDQV6av",
    "slug": "miles-davis-miles-ahead",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis + 19"
   },
   {
    "artist": "Miles Davis All Stars (Miles Davis And Milt Jackson)",
@@ -5725,7 +5854,8 @@
    "folderName": "Miles Davis_Miles Davis And Milt Jackson",
    "folderId": "1HEQikkDgS5cwpXC3BNe1yfA2Xb5bh-jy",
    "slug": "miles-davis-miles-davis-and-milt-jackson",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis All Stars (Miles Davis And Milt Jackson)"
   },
   {
    "artist": "Miles Davis featuring Sonny Rollins",
@@ -5769,7 +5899,8 @@
    "folderName": "Miles Davis_Dig",
    "folderId": "1olA0gOegilVVd8G_ah2-u8HpYFU1XZVp",
    "slug": "miles-davis-dig",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Miles Davis featuring Sonny Rollins"
   },
   {
    "artist": "Milt Jackson",
@@ -5813,7 +5944,8 @@
    "folderName": "Milt Jackson_Plenty Plenty Soul",
    "folderId": "1VjZhpSBtiFWVYn1TF3kRDVEaCpQ8L5Zt",
    "slug": "milt-jackson-plenty-plenty-soul",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Milt Jackson"
   },
   {
    "artist": "Milt Jackson",
@@ -5857,7 +5989,8 @@
    "folderName": "Milt Jackson_The Ballad Artistry Of Milt Jackson",
    "folderId": "1MAaqSxhDISeP8aDVH24MF-9jZcfYarqe",
    "slug": "milt-jackson-the-ballad-artistry-of-milt-jackson",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Milt Jackson"
   },
   {
    "artist": "Milt Jackson & John Coltrane",
@@ -5901,7 +6034,8 @@
    "folderName": "John Coltrane And Milt Jackson_Bags And Trane",
    "folderId": "1HNEyyOIK-iGy3unXgpMVEX9OFd14FsCt",
    "slug": "john-coltrane-and-milt-jackson-bags-and-trane",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Milt Jackson & John Coltrane"
   },
   {
    "artist": "Milt Jackson And Wes Montgomery",
@@ -5945,7 +6079,8 @@
    "folderName": "Milt Jackson And Wes Montgomery_Bags meets Wes!",
    "folderId": "1KJTftEC119r_zpOTwC8-GqruF5XczAVw",
    "slug": "milt-jackson-and-wes-montgomery-bags-meets-wes",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Milt Jackson And Wes Montgomery"
   },
   {
    "artist": "Nina Simone",
@@ -5989,7 +6124,8 @@
    "folderName": "Nina Simone_Baltimore",
    "folderId": "1q3Nhl2SMBMC7m3P_2kaKPTmr1z1JvFqE",
    "slug": "nina-simone-baltimore",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6033,7 +6169,8 @@
    "folderName": "Nina Simone_Black Gold",
    "folderId": "1gPk-t1PNspVXYlb7Biz7sgGdHWc00OaP",
    "slug": "nina-simone-black-gold",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6077,7 +6214,8 @@
    "folderName": "Nina Simone_Broadway Blues Ballads",
    "folderId": "1E6zZ0IM46fZ0dhnKLo3Am6Qn4i2_EOyZ",
    "slug": "nina-simone-broadway-blues-ballads",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6121,7 +6259,8 @@
    "folderName": "Nina Simone_Nina Simone",
    "folderId": "1Lp6qwQre2q_JYNB68a8MZoqatzqftZPw",
    "slug": "nina-simone-nina-simone",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6165,7 +6304,8 @@
    "folderName": "Nina Simone_I Put A Spell On You",
    "folderId": "1iTX7_r1OGfTOZMvlqkpcxs9kvQ1bGClL",
    "slug": "nina-simone-i-put-a-spell-on-you",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6209,7 +6349,8 @@
    "folderName": "Nina Simone_Let It All Out",
    "folderId": "1pZ1EXEfP7YMkGfVtfezhhcWP4QJfco8U",
    "slug": "nina-simone-let-it-all-out",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6253,7 +6394,8 @@
    "folderName": "Nina Simone_Nina Simone At Newport",
    "folderId": "1JBfRIMlmCXNK7yfoKVnOVRIyDUfl6-_9",
    "slug": "nina-simone-nina-simone-at-newport",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6297,7 +6439,8 @@
    "folderName": "Nina Simone_At the town hall",
    "folderId": "1D2UhuVCvymUM079Q-OpDHWf89L_e9-qp",
    "slug": "nina-simone-at-the-town-hall",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6341,7 +6484,8 @@
    "folderName": "Nina Simone_Emergency Ward",
    "folderId": "1relLpRxHSZR2GwdOycm9wfgew8bDUjUZ",
    "slug": "nina-simone-emergency-ward",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6385,7 +6529,8 @@
    "folderName": "Nina Simone_Nina Sings Duke Ellington",
    "folderId": "1vmFeevZrUVo-7V7dL8RECoL0kiTIf0cc",
    "slug": "nina-simone-nina-sings-duke-ellington",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6429,7 +6574,8 @@
    "folderName": "Nina Simone_Sings The Blues",
    "folderId": "1PFRZzwJywybSrLgOqEDjhgrUVFgAva0s",
    "slug": "nina-simone-sings-the-blues",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6473,7 +6619,8 @@
    "folderName": "Nina Simone_Silk And Soul",
    "folderId": "1YKZ5qKLT0Ff2ImIQug5HBdLxAEOcTN7H",
    "slug": "nina-simone-silk-and-soul",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6517,7 +6664,8 @@
    "folderName": "Nina Simone_Songs Of The Poets",
    "folderId": "1z8M4yF-CfPTB8be7YdTYn5-7Xdskez4c",
    "slug": "nina-simone-songs-of-the-poets",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6561,7 +6709,8 @@
    "folderName": "Nina Simone_The Beast Of Nina Simone",
    "folderId": "1DWYWDpcd2ZiSTLgRtEc1W586C355dVHV",
    "slug": "nina-simone-the-beast-of-nina-simone",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6605,7 +6754,8 @@
    "folderName": "Nina Simone_The Best Of Nina Simone",
    "folderId": "1hvpOQAnQzACHzXuOkrJnDpvaovwPYD_6",
    "slug": "nina-simone-the-best-of-nina-simone",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6649,7 +6799,8 @@
    "folderName": "Nina Simone_To Love Somebody",
    "folderId": "1H2wvVUSOvO4Ek_EgXmGzL3EZrY_Ytv0_",
    "slug": "nina-simone-to-love-somebody",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone",
@@ -6693,7 +6844,8 @@
    "folderName": "Nina Simone_Wild is the Wind",
    "folderId": "1eIdG8v15EbC9nSTWd0AY9dcOrBIC8lCV",
    "slug": "nina-simone-wild-is-the-wind",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone"
   },
   {
    "artist": "Nina Simone, Chris Connor, Carmen McRae",
@@ -6737,7 +6889,8 @@
    "folderName": "Nina Simone_Nina Simone And Her Friends",
    "folderId": "1YONtkMC0vRcyN8fK69bZt0WUWoEUPdWp",
    "slug": "nina-simone-nina-simone-and-her-friends",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Nina Simone, Chris Connor, Carmen McRae"
   },
   {
    "artist": "Pennywise",
@@ -6781,7 +6934,8 @@
    "folderName": "Pennywise_Pennywise",
    "folderId": "1TvtFYNeNySojJQ9DAIFoDUFr4ve5jAkj",
    "slug": "pennywise-pennywise",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Pennywise"
   },
   {
    "artist": "Samuel Barber / Eastman-Rochester Orchestra, Howard Hanson",
@@ -6825,7 +6979,8 @@
    "folderName": "Barber - Eastman-Rochester Orchestra, Howard Hanson_Symphony No. 1 - Overture To -The School For Scandal- - Medea Suite - Adagio For Strings",
    "folderId": "1oz9SckU7SXjrw_-OEN2-2ptWS6gum9vG",
    "slug": "barber-eastman-rochester-orchestra-howard-hanson-symphony-no-1-overture-to-the-school-for-scandal-medea-suite-adagio-for-strings",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Samuel Barber / Eastman-Rochester Orchestra, Howard Hanson"
   },
   {
    "artist": "Thad Jones",
@@ -6869,7 +7024,8 @@
    "folderName": "Thad Jones_After Hours",
    "folderId": "1eGmsJ3BAqLFOP-NroZFtT9rhSdGVtLHu",
    "slug": "thad-jones-after-hours",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Thad Jones"
   },
   {
    "artist": "The Cranberries",
@@ -6913,7 +7069,8 @@
    "folderName": "The Cranberries_MTV Unplugged",
    "folderId": "1regxuoRt1zCz0dJyiGNDnfCFzAP0-IQe",
    "slug": "the-cranberries-mtv-unplugged",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Cranberries"
   },
   {
    "artist": "The Cranberries",
@@ -6957,7 +7114,8 @@
    "folderName": "The Cranberries_To the Faithful Departed",
    "folderId": "1vQazH3adHEzd8yrQl9fXwBU9sQFNgG-Z",
    "slug": "the-cranberries-to-the-faithful-departed",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Cranberries"
   },
   {
    "artist": "The John Coltrane Quartet",
@@ -7001,7 +7159,8 @@
    "folderName": "John Coltrane_Africa Brass",
    "folderId": "1mW5U9KsYLl2r6PJaM8vocOAq9rWW4gE6",
    "slug": "john-coltrane-africa-brass",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "John Coltrane Quartet"
   },
   {
    "artist": "The Modern Jazz Quartet",
@@ -7045,7 +7204,8 @@
    "folderName": "The Modern Jazz Quartet_Concorde (2)",
    "folderId": "1yp4acXl2M40j7YnT1amWsHkICgNhKgf3",
    "slug": "the-modern-jazz-quartet-concorde-2",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Modern Jazz Quartet"
   },
   {
    "artist": "The Modern Jazz Quartet",
@@ -7089,7 +7249,8 @@
    "folderName": "The Modern Jazz Quartet_Concorde",
    "folderId": "1uasUhMcIwhdOeQoK9ysuwtvlTk_OTa11",
    "slug": "the-modern-jazz-quartet-concorde",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Modern Jazz Quartet"
   },
   {
    "artist": "The Modern Jazz Quartet",
@@ -7133,7 +7294,8 @@
    "folderName": "The Modern Jazz Quartet_Django",
    "folderId": "1Ci2b2KilqHz2PxfFS9cFw3Xwi0fDxoCU",
    "slug": "the-modern-jazz-quartet-django",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Modern Jazz Quartet"
   },
   {
    "artist": "The Modern Jazz Quartet",
@@ -7177,7 +7339,8 @@
    "folderName": "The Modern Jazz Quartet_The Modern Jazz Quartet",
    "folderId": "1_LNNaO4AsWbg64Q30AURuy3w7EELmfKw",
    "slug": "the-modern-jazz-quartet-the-modern-jazz-quartet",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Modern Jazz Quartet"
   },
   {
    "artist": "The Modern Jazz Quartet",
@@ -7221,7 +7384,8 @@
    "folderName": "The Modern Jazz Quartet_The Quartet",
    "folderId": "18pc4mrGL1g6UQSN2n9yMg6VynhPZU4jv",
    "slug": "the-modern-jazz-quartet-the-quartet",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Modern Jazz Quartet"
   },
   {
    "artist": "Tom Waits & Crystal Gayle",
@@ -7265,7 +7429,8 @@
    "folderName": "Tom Waits & Crystal Gayle_One From The Heart - The Original Motion Picture Soundtrack Of Francis Coppola's Movie",
    "folderId": "1D0w3kvVx0q-Q_NdNj33wnakqXuuqsA8m",
    "slug": "tom-waits-crystal-gayle-one-from-the-heart-the-original-motion-picture-soundtrack-of-francis-coppola-s-movie",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Tom Waits & Crystal Gayle"
   },
   {
    "artist": "Various Artists (Jimmy Witherspoon, Coleman Hawkins, Earl \"Fatha\" Hines, Mel Lewis, Woody Herman, Roy Eldridge, Ben Webster)",
@@ -7309,7 +7474,8 @@
    "folderName": "1959 Monterey Jazz Festival_Various",
    "folderId": "1teBa5CiGQnw32nAr2IerWwEpLubtQ__a",
    "slug": "1959-monterey-jazz-festival-various",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Various Artists (Jimmy Witherspoon, Coleman Hawkins, Earl \"Fatha\" Hines, Mel Lewis, Woody Herman, Roy Eldridge, Ben Webster)"
   },
   {
    "artist": "Various Artists (Miles Davis / Stan Getz / Gerry Mulligan / Lee Konitz / Sonny Rollins / Zoot Sims)",
@@ -7353,7 +7519,8 @@
    "folderName": "Various_Conception",
    "folderId": "1wrHIFnR_Y2n93vvQ7-YPmsNYgS8PJaHc",
    "slug": "various-conception",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Various Artists (Miles Davis / Stan Getz / Gerry Mulligan / Lee Konitz / Sonny Rollins / Zoot Sims)"
   },
   {
    "artist": "Wild Bill Moore Quintet",
@@ -7397,7 +7564,8 @@
    "folderName": "Wild Bill Moore Quintet_Bottom Groove",
    "folderId": "1xbXD4QSsb96gYRTJHGQoPqth4Zxsv0cf",
    "slug": "wild-bill-moore-quintet-bottom-groove",
-   "tab": "Collection"
+   "tab": "Collection",
+   "fileUnder": "Wild Bill Moore"
   },
   {
    "artist": "Aretha Franklin",
@@ -7441,7 +7609,8 @@
    "folderName": "Aretha Franklin_Live At Fillmore West",
    "folderId": "1NGpAlNDzB4ZpoGh4FiiN38izgu-MFSb8",
    "slug": "aretha-franklin-live-at-fillmore-west",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Aretha Franklin"
   },
   {
    "artist": "Art Pepper Quartet",
@@ -7485,7 +7654,8 @@
    "folderName": "Art Pepper Quartet_Modern Art",
    "folderId": "1g-cnNk7-PEYHIbLKdP_FM4HOyqUVbfmN",
    "slug": "art-pepper-quartet-modern-art",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Art Pepper"
   },
   {
    "artist": "Betty Davis",
@@ -7529,7 +7699,8 @@
    "folderName": "Betty Davis_Betty Davis",
    "folderId": "1ksVDvHQCZpLpNrOx2gWJu2Wl1xL9eT6X",
    "slug": "betty-davis-betty-davis",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Betty Davis"
   },
   {
    "artist": "Big Bill Broonzy",
@@ -7573,7 +7744,8 @@
    "folderName": "Big Bill Broonzy_The Blues",
    "folderId": "144gXllOM70FSEitXiY0UQwLTbNRMhHah",
    "slug": "big-bill-broonzy-the-blues",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Big Bill Broonzy"
   },
   {
    "artist": "Big John Patton",
@@ -7617,7 +7789,8 @@
    "folderName": "Big John Patton_Got a good thing going",
    "folderId": "1vfvHw9iTW-rThohr2UkNMhoU3i0c3RjT",
    "slug": "big-john-patton-got-a-good-thing-going",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Big John Patton"
   },
   {
    "artist": "Clifford Brown, Maynard Ferguson, Clark Terry",
@@ -7661,7 +7834,8 @@
    "folderName": "Clifford Brown, Maynard Ferguson, Clark Terry_Jam Session",
    "folderId": "1UIUMYcXUA0i4mHv-DEikXnu4obP2vOjq",
    "slug": "clifford-brown-maynard-ferguson-clark-terry-jam-session",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Clifford Brown, Maynard Ferguson, Clark Terry"
   },
   {
    "artist": "Dinah Washington",
@@ -7705,7 +7879,8 @@
    "folderName": "Dinah Washington_What a diff'rence a day makes!",
    "folderId": "1JCpFzJvpOiEXoYsWeMBsLc1sgmN0KxEi",
    "slug": "dinah-washington-what-a-diff-rence-a-day-makes",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Dinah Washington"
   },
   {
    "artist": "Dizzy Gillespie, Sonny Stitt, Sonny Rollins",
@@ -7749,7 +7924,8 @@
    "folderName": "Dizzy Gillespie, Sonny Stitt, Sonny Rollins_Sonny Side Up",
    "folderId": "12HD59Asq6c8tnzMTxy7upRvciK4PsixY",
    "slug": "dizzy-gillespie-sonny-stitt-sonny-rollins-sonny-side-up",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Dizzy Gillespie, Sonny Stitt, Sonny Rollins"
   },
   {
    "artist": "The Gerry Mulligan Sextet",
@@ -7793,7 +7969,8 @@
    "folderName": "The Gerry Mulligan Sextet_Presenting The Gerry Mulligan Sextet",
    "folderId": "12NnjopPRy9k7jG3uOfC5_3qSajFvgKaO",
    "slug": "the-gerry-mulligan-sextet-presenting-the-gerry-mulligan-sextet",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Gerry Mulligan"
   },
   {
    "artist": "Jennifer Warnes",
@@ -7837,7 +8014,8 @@
    "folderName": "Jennifer Warnes_Famous Blue Raincoat (The Songs of Leonard Cohen)",
    "folderId": "1e2VR9HrioIblvGNywqbQGfVgC4YE-9Zd",
    "slug": "jennifer-warnes-famous-blue-raincoat-the-songs-of-leonard-cohen",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Jennifer Warnes"
   },
   {
    "artist": "Marty Paich, Guest Artist: Art Pepper",
@@ -7881,7 +8059,8 @@
    "folderName": "Marty Paich, Guest Artist- Art Pepper_Like Wow! Jazz 1960",
    "folderId": "1_CFPRDv7xR9gPCCfgQAhR_bFmWCMEW3S",
    "slug": "marty-paich-guest-artist-art-pepper-like-wow-jazz-1960",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Marty Paich, Guest Artist: Art Pepper"
   },
   {
    "artist": "Miles Davis",
@@ -7925,7 +8104,8 @@
    "folderName": "Miles Davis_Kind of Blue",
    "folderId": "1xgupz3QQv9SzwlvVp82H9QCrGc2fXEMb",
    "slug": "miles-davis-kind-of-blue",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -7969,7 +8149,8 @@
    "folderName": "Miles Davis_Kind of Blue (2)",
    "folderId": "17F_PaysDLZM-8L1z0Gyo61kqTWRAHYi0",
    "slug": "miles-davis-kind-of-blue-classic-records",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -8013,7 +8194,8 @@
    "folderName": "Miles Davis_Miles Davis and Horns (2)",
    "folderId": "1tByq5T3SxuQUWTrPplLqyWYTjJbq4h82",
    "slug": "miles-davis-miles-davis-and-horns-2",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -8057,7 +8239,8 @@
    "folderName": "Miles Davis_Sketches of Spain",
    "folderId": "1uS1dI2I4-CDghmQ5-cr4pEvr0viPWRa1",
    "slug": "miles-davis-sketches-of-spain",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -8101,7 +8284,8 @@
    "folderName": "Miles Davis_Sketches of Spain (1960 first pressing)",
    "folderId": "1JIk3P-JIGDfuBr84caTzwQBW0_jpyUEs",
    "slug": "miles-davis-sketches-of-spain-1960",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "Miles Davis",
@@ -8145,7 +8329,8 @@
    "folderName": "Miles Davis_Sketches of Spain mofi",
    "folderId": "188XyUqAAJhgWl4HRSEqIahc8ciiSgzZu",
    "slug": "miles-davis-sketches-of-spain-mobile-fidelity",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Miles Davis"
   },
   {
    "artist": "The Band",
@@ -8189,7 +8374,8 @@
    "folderName": "The Band_Stage Fright",
    "folderId": "1A5__dKgo_6TPcaIylrDKkIOkzMQVvOdp",
    "slug": "the-band-stage-fright",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Band"
   },
   {
    "artist": "Tom Jones",
@@ -8233,7 +8419,8 @@
    "folderName": "Tom Jones_Tom Jones Live! At The Talk Of The Town",
    "folderId": "1brfMGAeMr8pDOUYrBP5mHr7VyW80hlrm",
    "slug": "tom-jones-tom-jones-live-at-the-talk-of-the-town",
-   "tab": "For Sale"
+   "tab": "For Sale",
+   "fileUnder": "Tom Jones"
   },
   {
    "artist": "Billie Holiday with Ray Ellis and His Orchestra",
@@ -8277,7 +8464,8 @@
    "folderName": "Billie Holiday with Ray Ellis and His Orchestra_Lady in Satin",
    "folderId": "1tT6c4-vXlbJxDUc1e9kCbe7UhLw5SN-0",
    "slug": "billie-holiday-with-ray-ellis-and-his-orchestra-lady-in-satin",
-   "tab": "Sold"
+   "tab": "Sold",
+   "fileUnder": "Billie Holiday"
   },
   {
    "artist": "Carole King",
@@ -8321,7 +8509,8 @@
    "folderName": "Carole King_Tapestry",
    "folderId": "19O7Q6RPg09Tg9Aj-PmgwUU1wqNBVwm5a",
    "slug": "carole-king-tapestry",
-   "tab": "Sold"
+   "tab": "Sold",
+   "fileUnder": "Carole King"
   },
   {
    "artist": "Clifford Brown",
@@ -8365,7 +8554,8 @@
    "folderName": "Clifford Brown_Clifford Brown with Strings",
    "folderId": "1vkOWsf7OuCx6WxxybmVO6Yn_WFSIpB8K",
    "slug": "clifford-brown-clifford-brown-with-strings",
-   "tab": "Sold"
+   "tab": "Sold",
+   "fileUnder": "Clifford Brown"
   },
   {
    "artist": "Donald Byrd",
@@ -8409,7 +8599,8 @@
    "folderName": "Donald Byrd_Off to the Races",
    "folderId": "1a1MVVzcoiD8b3tgXLQA3EXSFeL3NpHk-",
    "slug": "donald-byrd-off-to-the-races",
-   "tab": "Sold"
+   "tab": "Sold",
+   "fileUnder": "Donald Byrd"
   },
   {
    "artist": "Herbie Hancock",
@@ -8453,7 +8644,8 @@
    "folderName": "Herbie Hancock_Head Hunters",
    "folderId": "1HTTfd-gBWPR8jcmDuOE_o8zlstgNEN8y",
    "slug": "herbie-hancock-head-hunters",
-   "tab": "Sold"
+   "tab": "Sold",
+   "fileUnder": "Herbie Hancock"
   },
   {
    "artist": "Herbie Hancock",
@@ -8497,7 +8689,8 @@
    "folderName": "Herbie Hancock_Head Hunters (2)",
    "folderId": "1DUImEi35gNjcq_otQBuEE8_awad9LTmF",
    "slug": "herbie-hancock-head-hunters-1973",
-   "tab": "Sold"
+   "tab": "Sold",
+   "fileUnder": "Herbie Hancock"
   },
   {
    "artist": "The Kenny Burrell Quartet",
@@ -8541,7 +8734,8 @@
    "folderName": "The Kenny Burrell Quartet_The Tender Gender",
    "folderId": "1i_9zCo5JF7DfqK5y24RHjPBDbQE5DpCB",
    "slug": "the-kenny-burrell-quartet-the-tender-gender",
-   "tab": "Sold"
+   "tab": "Sold",
+   "fileUnder": "Kenny Burrell"
   },
   {
    "artist": "Pink Floyd",
@@ -8585,7 +8779,8 @@
    "folderName": "Pink Floyd_The Dark Side Of The Moon",
    "folderId": "1Yb8R48QHEBZQOJNxoLd-9_zsMIW_0ODl",
    "slug": "pink-floyd-the-dark-side-of-the-moon",
-   "tab": "Sold"
+   "tab": "Sold",
+   "fileUnder": "Pink Floyd"
   },
   {
    "artist": "Pink Floyd",
@@ -8629,7 +8824,8 @@
    "folderName": "Pink Floyd_The Wall",
    "folderId": "12_82JFouDK9kdjBiNr1WHrVshFZFIgX4",
    "slug": "pink-floyd-the-wall",
-   "tab": "Sold"
+   "tab": "Sold",
+   "fileUnder": "Pink Floyd"
   },
   {
    "artist": "Pink Floyd",
@@ -8673,7 +8869,8 @@
    "folderName": "Pink Floyd_Wish You Were Here",
    "folderId": "1TA13I8x2hZRwiHEpgFHrwYwgd0T9zeH3",
    "slug": "pink-floyd-wish-you-were-here",
-   "tab": "Sold"
+   "tab": "Sold",
+   "fileUnder": "Pink Floyd"
   }
  ]
 }
