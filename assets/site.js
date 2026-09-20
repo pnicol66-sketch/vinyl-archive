@@ -195,28 +195,42 @@
       });
     });
 
-    // Order-by: re-sort the cards in place. Year parses the 4-digit key; every
-    // other key falls back to artist then title so ties are stable.
+    // Order-by: re-sort the cards in place, on the first key and then the
+    // second, which is subordinate to it and only breaks its ties. Year parses
+    // the 4-digit key; 'default' is the order the build put the cards in (the
+    // "As listed" option on Available); every sort ends on artist, title and
+    // then that build order, so the result is stable whatever is chosen.
     var order = document.getElementById('orderby');
+    var order2 = document.getElementById('orderby2');
     if (order) {
       var collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
       var attr = function (el, k) { return el.getAttribute('data-' + k) || ''; };
-      var sortBy = function (key) {
+      cards.forEach(function (c, i) { c.dataset.seq = i; });
+      var seq = function (el) { return parseInt(el.dataset.seq, 10); };
+      var cmpKey = function (a, b, key) {
+        if (!key) return 0;
+        if (key === 'default') return seq(a) - seq(b);
+        if (key === 'year') {
+          return (parseInt(attr(a, 'year'), 10) || 9999) - (parseInt(attr(b, 'year'), 10) || 9999);
+        }
+        return collator.compare(attr(a, key), attr(b, key));
+      };
+      var sortBy = function (key, key2) {
         cards.slice().sort(function (a, b) {
-          if (key === 'year') {
-            var d = (parseInt(attr(a, 'year'), 10) || 9999) - (parseInt(attr(b, 'year'), 10) || 9999);
-            if (d) return d;
-          } else {
-            var c = collator.compare(attr(a, key), attr(b, key));
-            if (c) return c;
-          }
-          var ca = collator.compare(attr(a, 'artist'), attr(b, 'artist'));
-          return ca || collator.compare(attr(a, 'title'), attr(b, 'title'));
+          return cmpKey(a, b, key) ||
+            (key2 !== key ? cmpKey(a, b, key2) : 0) ||
+            collator.compare(attr(a, 'artist'), attr(b, 'artist')) ||
+            collator.compare(attr(a, 'title'), attr(b, 'title')) ||
+            (seq(a) - seq(b));
         }).forEach(function (c) { grid.appendChild(unit(c)); });
       };
-      order.addEventListener('change', function () { sortBy(order.value); });
-      // Match the control to what is shown: order by the default (Artist) once.
-      sortBy(order.value);
+      var applyOrder = function () {
+        sortBy(order.value, order2 ? order2.value : '');
+      };
+      order.addEventListener('change', applyOrder);
+      if (order2) order2.addEventListener('change', applyOrder);
+      // Match the control to what is shown: order by the first option once.
+      applyOrder();
     }
   }
 
