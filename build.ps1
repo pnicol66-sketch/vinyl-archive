@@ -1082,7 +1082,21 @@ foreach ($album in $json.albums) {
   # Sort keys for the streaming index's "Order by" control (site.js reads these
   # data-* attributes): artist with a leading "The" dropped, title, primary
   # genre (the part before " - "), label, and a 4-digit year (9999 if none).
-  $artistKey = (([string]$album.artist).Trim() -replace '^(?i)the\s+', '').ToLowerInvariant()
+  # The card SORTS on the name the collector files the album under and PRINTS
+  # the credit the label carries. They are different strings on purpose: one
+  # artist's records are credited many ways across their sleeves ("Miles Davis",
+  # "Miles Davis Quintet", "The Miles Davis Quintet", "Miles Davis All Stars"),
+  # and until the sheet started exporting `fileUnder` each spelling filed in a
+  # different place - 32 cards of one artist spread over 49 positions of the
+  # index, and every other ordering degraded too, since this key is also the
+  # tie-break in site.js. An export made before that field existed carries
+  # none, so the old expression stays as the fallback: leading "The" dropped,
+  # which is what the sheet now does unconditionally as well.
+  $fileUnder = ([string]$album.fileUnder).Trim()
+  if (-not $fileUnder) {
+    $fileUnder = ([string]$album.artist).Trim() -replace '^(?i)the\s+', ''
+  }
+  $artistKey = $fileUnder.ToLowerInvariant()
   $titleKey  = ([string]$album.title).Trim().ToLowerInvariant()
   $genreDisp = (([string]$album.genre).Trim() -split ' - ', 2)[0].Trim()
   $genreKey  = $genreDisp.ToLowerInvariant()
@@ -1106,7 +1120,7 @@ foreach ($album in $json.albums) {
     $primaryGenre = (([string]$album.genre).Trim() -split ' - ', 2)[0].Trim().ToLowerInvariant()
     [void]$collectionRows.Add([pscustomobject]@{
       Genre  = $primaryGenre
-      Artist = ((([string]$album.artist).Trim() -replace '^(?i)the\s+', '')).ToLowerInvariant()
+      Artist = $artistKey
       Seq    = $collectionRows.Count; Html = $cardHtml
     })
     $collectionCount++
@@ -1122,7 +1136,7 @@ foreach ($album in $json.albums) {
     $primaryGenre = (([string]$album.genre).Trim() -split ' - ', 2)[0].Trim().ToLowerInvariant()
     [void]$collectionRows.Add([pscustomobject]@{
       Genre  = $primaryGenre
-      Artist = ((([string]$album.artist).Trim() -replace '^(?i)the\s+', '')).ToLowerInvariant()
+      Artist = $artistKey
       Seq    = $collectionRows.Count; Html = $cardHtml
     })
     $collectionCount++
