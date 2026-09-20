@@ -1170,13 +1170,18 @@ function CountLabel([int]$n) {
 function Render-Index([string]$title, [string]$lede, [string]$desc,
     [string]$canonical, [string]$current, [string]$cardsHtml, [string]$outDir,
     [string]$eyebrow = 'A documented collection', [int]$total = 0,
-    [bool]$showControls = $false) {
+    [string]$controlMode = 'none') {
   # $current is 'archive', 'available' or 'sold' - the section this index is.
   # Build-Nav marks it aria-current and, inside Available/Sold, shows the Sold
   # sublink (a sub-item under Available, per .nav-sec). The nav is per-tenant.
-  # $showControls adds the streaming Tiled/List + Order-by controls; they are on
-  # the collection library (Personal Archive / a client's) but not on the curated
-  # Available / Sold pages, whose server-side order should stand.
+  # $controlMode picks the streaming controls under the search box:
+  #   'library' - the Tiled/List toggle + the Order-by pair, on the collection
+  #               library (Personal Archive / a client's), which has no
+  #               curated order to protect.
+  #   'order'   - the Order-by pair alone, on Available: no view toggle, and
+  #               the first option is "As listed" so the server-side order
+  #               stands until the reader asks for another.
+  #   'none'    - nothing, on Sold, whose newest-first order should stand.
   $h = $tplIndex.Replace('{{PAGE_TITLE}}', $title).Replace('{{LEDE}}', $lede)
   $h = $h.Replace('{{META_DESC}}', $desc).Replace('{{CANONICAL}}', $canonical)
   $h = $h.Replace('{{NAV}}', (Build-Nav $current $RootIndex ''))
@@ -1184,21 +1189,47 @@ function Render-Index([string]$title, [string]$lede, [string]$desc,
   $h = $h.Replace('{{EYEBROW}}', (HtmlEnc $eyebrow))
   $h = $h.Replace('{{TOTAL}}', "$total").Replace('{{COUNT}}', "$total of $total")
   $controls = ''
-  if ($showControls) {
+  if ($controlMode -ne 'none') {
     $nl = "`n"
+    # The five sort keys, in the order they are offered. Each value is the
+    # data-* attribute site.js reads off the card, so "Album" must be `title`:
+    # a value with no matching attribute reads as empty on every card and the
+    # sort silently falls through to its artist/title tiebreak.
+    $sortOpts = @(
+      @('artist', 'Artist'), @('title', 'Album'), @('genre', 'Genre'),
+      @('label', 'Label'), @('year', 'Year'))
+    $opts = ($sortOpts | ForEach-Object {
+      '          <option value="' + $_[0] + '">' + $_[1] + '</option>' }) -join $nl
+    # Available keeps its published order until the reader asks for another,
+    # so its first option is that order rather than Artist. The library pages
+    # are already re-sorted to Artist on load, so they need no such option.
+    $first = ''
+    if ($controlMode -eq 'order') {
+      $first = '          <option value="default">As listed</option>' + $nl
+    }
+    $view = ''
+    if ($controlMode -eq 'library') {
+      $view =
+        '      <div class="viewbar" role="group" aria-label="View">' + $nl +
+        '        <button type="button" data-view="tiled" aria-pressed="true">Tiled</button>' + $nl +
+        '        <button type="button" data-view="list" aria-pressed="false">List</button>' + $nl +
+        '      </div>' + $nl
+    }
+    # Two selects: the second is subordinate to the first and breaks its ties.
+    # It starts at "Nothing", so the page behaves exactly as it did before
+    # anyone touches it.
     $controls =
       '    <div class="viewrow">' + $nl +
-      '      <div class="viewbar" role="group" aria-label="View">' + $nl +
-      '        <button type="button" data-view="tiled" aria-pressed="true">Tiled</button>' + $nl +
-      '        <button type="button" data-view="list" aria-pressed="false">List</button>' + $nl +
-      '      </div>' + $nl +
+      $view +
       '      <label class="orderby"><span class="orderby-label">Order by</span>' + $nl +
       '        <select id="orderby">' + $nl +
-      '          <option value="artist">Artist</option>' + $nl +
-      '          <option value="album">Album</option>' + $nl +
-      '          <option value="genre">Genre</option>' + $nl +
-      '          <option value="label">Label</option>' + $nl +
-      '          <option value="year">Year</option>' + $nl +
+      $first + $opts + $nl +
+      '        </select>' + $nl +
+      '      </label>' + $nl +
+      '      <label class="orderby"><span class="orderby-label">then by</span>' + $nl +
+      '        <select id="orderby2">' + $nl +
+      '          <option value="">Nothing</option>' + $nl +
+      $opts + $nl +
       '        </select>' + $nl +
       '      </label>' + $nl +
       '    </div>'
@@ -1230,7 +1261,7 @@ if ($private) {
       'matrix transcribed by hand, and the exact pressing identified.') `
     'A private, documented vinyl collection.' `
     "$tenantBase/albums/" 'archive' $cardsCollection.ToString() $Albums `
-    'Documented collection' $collectionCount $true
+    'Documented collection' $collectionCount 'library'
 } else {
   Render-Index 'Personal Archive' `
     ("Albums added constantly as I transition my collection into the Archive system. " +
@@ -1238,7 +1269,7 @@ if ($private) {
       "minus the valuation research which remains private.") `
     'A documented personal vinyl collection: original pressings photographed, transcribed, and researched.' `
     "$tenantBase/albums/" 'archive' $cardsCollection.ToString() $Albums `
-    'A documented collection' $collectionCount $true
+    'A documented collection' $collectionCount 'library'
 }
 
 if (-not $private) {
@@ -1250,7 +1281,7 @@ Render-Index 'Available from Archive' `
     "Each card opens the full documentation; the live listings are on Discogs and eBay.") `
   'Documented vinyl records currently listed for sale on Discogs and eBay, with full pressing documentation.' `
   "$tenantBase/available/" 'available' $cardsAvailable.ToString() $AvailableDir `
-  'Available from the archive' $availableCount $false
+  'Available from the archive' $availableCount 'order'
 
 # Newest sale first. Date Sold arrives as ISO text from the sheet, so sorting
 # the string sorts the date; anything else was normalised to blank above and
@@ -1272,7 +1303,7 @@ Render-Index 'Sold from Archive' `
   ((CountLabel $soldCount) + " that have found new homes $mid the record has gone, its documentation stays here.") `
   'Vinyl records previously sold from the archive, with their full pressing documentation kept online.' `
   "$tenantBase/sold/" 'sold' $cardsSold.ToString() $SoldDir `
-  'Sold from the archive' $soldCount $false
+  'Sold from the archive' $soldCount 'none'
 }  # end: Available + Sold indexes (public/owner only)
 
 # ---------- owner-only global pages ----------
