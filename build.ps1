@@ -647,7 +647,18 @@ if ($escapeHits.Count -gt 0) {
     "in the sheet and re-export. Nothing was built.")
 }
 
-# (removed from the public history, 2026-11-08: the guard's patterns and notes live outside this repo)
+# PROSE GUARD (2026-09-18): the published text describes the record itself.
+# An export whose text says where a fact came from (a site, a database, a
+# forum, a release number, a web address the record does not print) or how it
+# was checked is refused, like a price. Keep the patterns in step with the
+# sheet's own check.
+#
+# THE PATTERNS ARE NOT IN THIS REPO (2026-09-23). They have to name what they
+# refuse, so they live in build.config.json (gitignored, machine-local) under
+# "proseGuard" - source, domain, process and shops - installed there from a
+# private copy. Without all four the build REFUSES rather than skip the guard:
+# a guard that quietly stops running is how this one went four days refusing
+# nothing.
 $pg = if ($cfg) { $cfg.proseGuard } else { $null }
 $pgMissing = @(@('source', 'domain', 'process', 'shops') | Where-Object { -not ($pg -and ([string]$pg.$_).Trim()) })
 if ($pgMissing.Count -gt 0) {
@@ -658,14 +669,21 @@ $proseSourceRx  = [regex]([string]$pg.source)
 $proseDomainRx  = [regex]([string]$pg.domain)
 $proseProcessRx = [regex]([string]$pg.process)
 $proseShopRx    = [regex]('^(?i)(' + [string]$pg.shops + ')$')
-# (removed from the public history, 2026-11-08: the guard's patterns and notes live outside this repo)
+# A pattern that matches empty text matches EVERY field, and would spin the
+# shop-name loop below on a zero-length match - refuse it like a missing one.
 foreach ($rxk in @(@('source', $proseSourceRx), @('domain', $proseDomainRx), @('process', $proseProcessRx), @('shops', $proseShopRx))) {
   if ($rxk[1].IsMatch('')) {
     throw ('The prose guard pattern "' + $rxk[0] + '" in build.config.json matches empty text, so it would ' +
       'match every field - refusing to build. Reinstall the patterns from the private copy. Nothing was built.')
   }
 }
-# (removed from the public history, 2026-11-08: the guard's patterns and notes live outside this repo)
+# EVERY PUBLISHED STRING, NOT A NAMED LIST (2026-09-19). This guard began as an
+# INCLUDE list of six fields while the price guard above walks every property
+# of every album recursively, so a field that was not on the list published
+# whatever it held. Three did - countryOfOrigin, year and monoStereo, all
+# rendered onto the album page and its subtitle - and eight such strings were
+# live on the site on 2026-09-19. So the guard is now structural like its
+# neighbour, with an EXCLUDE list for the fields that carry a link on purpose.
 $proseSkip = @{ 'discogsListingUrl' = $true; 'ebayItemUrl' = $true; 'discogsUrl' = $true;
                 'slug' = $true; 'folderId' = $true; 'folderName' = $true; 'albumId' = $true;
                 'images' = $true; 'photos' = $true; 'status' = $true }
@@ -673,7 +691,12 @@ $proseHits = New-Object System.Collections.Generic.List[string]
 function Test-Prose($node, [string]$path, [string]$slug) {
   if ($null -eq $node) { return }
   if ($node -is [string]) {
-    # (removed from the public history, 2026-11-08: the guard's patterns and notes live outside this repo)
+    # A SHOP'S NAME IS NOT ALWAYS A CITATION (2026-09-19), and this guard has
+    # to agree with the sheet's own check or the two disagree about the same
+    # album: the three names below are also EDITIONS and COMPANIES in a
+    # record's own history. After "under", "owned by" or a label and a slash,
+    # or before "series", "edition", "reissue" and the like, the name is a
+    # fact of the record, not a source.
     foreach ($prx in @($proseSourceRx, $proseDomainRx, $proseProcessRx)) {
       $pm = $prx.Match($node)
       while ($pm.Success -and $pm.Length -gt 0 -and $prx -eq $proseSourceRx -and $proseShopRx.IsMatch($pm.Value)) {
@@ -686,7 +709,11 @@ function Test-Prose($node, [string]$path, [string]$slug) {
         }
         break
       }
-      # (removed from the public history, 2026-11-08: the guard's patterns and notes live outside this repo)
+      # RECORD THE HIT, THEN STOP (restored 2026-09-23). An edit on 2026-09-19
+      # dropped the two lines below and kept only the return, so this guard
+      # refused nothing for four days and every build passed it. It is now
+      # proven by running it on a planted copy (build.ps1 -CheckOnly -Data),
+      # never by reading this file.
       if ($pm.Success) {
         $ps = [Math]::Max(0, $pm.Index - 30); $pe = [Math]::Min($node.Length, $pm.Index + $pm.Length + 30)
         $proseHits.Add(("{0}.{1}: ...{2}..." -f $slug, $path, $node.Substring($ps, $pe - $ps).Replace("`n", ' ')))
