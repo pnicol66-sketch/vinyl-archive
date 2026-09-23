@@ -94,6 +94,23 @@ if (Test-Path $ConfigFile) {
     }
   }
 }
+# The owner's choice of divider for an artist, where the count of their
+# records' genres does not give the right answer (a tie, or a majority the
+# owner files differently): artist-genres.json, "artists": { "Bo Diddley":
+# "Rock" }. COMMITTED, unlike build.config.json (machine-local paths,
+# gitignored), so the choice reaches every machine and build. Keyed by the
+# name the artist files under (case ignored); the value must be one of the
+# $LeadGenres family names or Other, and is applied after the tally.
+$ArtistGenreFile = Join-Path $Site 'artist-genres.json'
+$ArtistGenreOverrides = @{}
+if (Test-Path $ArtistGenreFile) {
+  $ag = [IO.File]::ReadAllText($ArtistGenreFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
+  if ($ag.artists) {
+    foreach ($p in $ag.artists.PSObject.Properties) {
+      $ArtistGenreOverrides[$p.Name.Trim().ToLowerInvariant()] = ([string]$p.Value).Trim()
+    }
+  }
+}
 
 # ---------- tenant registry ----------
 # Each collection published to this site is a tenant: its own URL prefix, data
@@ -856,6 +873,22 @@ foreach ($k in $leadTally.Keys) {
     if ($n -gt $bestN) { $best = $fam[0]; $bestN = $n }
   }
   $ArtistLead[$k] = $best
+}
+# The owner's overrides (artist-genres.json) win over the tally.
+# A value that is no family name is refused with a warning, never invented as
+# a new divider; an artist not in the export is named too (a typo or a rename).
+$famNames = @($LeadGenres | ForEach-Object { $_[0] }) + @('Other')
+foreach ($k in $ArtistGenreOverrides.Keys) {
+  $v = $ArtistGenreOverrides[$k]
+  $fam = $famNames | Where-Object { $_ -eq $v } | Select-Object -First 1
+  if (-not $fam) {
+    $warnings.Add("artist-genres.json: '$v' for '$k' is not a genre divider (use one of: $($famNames -join ', ')) - ignored")
+    continue
+  }
+  if (-not ($json.albums | Where-Object { [string]$_.status -ne 'withdrawn' -and (ArtistFileKey $_) -eq $k })) {
+    $warnings.Add("artist-genres.json: no record in the export files under '$k' - check the spelling")
+  }
+  $ArtistLead[$k] = $fam
 }
 
 foreach ($album in $json.albums) {
