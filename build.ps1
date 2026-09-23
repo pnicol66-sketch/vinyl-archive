@@ -669,7 +669,11 @@ function Test-Prose($node, [string]$path, [string]$slug) {
         }
         break
       }
-      if ($pm.Success) {        return
+      # (removed from the public history, 2026-11-08: the guard's patterns and notes live outside this repo)
+      if ($pm.Success) {
+        $ps = [Math]::Max(0, $pm.Index - 30); $pe = [Math]::Min($node.Length, $pm.Index + $pm.Length + 30)
+        $proseHits.Add(("{0}.{1}: ...{2}..." -f $slug, $path, $node.Substring($ps, $pe - $ps).Replace("`n", ' ')))
+        return
       }
     }
     return
