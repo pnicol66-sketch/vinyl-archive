@@ -87,10 +87,13 @@ $mid = [string][char]0x00B7
 # Em dash, same reason - used in the section-header ledes below.
 $dash = [string][char]0x2014
 
-# Optional local config (gitignored - holds machine paths): extra photo roots
-# and per-album folder overrides for albums whose photos don't resolve:
+# Local config (gitignored - machine paths, and the prose guard's patterns):
+# extra photo roots, per-album folder overrides for albums whose photos don't
+# resolve, and "proseGuard" (see PROSE GUARD below - required, the build
+# refuses without it):
 #   { "photoRoots": ["D:\\More Albums"],
-#     "folderOverrides": { "<album slug>": "C:\\full\\path\\to\\album folder" } }
+#     "folderOverrides": { "<album slug>": "C:\\full\\path\\to\\album folder" },
+#     "proseGuard": { "source": "...", "domain": "...", "process": "...", "shops": "..." } }
 $ConfigFile = Join-Path $Site 'build.config.json'
 $FolderOverrides = @{}
 if (Test-Path $ConfigFile) {
@@ -647,11 +650,33 @@ if ($escapeHits.Count -gt 0) {
 # PROSE GUARD (2026-09-18): the published text describes the record itself.
 # An export whose text says where a fact came from (a site, a database, a
 # forum, a release number, a web address the record does not print) or how it
-# was checked is refused, like a price. Keep these patterns in step with the
+# was checked is refused, like a price. Keep the patterns in step with the
 # sheet's own check.
-$proseSourceRx = [regex]"(?i)\b(discogs|popsike|e-?bay|steve hoffman|stevehoffman|hoffman(?:'s)? forums?|bsnpubs|london ?jazz ?collector|45worlds|45cat|musicbrainz|analog ?planet|acoustic sounds(?!\s+series)|elusive disc|music direct|valueyourmusic|vinylbeat|cvinyl|globaldog|organissimo|wikipedia|rateyourmusic|catalogue server|evidence block|price evidence|the evidence on file|the catalogue's other cells|the sheet's)\b|\breleases?\s+#?\d{5,9}(?:\s*(?:,|and|/|&|;)\s*(?:r)?\d{5,9})*\b|\br\d{6,9}\b"
-$proseDomainRx = [regex]"(?i)(?<!(?:address|printed|prints|reads|text|barcode|contact block|carries|shows|url)[:,]?\s*(?:the\s+)?[""']?)(https?://[^\s)]+|\bwww\.[a-z0-9.-]+|\b[a-z0-9][a-z0-9-]*\.(?:com|org|net|tv|info|de|fr|co\.uk)\b)(?!\s+(?:web address|address|printed|on the (?:back|jacket|cover|label|sleeve)))"
-$proseProcessRx = [regex]"(?i)\b(the collector's|the collector\b(?! (?:hierarchy|market|world|community|base))|recorded by the collector|collector-recorded|deep groove: ?(?:seen|not seen|cannot tell|recorded)|(?:supplied|provided|attached|uploaded|available) (?:label |cover |side[- ]label |back[- ]cover |front[- ]cover )?(?:photo|photograph|scan)s?|(?:in|from|on|per) (?:the|these|both|this|any|either) (?:label |cover |side[- ]label |side |back[- ]cover |front[- ]cover |supplied |provided |available |two |four )?(?:photo|photograph|scan)s?\b(?! (?:by|credit|of the|of a|taken|shot))|(?:the|these|both) (?:label |cover |side |supplied )?(?:photo|photograph|scan)s? (?:supplied|provided|show|shows|showed|do not|does not|did not|confirm|confirms|cannot|can't|are|is|were|was)|(?:runout|matrix|dead-?wax|typed|collector's) transcriptions?|transcription (?:slip|error|variance|misread)|as transcribed|transcribed (?:here|as|by the collector)|as typed|typed (?:runout|matrix|entry|transcription|dead-?wax)s?|\bOCR\b|not (?:visible|seen|legible|shown) (?:in|on|from) (?:the|any|this|these|either)|not (?:confirmed|asserted|verified|verifiable)|un(?:confirmed|verified)|cannot (?:tell|be confirmed|be verified|be pinned|be determined|be ruled|be checked)|could not be (?:confirmed|verified|determined|pinned|ruled|measured|checked)|can't be (?:confirmed|verified|determined)|worth (?:re)?check(?:ing)?|to rule out|flagged|noted only|a question,? not|this block|the evidence block|(?:the|our|this) research(?! (?:into|by|of))|research (?:found|confirms|confirmed|shows|showed|indicates|did not|could not)|web search|was searched|search(?:es)? (?:found|returned|turned up)|no (?:[A-Za-z'-]+ ){0,5}(?:thread|consensus|reference|source|listing|shootout|review)s? (?:was|were|has been|have been|could be) (?:found|located|traced|identified)|(?:was|were) (?:found|traced|located) (?:on|at|in) (?:the (?:forums?|archive)|a (?:forum|database)))\b"
+#
+# THE PATTERNS ARE NOT IN THIS REPO (2026-09-23). They have to name what they
+# refuse, so they live in build.config.json (gitignored, machine-local) under
+# "proseGuard" - source, domain, process and shops - installed there from a
+# private copy. Without all four the build REFUSES rather than skip the guard:
+# a guard that quietly stops running is how this one went four days refusing
+# nothing.
+$pg = if ($cfg) { $cfg.proseGuard } else { $null }
+$pgMissing = @(@('source', 'domain', 'process', 'shops') | Where-Object { -not ($pg -and ([string]$pg.$_).Trim()) })
+if ($pgMissing.Count -gt 0) {
+  throw ('build.config.json carries no prose guard patterns (' + ($pgMissing -join ', ') + ' missing under "proseGuard"), ' +
+    'so the prose guard cannot run - refusing to build. Install them from the private copy. Nothing was built.')
+}
+$proseSourceRx  = [regex]([string]$pg.source)
+$proseDomainRx  = [regex]([string]$pg.domain)
+$proseProcessRx = [regex]([string]$pg.process)
+$proseShopRx    = [regex]('^(?i)(' + [string]$pg.shops + ')$')
+# A pattern that matches empty text matches EVERY field, and would spin the
+# shop-name loop below on a zero-length match - refuse it like a missing one.
+foreach ($rxk in @(@('source', $proseSourceRx), @('domain', $proseDomainRx), @('process', $proseProcessRx), @('shops', $proseShopRx))) {
+  if ($rxk[1].IsMatch('')) {
+    throw ('The prose guard pattern "' + $rxk[0] + '" in build.config.json matches empty text, so it would ' +
+      'match every field - refusing to build. Reinstall the patterns from the private copy. Nothing was built.')
+  }
+}
 # EVERY PUBLISHED STRING, NOT A NAMED LIST (2026-09-19). This guard began as an
 # INCLUDE list of six fields while the price guard above walks every property
 # of every album recursively, so a field that was not on the list published
@@ -674,7 +699,7 @@ function Test-Prose($node, [string]$path, [string]$slug) {
     # fact of the record, not a source.
     foreach ($prx in @($proseSourceRx, $proseDomainRx, $proseProcessRx)) {
       $pm = $prx.Match($node)
-      while ($pm.Success -and $prx -eq $proseSourceRx -and $pm.Value -match '^(?i)(acoustic sounds|elusive disc|music direct)$') {
+      while ($pm.Success -and $pm.Length -gt 0 -and $prx -eq $proseSourceRx -and $proseShopRx.IsMatch($pm.Value)) {
         $b = $node.Substring([Math]::Max(0, $pm.Index - 40), [Math]::Min(40, $pm.Index))
         $a2 = $node.Substring([Math]::Min($node.Length, $pm.Index + $pm.Length), [Math]::Min(24, [Math]::Max(0, $node.Length - $pm.Index - $pm.Length)))
         if ($b -match "(?i)(?:[A-Za-z][A-Za-z.'-]*/|\b(?:under|owned by|bought by|acquired by|relaunch(?:ed)? under|part of|division of|imprint of)\s+(?:[A-Za-z][A-Za-z.'-]*[\s/])?)$" -or
