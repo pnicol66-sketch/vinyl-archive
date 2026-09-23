@@ -8,15 +8,23 @@
 #   .\build.ps1 -Push     build, then git add/commit/push (publishes)
 #   .\build.ps1 -Force    ignore the per-album manifests AND the source folder
 #                         scan cache: re-scan every folder, rebuild every photo
+#   .\build.ps1 -CheckOnly [-Data <file>]
+#                         run the export guards below and stop - nothing is
+#                         built or written. -Data checks another export file
+#                         (a copy) and is refused without -CheckOnly, so a
+#                         stray file can never be built or published.
 #
 # PRICE GUARD: the export already whitelists fields, but this script refuses
 # to build if any price-like key or any $-amount appears anywhere in the
 # data - album pages double as marketplace link targets and must stay
 # price-free.
 
-param([switch]$Push, [switch]$Force, [switch]$AllowEmpty, [string]$Tenant = 'owner', [switch]$All)
+param([switch]$Push, [switch]$Force, [switch]$AllowEmpty, [string]$Tenant = 'owner', [switch]$All,
+      [switch]$CheckOnly, [string]$Data)
 
 $ErrorActionPreference = 'Stop'
+if ($Data -and -not $CheckOnly) { throw '-Data is for -CheckOnly runs only: a build publishes the sheet export, never another file.' }
+if ($CheckOnly -and ($Push -or $All)) { throw '-CheckOnly builds nothing, so it takes neither -Push nor -All.' }
 Add-Type -AssemblyName System.Drawing
 $Elapsed = [Diagnostics.Stopwatch]::StartNew()
 
@@ -186,9 +194,10 @@ if (Test-Path $TenantsFile) {
 $private = ($tenantCfg.private -eq $true)
 $urlPrefix = if ($private) { '' } else { [string]$tenantCfg.urlPrefix }
 $DataFile  = Join-Path $WebsiteDataDir ([string]$tenantCfg.dataFile)
+if ($Data) { $DataFile = $Data }
 if ($private) {
   $OutRoot = Join-Path $env:LOCALAPPDATA ('vinyl-private\' + [string]$tenantCfg.slug)
-  if (-not (Test-Path $OutRoot)) { New-Item -ItemType Directory $OutRoot -Force | Out-Null }
+  if (-not $CheckOnly -and -not (Test-Path $OutRoot)) { New-Item -ItemType Directory $OutRoot -Force | Out-Null }
 } else {
   $OutRoot = $Site
 }
@@ -592,6 +601,49 @@ if ($violations.Count -gt 0) {
   throw 'Price guard failed - fix the export (or the sheet cells) and re-export. Nothing was built.'
 }
 
+# ESCAPE GUARD (2026-09-23): a literal unicode escape - a backslash, "u" and
+# four hex digits - is six characters of text, never the character it names.
+# Nine album pages published them on 2026-09-22 (a Year reading "... the
+# backslash-u2117 1972 GRT Corp. copyright", rim text with backslash-u2022
+# where the bullet belongs): the text had reached the sheet with its
+# characters still escaped. Every published string is checked, the whole
+# export and not a named list, like the price guard. The fix is the sheet's
+# cell, then a re-export.
+$escapeRx = [regex]'\\u[0-9a-fA-F]{4}'
+$escapeHits = New-Object System.Collections.Generic.List[string]
+function Test-Escape($node, [string]$path, [string]$slug) {
+  if ($null -eq $node) { return }
+  if ($node -is [string]) {
+    $em = $escapeRx.Match($node)
+    if ($em.Success) {
+      $es = [Math]::Max(0, $em.Index - 30); $ee = [Math]::Min($node.Length, $em.Index + $em.Length + 30)
+      $escapeHits.Add(("{0}.{1}: {2} escape(s) ...{3}..." -f $slug, $path, $escapeRx.Matches($node).Count,
+        $node.Substring($es, $ee - $es).Replace("`n", ' ')))
+    }
+    return
+  }
+  if ($node -is [System.Collections.IEnumerable]) {
+    $i = 0
+    foreach ($item in $node) { Test-Escape $item "$path[$i]" $slug; $i++ }
+    return
+  }
+  if ($node -is [System.Management.Automation.PSCustomObject]) {
+    foreach ($p in $node.PSObject.Properties) {
+      Test-Escape $p.Value $(if ($path) { "$path.$($p.Name)" } else { $p.Name }) $slug
+    }
+  }
+}
+foreach ($top in $json.PSObject.Properties) {
+  if ($top.Name -eq 'albums') { foreach ($a in @($top.Value)) { Test-Escape $a '' ([string]$a.slug) } }
+  else { Test-Escape $top.Value $top.Name '(export)' }
+}
+if ($escapeHits.Count -gt 0) {
+  $escapeHits | ForEach-Object { Write-Host "ESCAPE: $_" -ForegroundColor Red }
+  throw ("Escape guard failed - " + $escapeHits.Count + " field(s) carry a literal unicode escape " +
+    "(a backslash, u and four hex digits) where a character belongs. Repair the listed cells " +
+    "in the sheet and re-export. Nothing was built.")
+}
+
 # PROSE GUARD (rule 37, 2026-09-18): the published prose describes the record,
 # never the research. An export naming a research source (Discogs, Popsike,
 # eBay, the Steve Hoffman forum, a label-history site, a release id, a web
@@ -679,6 +731,11 @@ if (@($json.albums).Count -eq 0 -and -not $AllowEmpty) {
     'would empty the site. Re-export from the sheet (Website > Publish Vinyl ' +
     'Site...). If you really do mean to publish an empty site, re-run with ' +
     '-AllowEmpty.')
+}
+
+if ($CheckOnly) {
+  Write-Host ("Export passes every guard: " + @($json.albums).Count + " album(s) in $DataFile. Nothing was built.") -ForegroundColor Green
+  return
 }
 
 # Per-album crawler policy. Absent "listed" (the current export shape) leaves
