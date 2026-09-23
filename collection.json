@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-23T13:02:27.936Z",
+ "generated": "2026-09-23T14:45:29.684Z",
  "site": {
   "title": "Vinyl Curator",
   "baseUrl": "https://vinylcurator.net",
@@ -100,7 +100,7 @@
   {
    "artist": "Bo Diddley",
    "title": "Where It All Began",
-   "year": "1972 - fixed by the \"℗ 1972 GRT Corp.\" copyright line stamped on both side labels, matching the catalogue-matched pressing's release year.",
+   "year": "1972 - the \"℗ 1972 GRT Corp.\" copyright line stamped on both side labels.",
    "labelName": "Chess",
    "labelNumber": "CH 50016",
    "monoStereo": "Stereo, as printed on both the front cover (\"STEREO\" top right) and the top of each side label.",
@@ -517,7 +517,7 @@
    "composer": "Glen Hansard",
    "conductor": "",
    "performerOrchestra": "",
-   "musicians": "Glen Hansard (vocals, guitar), Joseph Doyle (bass, vocals), Graham Hopkins (drums), Earl Harvin (drums), Rob Bochnik (guitar), Ruth O'Mahony Brady (keyboards, vocals), Gareth Quinn Redmond, Kate Ellis, Paula Hughes, Katie O'Connor, Una O'Kane (strings), Warren Ellis (violin on 'The Feast Of St John'), Via Mardot (theremin on select tracks, per Anti-'s album bio)",
+   "musicians": "Glen Hansard (vocals, guitar), Joseph Doyle (bass, vocals), Graham Hopkins (drums), Earl Harvin (drums), Rob Bochnik (guitar), Ruth O'Mahony Brady (keyboards, vocals), Gareth Quinn Redmond, Kate Ellis, Paula Hughes, Katie O'Connor, Una O'Kane (strings), Warren Ellis (violin on 'The Feast Of St John'), Via Mardot (theremin on select tracks)",
    "coverGrade": "NM",
    "vinylGrade": "NM",
    "matrix": {
@@ -554,7 +554,7 @@
    "labelName": "Anti-",
    "labelNumber": "87419-1",
    "monoStereo": "Stereo",
-   "countryOfOrigin": "US (likely - no country printed on labels; matches documented US promo and US retail pressings with the RJ/Sterling Sound cut)",
+   "countryOfOrigin": "US (no country printed on labels; with the RJ/Sterling Sound cut)",
    "format": "LP, promo",
    "genre": "Rock - Folk Rock / Singer-Songwriter",
    "speed": "33 1/3 RPM",
@@ -1904,7 +1904,7 @@
    "labelName": "Impulse!",
    "labelNumber": "B0037785-01",
    "monoStereo": "Mono",
-   "countryOfOrigin": "US release, manufactured in Mexico (Vantiva, Guadalajara - stated on companies list and shrink-wrap text)",
+   "countryOfOrigin": "US release, manufactured in Mexico (Vantiva, Guadalajara - stated on shrink-wrap text)",
    "format": "2xLP, gatefold",
    "genre": "Jazz - Modal/Post-Bop",
    "speed": "33 1/3 RPM",
@@ -2722,7 +2722,7 @@
    "composer": "",
    "conductor": "",
    "performerOrchestra": "",
-   "musicians": "King Curtis (tenor/alto saxophone), unidentified backing rhythm section - likely drawn from Curtis's working band/session players of the period (guitar, bass, drums, piano); specific credited players are not listed on the jacket or labels",
+   "musicians": "King Curtis (tenor/alto saxophone), unidentified backing rhythm section (guitar, bass, drums, piano); specific credited players are not listed on the jacket or labels",
    "coverGrade": "NM",
    "vinylGrade": "NM-",
    "matrix": {
@@ -2812,7 +2812,7 @@
    "composer": "",
    "conductor": "",
    "performerOrchestra": "",
-   "musicians": "King Curtis (tenor sax, saxello, vocal on \"Road Runner\"), Willie Bridges (baritone sax), Melvin Lastie (cornet), Cornell Dupree (guitar), Charles Rainey (bass), Ray Lucas (drums); Paul Griffin (piano) is documented on some session listings but not credited on this jacket",
+   "musicians": "King Curtis (tenor sax, saxello, vocal on \"Road Runner\"), Willie Bridges (baritone sax), Melvin Lastie (cornet), Cornell Dupree (guitar), Charles Rainey (bass), Ray Lucas (drums); Paul Griffin (piano), not credited on this jacket",
    "coverGrade": "EX",
    "vinylGrade": "EX",
    "matrix": {
@@ -2893,7 +2893,7 @@
    "year": "c. 1973-1976",
    "labelName": "Up Front Records (a product of Springboard International Records, Inc.)",
    "labelNumber": "UPF-157",
-   "monoStereo": "Stereo (likely electronically rechanneled from mono masters)",
+   "monoStereo": "Stereo (electronically rechanneled from mono masters)",
    "countryOfOrigin": "US",
    "format": "LP",
    "genre": "R&B/Soul - Instrumental Sax",
@@ -2902,7 +2902,7 @@
    "composer": "",
    "conductor": "",
    "performerOrchestra": "King Curtis and the Noble Knights (uncredited on this reissue)",
-   "musicians": "King Curtis (tenor sax), unidentified backing band (guitar, organ, bass, drums) - specific session personnel undocumented for this compilation's early-1960s Tru-Sound/Enjoy source recordings",
+   "musicians": "King Curtis (tenor sax), unidentified backing band (guitar, organ, bass, drums) on this compilation's early-1960s Tru-Sound/Enjoy source recordings",
    "coverGrade": "NM",
    "vinylGrade": "NM/NN",
    "matrix": {
@@ -4105,7 +4105,7 @@
   {
    "artist": "Louis Armstrong & Duke Ellington",
    "title": "Recording Together For The First Time",
-   "year": "not established",
+   "year": "",
    "labelName": "Roulette (Japanese pressing, licensed to Nippon Columbia)",
    "labelNumber": "SL-5120-RO",
    "monoStereo": "Stereo",
@@ -4240,7 +4240,7 @@
   {
    "artist": "Margie Joseph",
    "title": "Margie Joseph Makes A New Impression",
-   "year": "1970 (often catalogued as 1971)",
+   "year": "1970",
    "labelName": "Volt Records",
    "labelNumber": "VOS-6012",
    "monoStereo": "Stereo",
@@ -4252,7 +4252,7 @@
    "composer": "",
    "conductor": "",
    "performerOrchestra": "The Bar-Kays and Stax staff musicians; Muscle Shoals Rhythm Section",
-   "musicians": "Margie Joseph (vocals); Fred Briggs (keyboards), Winston Stewart (keyboards), Michael Toles (guitar), James Alexander (bass), Willie Hall (drums), Roy Cunningham (drums) on Stax tracks A2, A4, A5, B1, B6; Barry Beckett (keyboards), Eddie Hinton (guitar), Jimmy Johnson (guitar), David Hood (bass), Roger Hawkins (drums) on Muscle Shoals tracks A3, B2, B4; Lester Snell (keyboards), Marvell Thomas (keyboards), Cornell McFadden (guitar), Kirk Dudley (bass), Willie Pettis (drums) on Stax tracks B3, B5; Bobby Manuel reportedly on guitar on Stax-recorded tracks though credited only as engineer on the jacket - individual players are not credited on the original sleeve.",
+   "musicians": "Margie Joseph (vocals); Fred Briggs (keyboards), Winston Stewart (keyboards), Michael Toles (guitar), James Alexander (bass), Willie Hall (drums), Roy Cunningham (drums) on Stax tracks A2, A4, A5, B1, B6; Barry Beckett (keyboards), Eddie Hinton (guitar), Jimmy Johnson (guitar), David Hood (bass), Roger Hawkins (drums) on Muscle Shoals tracks A3, B2, B4; Lester Snell (keyboards), Marvell Thomas (keyboards), Cornell McFadden (guitar), Kirk Dudley (bass), Willie Pettis (drums) on Stax tracks B3, B5; Bobby Manuel on guitar on Stax-recorded tracks though credited only as engineer on the jacket - individual players are not credited on the original sleeve.",
    "coverGrade": "VG",
    "vinylGrade": "VG",
    "matrix": {
@@ -4387,7 +4387,7 @@
    "composer": "",
    "conductor": "Gene Page (orchestra); Lesley Drayton (\"Fossil Medley\")",
    "performerOrchestra": "40-piece touring orchestra arranged and conducted by Gene Page",
-   "musicians": "Marvin Gaye (vocals), James Jamerson (bass), Ed Greene (drums), David T. Walker (guitar), Ray Parker Jr. (guitar), Joe Sample (keyboards), Ernie Watts (saxophone), William Green (saxophone/horns), plus 40-piece orchestra arranged/conducted by Gene Page; Lesley Drayton conducted the \"Fossil Medley\". Individual player credits are not printed on the jacket/labels; personnel per session documentation.",
+   "musicians": "Marvin Gaye (vocals), James Jamerson (bass), Ed Greene (drums), David T. Walker (guitar), Ray Parker Jr. (guitar), Joe Sample (keyboards), Ernie Watts (saxophone), William Green (saxophone/horns), plus 40-piece orchestra arranged/conducted by Gene Page; Lesley Drayton conducted the \"Fossil Medley\". Individual player credits are not printed on the jacket/labels.",
    "coverGrade": "VG",
    "vinylGrade": "EX",
    "matrix": {
@@ -5099,7 +5099,7 @@
    "labelName": "Columbia",
    "labelNumber": "CL 949",
    "monoStereo": "Mono",
-   "countryOfOrigin": "US (likely a Columbia regional pressing plant per the 'H'-type runout mark; exact plant not certain from transcription alone)",
+   "countryOfOrigin": "US; runout carries an 'H'-type mark",
    "format": "LP",
    "genre": "Jazz - Hard Bop",
    "speed": "33 1/3 RPM",
@@ -6948,7 +6948,7 @@
    "format": "LP",
    "genre": "Classical - 20th Century American Orchestral",
    "speed": "33 1/3 RPM",
-   "producer": "Wilma Cozart (uncredited on jacket; documented Mercury Living Presence producer, engineered by C. Robert Fine)",
+   "producer": "Wilma Cozart (uncredited on jacket; Mercury Living Presence producer, engineered by C. Robert Fine)",
    "composer": "Samuel Barber",
    "conductor": "Howard Hanson",
    "performerOrchestra": "Eastman-Rochester Orchestra",
@@ -7402,7 +7402,7 @@
    "composer": "Tom Waits",
    "conductor": "Bob Alcivar",
    "performerOrchestra": "Studio orchestra arranged and conducted by Bob Alcivar",
-   "musicians": "Tom Waits (vocals, piano), Crystal Gayle (vocals), Bob Alcivar (arranger, conductor), Greg Cohen (bass), Larry Bunker (drums, percussion), Jack Sheldon (trumpet), plus Hollywood studio orchestra; Pete Jolly (piano) and Dennis Budimir (guitar) also documented on the sessions",
+   "musicians": "Tom Waits (vocals, piano), Crystal Gayle (vocals), Bob Alcivar (arranger, conductor), Greg Cohen (bass), Larry Bunker (drums, percussion), Jack Sheldon (trumpet), plus Hollywood studio orchestra; Pete Jolly (piano) and Dennis Budimir (guitar) also on the sessions",
    "coverGrade": "NM",
    "vinylGrade": "EX+",
    "matrix": {
@@ -7660,7 +7660,7 @@
   {
    "artist": "Abner Jay",
    "title": "True Story Of Abner Jay",
-   "year": "c. 2009-2010s (runout matches a documented repress of this title)",
+   "year": "c. 2009-2010s (repress of this title)",
    "labelName": "Mississippi Records",
    "labelNumber": "LP-MR-036",
    "monoStereo": "Mono",
@@ -8437,7 +8437,7 @@
    "composer": "Leonard Cohen",
    "conductor": "Bill Ginn",
    "performerOrchestra": "",
-   "musicians": "Jennifer Warnes (vocals, vocal harmonies), Leonard Cohen (guest vocal on 'Joan of Arc'), Roscoe Beck (bass, fretless bass, string bass), Vinnie Colaiuta (drums), Bill Ginn (piano, synthesizer, conductor), Bill Payne (synthesizers, 'Came So Far for Beauty'), David Lindley (lap steel guitar), Fred Tackett (guitar), Michael Landau (guitar), William 'Smitty' Smith (Hammond organ), Russell Ferrante (synthesizer/organ), Jorge Calderón (bass), Steve Forman (percussion), Van Dyke Parks (arrangement, 'A Singer Must Die'), Jeremy Lubbock (string arrangements), Sid Page, Barbara Porter (violins), Novi Novog (viola), Larry Corbett (cello), Richard Feves (bass), Bobby King, Terry Evans, Willie Greene Jr. (backing vocals). Stevie Ray Vaughan (guitar on 'First We Take Manhattan') and Robben Ford (guitar) are documented session contributors.",
+   "musicians": "Jennifer Warnes (vocals, vocal harmonies), Leonard Cohen (guest vocal on 'Joan of Arc'), Roscoe Beck (bass, fretless bass, string bass), Vinnie Colaiuta (drums), Bill Ginn (piano, synthesizer, conductor), Bill Payne (synthesizers, 'Came So Far for Beauty'), David Lindley (lap steel guitar), Fred Tackett (guitar), Michael Landau (guitar), William 'Smitty' Smith (Hammond organ), Russell Ferrante (synthesizer/organ), Jorge Calderón (bass), Steve Forman (percussion), Van Dyke Parks (arrangement, 'A Singer Must Die'), Jeremy Lubbock (string arrangements), Sid Page, Barbara Porter (violins), Novi Novog (viola), Larry Corbett (cello), Richard Feves (bass), Bobby King, Terry Evans, Willie Greene Jr. (backing vocals). Stevie Ray Vaughan (guitar on 'First We Take Manhattan') and Robben Ford (guitar) are session contributors.",
    "coverGrade": "NM",
    "vinylGrade": "VG+",
    "matrix": {
@@ -8482,7 +8482,7 @@
    "composer": "",
    "conductor": "",
    "performerOrchestra": "Art Pepper (guest star)",
-   "musicians": "Marty Paich (piano), Art Pepper (alto sax, guest - on Art's Opus, All The Things You Are, Pitfall, Marty's Blues, What's Right For You), Larry Bunker (vibraphone, drums), Joe Mondragon (bass); documented but uncredited on the jacket: Howard Roberts (guitar) and Frank Capp (drums) on the ex-\"Hot Piano\" tracks, Buddy Clark (bass) and Frank Capp (drums) on the Pepper quartet tracks",
+   "musicians": "Marty Paich (piano), Art Pepper (alto sax, guest - on Art's Opus, All The Things You Are, Pitfall, Marty's Blues, What's Right For You), Larry Bunker (vibraphone, drums), Joe Mondragon (bass); uncredited on the jacket: Howard Roberts (guitar) and Frank Capp (drums) on the ex-\"Hot Piano\" tracks, Buddy Clark (bass) and Frank Capp (drums) on the Pepper quartet tracks",
    "coverGrade": "VG+",
    "vinylGrade": "EX",
    "matrix": {
@@ -8707,7 +8707,7 @@
    "composer": "",
    "conductor": "Gil Evans",
    "performerOrchestra": "Gil Evans Orchestra",
-   "musicians": "Miles Davis (trumpet, flugelhorn), Gil Evans (arranger, conductor), Elvin Jones (drums, percussion), Jimmy Cobb (drums), Paul Chambers (bass), Jose Mangual (percussion), Johnny Coles, Bernie Glow, Louis Mucci, Ernie Royal, Taft Jordan (trumpets, varying by session), Bill Barber (tuba), Danny Bank (flute, clarinet, bass clarinet), Romeo Penque, Eddie Caine, Al Block, Harold Feldman (woodwinds), Jack Knitzer (bassoon), Earl Chapin, Tony Miranda (French horn); personnel varies somewhat between the November 1959 and March 1960 sessions per Columbia files",
+   "musicians": "Miles Davis (trumpet, flugelhorn), Gil Evans (arranger, conductor), Elvin Jones (drums, percussion), Jimmy Cobb (drums), Paul Chambers (bass), Jose Mangual (percussion), Johnny Coles, Bernie Glow, Louis Mucci, Ernie Royal, Taft Jordan (trumpets, varying by session), Bill Barber (tuba), Danny Bank (flute, clarinet, bass clarinet), Romeo Penque, Eddie Caine, Al Block, Harold Feldman (woodwinds), Jack Knitzer (bassoon), Earl Chapin, Tony Miranda (French horn); personnel varies somewhat between the November 1959 and March 1960 sessions",
    "coverGrade": "VG+",
    "vinylGrade": "NM",
    "matrix": {
