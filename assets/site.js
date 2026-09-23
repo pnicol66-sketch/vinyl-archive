@@ -171,6 +171,44 @@
     // the sortable / hideable unit is the wrapper, not the bare card.
     function unit(c) { return c.closest('.card-wrap') || c; }
 
+    // Genre dividers: a small titled break before the first card of each main
+    // genre (data-lead, which the build reads off the lead genre of the Genre
+    // cell). The main genre is the outer grouping of every ordering except
+    // "As listed", a deliberate order that shows no breaks; a page holding one
+    // genre only shows none either. A divider counts the cards shown under it
+    // and hides when the filter leaves it none.
+    var breaks = {};
+    var leadOf = function (el) { return el.getAttribute('data-lead') || 'Other'; };
+    var leadCount = cards.reduce(function (seen, c) {
+      if (seen.indexOf(leadOf(c)) === -1) seen.push(leadOf(c));
+      return seen;
+    }, []).length;
+    function breakFor(l) {
+      if (!breaks[l]) {
+        var h = document.createElement('h2');
+        h.className = 'genre-break';
+        var name = document.createElement('span');
+        name.className = 'gb-name';
+        name.textContent = l;
+        var n = document.createElement('span');
+        n.className = 'gb-count';
+        h.appendChild(name);
+        h.appendChild(n);
+        breaks[l] = h;
+      }
+      return breaks[l];
+    }
+    function updateBreaks() {
+      var shown = {};
+      cards.forEach(function (c) {
+        if (!unit(c).hidden) shown[leadOf(c)] = (shown[leadOf(c)] || 0) + 1;
+      });
+      Object.keys(breaks).forEach(function (l) {
+        breaks[l].hidden = !shown[l];
+        breaks[l].lastChild.textContent = shown[l] || 0;
+      });
+    }
+
     function applyFilter() {
       var q = filter.value.trim().toLowerCase();
       var shown = 0;
@@ -179,6 +217,7 @@
         unit(c).hidden = !hit;
         if (hit) shown++;
       });
+      updateBreaks();
       if (nomatch) nomatch.hidden = shown > 0;
       if (countEl) countEl.textContent = shown + ' of ' + total;
     }
@@ -217,14 +256,37 @@
         return collator.compare(attr(a, key), attr(b, key));
       };
       var sortBy = function (key, key2, key3) {
+        var grouped = key !== 'default' && leadCount > 1;
+        var cmpLead = function (a, b) {
+          if (!grouped) return 0;
+          var la = leadOf(a), lb = leadOf(b);
+          if (la === lb) return 0;
+          if (la === 'Other') return 1;
+          if (lb === 'Other') return -1;
+          return collator.compare(la, lb);
+        };
+        var last = null;
         cards.slice().sort(function (a, b) {
-          return cmpKey(a, b, key) ||
+          return cmpLead(a, b) ||
+            cmpKey(a, b, key) ||
             (key2 !== key ? cmpKey(a, b, key2) : 0) ||
             (key3 !== key && key3 !== key2 ? cmpKey(a, b, key3) : 0) ||
             collator.compare(attr(a, 'artist'), attr(b, 'artist')) ||
             collator.compare(attr(a, 'title'), attr(b, 'title')) ||
             (seq(a) - seq(b));
-        }).forEach(function (c) { grid.appendChild(unit(c)); });
+        }).forEach(function (c) {
+          if (grouped && leadOf(c) !== last) {
+            last = leadOf(c);
+            grid.appendChild(breakFor(last));
+          }
+          grid.appendChild(unit(c));
+        });
+        if (!grouped) {
+          Object.keys(breaks).forEach(function (l) {
+            if (breaks[l].parentNode) breaks[l].parentNode.removeChild(breaks[l]);
+          });
+        }
+        updateBreaks();
       };
       var applyOrder = function () {
         sortBy(order.value, order2 ? order2.value : '', order3 ? order3.value : '');
