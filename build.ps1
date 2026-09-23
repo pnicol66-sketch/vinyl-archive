@@ -87,10 +87,13 @@ $mid = [string][char]0x00B7
 # Em dash, same reason - used in the section-header ledes below.
 $dash = [string][char]0x2014
 
-# Optional local config (gitignored - holds machine paths): extra photo roots
-# and per-album folder overrides for albums whose photos don't resolve:
+# Local config (gitignored - machine paths, and the prose guard's patterns):
+# extra photo roots, per-album folder overrides for albums whose photos don't
+# resolve, and "proseGuard" (see PROSE GUARD below - required, the build
+# refuses without it):
 #   { "photoRoots": ["D:\\More Albums"],
-#     "folderOverrides": { "<album slug>": "C:\\full\\path\\to\\album folder" } }
+#     "folderOverrides": { "<album slug>": "C:\\full\\path\\to\\album folder" },
+#     "proseGuard": { "source": "...", "domain": "...", "process": "...", "shops": "..." } }
 $ConfigFile = Join-Path $Site 'build.config.json'
 $FolderOverrides = @{}
 if (Test-Path $ConfigFile) {
@@ -645,9 +648,23 @@ if ($escapeHits.Count -gt 0) {
 }
 
 # (removed from the public history, 2026-11-08: the guard's patterns and notes live outside this repo)
-$proseSourceRx = [regex]"(?!)"
-$proseDomainRx = [regex]"(?!)"
-$proseProcessRx = [regex]"(?!)"
+$pg = if ($cfg) { $cfg.proseGuard } else { $null }
+$pgMissing = @(@('source', 'domain', 'process', 'shops') | Where-Object { -not ($pg -and ([string]$pg.$_).Trim()) })
+if ($pgMissing.Count -gt 0) {
+  throw ('build.config.json carries no prose guard patterns (' + ($pgMissing -join ', ') + ' missing under "proseGuard"), ' +
+    'so the prose guard cannot run - refusing to build. Install them from the private copy. Nothing was built.')
+}
+$proseSourceRx  = [regex]([string]$pg.source)
+$proseDomainRx  = [regex]([string]$pg.domain)
+$proseProcessRx = [regex]([string]$pg.process)
+$proseShopRx    = [regex]('^(?i)(' + [string]$pg.shops + ')$')
+# (removed from the public history, 2026-11-08: the guard's patterns and notes live outside this repo)
+foreach ($rxk in @(@('source', $proseSourceRx), @('domain', $proseDomainRx), @('process', $proseProcessRx), @('shops', $proseShopRx))) {
+  if ($rxk[1].IsMatch('')) {
+    throw ('The prose guard pattern "' + $rxk[0] + '" in build.config.json matches empty text, so it would ' +
+      'match every field - refusing to build. Reinstall the patterns from the private copy. Nothing was built.')
+  }
+}
 # (removed from the public history, 2026-11-08: the guard's patterns and notes live outside this repo)
 $proseSkip = @{ 'discogsListingUrl' = $true; 'ebayItemUrl' = $true; 'discogsUrl' = $true;
                 'slug' = $true; 'folderId' = $true; 'folderName' = $true; 'albumId' = $true;
@@ -659,7 +676,7 @@ function Test-Prose($node, [string]$path, [string]$slug) {
     # (removed from the public history, 2026-11-08: the guard's patterns and notes live outside this repo)
     foreach ($prx in @($proseSourceRx, $proseDomainRx, $proseProcessRx)) {
       $pm = $prx.Match($node)
-      while ($pm.Success -and $prx -eq $proseSourceRx -and $pm.Value -match '^(?i)(acoustic sounds|elusive disc|music direct)$') {
+      while ($pm.Success -and $pm.Length -gt 0 -and $prx -eq $proseSourceRx -and $proseShopRx.IsMatch($pm.Value)) {
         $b = $node.Substring([Math]::Max(0, $pm.Index - 40), [Math]::Min(40, $pm.Index))
         $a2 = $node.Substring([Math]::Min($node.Length, $pm.Index + $pm.Length), [Math]::Min(24, [Math]::Max(0, $node.Length - $pm.Index - $pm.Length)))
         if ($b -match "(?i)(?:[A-Za-z][A-Za-z.'-]*/|\b(?:under|owned by|bought by|acquired by|relaunch(?:ed)? under|part of|division of|imprint of)\s+(?:[A-Za-z][A-Za-z.'-]*[\s/])?)$" -or
