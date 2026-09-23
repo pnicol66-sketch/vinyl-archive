@@ -195,13 +195,14 @@
       });
     });
 
-    // Order-by: re-sort the cards in place, on the first key and then the
-    // second, which is subordinate to it and only breaks its ties. Year parses
+    // Order-by: re-sort the cards in place on up to three keys, each
+    // subordinate to the one before it and only breaking its ties. Year parses
     // the 4-digit key; 'default' is the order the build put the cards in (the
-    // "As listed" option on Available); every sort ends on artist, title and
+    // "As listed" option on Available and Sold); every sort ends on artist, title and
     // then that build order, so the result is stable whatever is chosen.
     var order = document.getElementById('orderby');
     var order2 = document.getElementById('orderby2');
+    var order3 = document.getElementById('orderby3');
     if (order) {
       var collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
       var attr = function (el, k) { return el.getAttribute('data-' + k) || ''; };
@@ -215,21 +216,24 @@
         }
         return collator.compare(attr(a, key), attr(b, key));
       };
-      var sortBy = function (key, key2) {
+      var sortBy = function (key, key2, key3) {
         cards.slice().sort(function (a, b) {
           return cmpKey(a, b, key) ||
             (key2 !== key ? cmpKey(a, b, key2) : 0) ||
+            (key3 !== key && key3 !== key2 ? cmpKey(a, b, key3) : 0) ||
             collator.compare(attr(a, 'artist'), attr(b, 'artist')) ||
             collator.compare(attr(a, 'title'), attr(b, 'title')) ||
             (seq(a) - seq(b));
         }).forEach(function (c) { grid.appendChild(unit(c)); });
       };
       var applyOrder = function () {
-        sortBy(order.value, order2 ? order2.value : '');
+        sortBy(order.value, order2 ? order2.value : '', order3 ? order3.value : '');
       };
       order.addEventListener('change', applyOrder);
       if (order2) order2.addEventListener('change', applyOrder);
-      // Match the control to what is shown: order by the first option once.
+      if (order3) order3.addEventListener('change', applyOrder);
+      // Match the grid to what the controls show (Artist, Year, Genre by
+      // default): order by them once on load.
       applyOrder();
     }
   }
