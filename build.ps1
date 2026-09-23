@@ -221,6 +221,60 @@ $RootIndex = '../' * ($prefixDepth + 1)   # section index + about
 # ---------- helpers ----------
 function HtmlEnc([string]$s) { return [System.Net.WebUtility]::HtmlEncode($s) }
 
+# The main genre an index files a record under, for the genre dividers in the
+# card grid (owner, 2026-09-22: "just do main/lead genres and consolidate").
+# The Genre cell is free text ("jazz/soul", "blues / r&b-soul", "vocal/jazz-soul
+# (reggae, soft rock, gospel)"), 28 distinct strings over 178 records, so a
+# divider per string would be mostly one-card sections. The LEAD genre decides:
+# the cell's parts are read in order (split on "/" and ",", brackets dropped)
+# and the first part that names a main genre wins, so "blues/jazz" is Blues and
+# "jazz/soul" is Jazz; a part naming none ("vocal") passes to the next. Within
+# a part the tests run in this order, so a compound files under the family it
+# is a style of: "soul-jazz" and "jazz-funk" are Jazz, "rock & roll" is Rock.
+# Stage & screen, soundtrack and spoken word say where or how a record was
+# used, not what the music is (owner, 2026-09-22), so they are no family: the
+# part passes and the record files under the genre of its music ("stage &
+# screen / jazz" is Jazz). A cell naming no main genre at all (a bare
+# "Soundtrack") returns '' and the record files under its ARTIST'S usual
+# genre - the main genre most of that artist's other records carry (owner,
+# 2026-09-22), tallied over the whole export by $ArtistLead before the card
+# loop; an artist with nothing else to go on files under Other.
+$LeadGenres = @(
+  @('Jazz',           '\bjazz'),
+  @('Soul & Funk',    '\bsoul\b|\bfunk|r\s*&\s*b|rhythm\s*(&|and)\s*blues|\bgospel|\bdisco'),
+  @('Blues',          '\bblues'),
+  # "rock" is bounded so the reggae styles Rocksteady and Rockers reach Reggae
+  # (rockabilly stays Rock), and hardcore techno reaches Electronic.
+  @('Rock',           '\brock(?!steady|ers\b)|\bpunk|\bhardcore\b(?!\s*techno)|\bmetal|\bgrunge|\bindie|psychedel'),
+  @('Pop',            '\bpop\b'),
+  @('Classical',      'classical|\bopera|baroque|orchestral|symphon|chamber'),
+  @('Folk & Country', '\bfolk|\bcountry|bluegrass|americana'),
+  @('Reggae',         'reggae|\bska\b|\bdub\b|rocksteady|\brockers\b'),
+  @('Hip Hop',        'hip[\s-]?hop|\brap\b'),
+  @('Electronic',     'electronic|techno|\bhouse\b|ambient'),
+  @('Latin',          '\blatin|salsa|bossa|samba|mambo'),
+  @('World',          '\bworld\b|\bafro|african'))
+function LeadGenre([string]$genre) {
+  $g = ($genre.ToLowerInvariant() -replace '\([^)]*\)', ' ')
+  foreach ($part in ($g -split '[/,]')) {
+    foreach ($fam in $LeadGenres) {
+      if ($part -match $fam[1]) { return $fam[0] }
+    }
+  }
+  return ''
+}
+# The name an artist's records file under on the index, lower-cased: the
+# sheet's file-under name, else the credit with a leading "The" dropped. The
+# card's data-artist sort key and the $ArtistLead tally share it.
+function ArtistFileKey($album) {
+  $fu = ([string]$album.fileUnder).Trim()
+  if (-not $fu) { $fu = ([string]$album.artist).Trim() -replace '^(?i)the\s+', '' }
+  return $fu.ToLowerInvariant()
+}
+function MainGenreCell([string]$genre) {
+  return (($genre.Trim() -split ' - ', 2)[0].Trim())
+}
+
 function Write-Utf8([string]$path, [string]$text) {
   [IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding($false)))
 }
@@ -776,6 +830,33 @@ $collectionCount = 0; $availableCount = 0; $soldCount = 0; $unlistedCount = 0
 $withdrawnCount = 0; $photosPurged = 0
 $slugSet = @{}
 
+# Each artist's usual main genre, for a record whose Genre cell names none
+# (see LeadGenre): the family most of the artist's records file under, over
+# every tab of the export; a tie goes to the family listed first in
+# $LeadGenres, so the answer never depends on row order.
+$leadTally = @{}
+foreach ($a in $json.albums) {
+  if ([string]$a.status -eq 'withdrawn') { continue }
+  $l = LeadGenre (MainGenreCell ([string]$a.genre))
+  if (-not $l) { continue }
+  $k = ArtistFileKey $a
+  # "Various Artists" is not an artist with a usual genre: every compilation
+  # shares the credit, so a various-artists soundtrack would otherwise take
+  # the genre of unrelated compilations. It gets no entry and files as Other.
+  if ($k -match '^(various( artists)?|v\.?\s?a\.?)$') { continue }
+  if (-not $leadTally.ContainsKey($k)) { $leadTally[$k] = @{} }
+  $leadTally[$k][$l] = 1 + [int]$leadTally[$k][$l]
+}
+$ArtistLead = @{}
+foreach ($k in $leadTally.Keys) {
+  $best = ''; $bestN = 0
+  foreach ($fam in $LeadGenres) {
+    $n = [int]$leadTally[$k][$fam[0]]
+    if ($n -gt $bestN) { $best = $fam[0]; $bestN = $n }
+  }
+  $ArtistLead[$k] = $best
+}
+
 foreach ($album in $json.albums) {
   $slug = $album.slug
   $slugSet[$slug] = $true
@@ -1092,13 +1173,15 @@ foreach ($album in $json.albums) {
   # tie-break in site.js. An export made before that field existed carries
   # none, so the old expression stays as the fallback: leading "The" dropped,
   # which is what the sheet now does unconditionally as well.
-  $fileUnder = ([string]$album.fileUnder).Trim()
-  if (-not $fileUnder) {
-    $fileUnder = ([string]$album.artist).Trim() -replace '^(?i)the\s+', ''
-  }
-  $artistKey = $fileUnder.ToLowerInvariant()
+  $artistKey = ArtistFileKey $album
   $titleKey  = ([string]$album.title).Trim().ToLowerInvariant()
-  $genreDisp = (([string]$album.genre).Trim() -split ' - ', 2)[0].Trim()
+  $genreDisp = MainGenreCell ([string]$album.genre)
+  $leadGenre = LeadGenre $genreDisp
+  if (-not $leadGenre) { $leadGenre = [string]$ArtistLead[$artistKey] }
+  if (-not $leadGenre) { $leadGenre = 'Other' }
+  # The divider a card sits under must be findable by its own name: the
+  # filter reads data-search, and "Soul & Funk" is in no Genre cell.
+  $search = ($search + ' ' + $leadGenre.ToLowerInvariant()).Trim()
   $genreKey  = $genreDisp.ToLowerInvariant()
   $labelKey  = ([string]$album.labelName).Trim().ToLowerInvariant()
   $yearNum   = if ([string]$album.year -match '(\d{4})') { $matches[1] } else { '9999' }
@@ -1108,7 +1191,8 @@ foreach ($album in $json.albums) {
   $cardHtml = '<a class="card" href="' + $p + $slug + '/" data-search="' +
     (HtmlEnc $search) + '" data-artist="' + (HtmlEnc $artistKey) + '" data-title="' +
     (HtmlEnc $titleKey) + '" data-genre="' + (HtmlEnc $genreKey) + '" data-label="' +
-    (HtmlEnc $labelKey) + '" data-year="' + $yearNum + '">' + $coverHtmlP +
+    (HtmlEnc $labelKey) + '" data-year="' + $yearNum + '" data-lead="' +
+    (HtmlEnc $leadGenre) + '">' + $coverHtmlP +
     '<div class="meta"><p class="t">' + $enc.title + '</p><p class="a">' + $enc.artist +
     '</p><p class="y">' + $metaLine + '</p>' + $soldLine + '</div></a>'
   # Unlisted albums keep their page and their URL but get no card on any
