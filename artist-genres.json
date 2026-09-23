@@ -1,6 +1,7 @@
 {
   "_comment": "The owner's choice of genre divider for an artist, where the count of the artist's records' genres does not give the right answer (a tie, or a majority filed differently). Keyed by the name the artist files under on the site (case ignored). The value must be a divider build.ps1 knows ($LeadGenres: Jazz, Soul & Funk, Blues, Rock, Pop, Classical, Folk & Country, Reggae, Hip Hop, Electronic, Latin, World) or Other; anything else is refused with a warning.",
   "artists": {
-    "Bo Diddley": "Rock"
+    "Bo Diddley": "Rock",
+    "King Curtis": "Blues"
   }
 }
