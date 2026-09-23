@@ -1302,9 +1302,11 @@ function Render-Index([string]$title, [string]$lede, [string]$desc,
     $sortOpts = @(
       @('artist', 'Artist'), @('title', 'Album'), @('genre', 'Genre'),
       @('label', 'Label'), @('year', 'Year'))
-    # Every index opens ordered Artist, then Year, then Genre (owner,
-    # 2026-09-22): each select carries its default as `selected`, and site.js
-    # applies whatever the three selects hold on load.
+    # Every index opens grouped by main genre (the dividers, site.js) and
+    # ordered Artist, then Year within each (owner, 2026-09-22): each select
+    # carries its default as `selected`, and site.js applies whatever the two
+    # hold on load. A third "then by" select (Genre) shipped the same morning
+    # and was taken out once the genre dividers made it redundant.
     $optsFor = {
       param([string]$sel)
       ($sortOpts | ForEach-Object {
@@ -1325,8 +1327,8 @@ function Render-Index([string]$title, [string]$lede, [string]$desc,
         '        <button type="button" data-view="list" aria-pressed="false">List</button>' + $nl +
         '      </div>' + $nl
     }
-    # Three selects: each is subordinate to the one before it and only breaks
-    # its ties. The second and third can be set to "Nothing".
+    # Two selects: the second is subordinate to the first and only breaks its
+    # ties; it can be set to "Nothing".
     $controls =
       '    <div class="viewrow">' + $nl +
       $view +
@@ -1339,12 +1341,6 @@ function Render-Index([string]$title, [string]$lede, [string]$desc,
       '        <select id="orderby2">' + $nl +
       '          <option value="">Nothing</option>' + $nl +
       (& $optsFor 'year') + $nl +
-      '        </select>' + $nl +
-      '      </label>' + $nl +
-      '      <label class="orderby"><span class="orderby-label">then by</span>' + $nl +
-      '        <select id="orderby3">' + $nl +
-      '          <option value="">Nothing</option>' + $nl +
-      (& $optsFor 'genre') + $nl +
       '        </select>' + $nl +
       '      </label>' + $nl +
       '    </div>'
