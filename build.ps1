@@ -694,7 +694,15 @@ function Test-Prose($node, [string]$path, [string]$slug) {
         }
         break
       }
-      if ($pm.Success) {        return
+      # RECORD THE HIT, THEN STOP (restored 2026-09-23). An edit on 2026-09-19
+      # dropped the two lines below and kept only the return, so this guard
+      # refused nothing for four days and every build passed it. It is now
+      # proven by running it on a planted copy (build.ps1 -CheckOnly -Data),
+      # never by reading this file.
+      if ($pm.Success) {
+        $ps = [Math]::Max(0, $pm.Index - 30); $pe = [Math]::Min($node.Length, $pm.Index + $pm.Length + 30)
+        $proseHits.Add(("{0}.{1}: ...{2}..." -f $slug, $path, $node.Substring($ps, $pe - $ps).Replace("`n", ' ')))
+        return
       }
     }
     return
