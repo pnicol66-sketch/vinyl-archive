@@ -644,31 +644,21 @@ if ($escapeHits.Count -gt 0) {
     "in the sheet and re-export. Nothing was built.")
 }
 
-# PROSE GUARD (rule 37, 2026-09-18): the published prose describes the record,
-# never the research. An export naming a research source (Discogs, Popsike,
-# eBay, the Steve Hoffman forum, a label-history site, a release id, a web
-# address the record does not print) or narrating the checking (the
-# photographs, the transcriptions, the collector, "not seen", "unconfirmed",
-# "flagged") in LP Notes, Label Notes, Fidelity, General Notes, the story or
-# the chronology is refused, like a price. The patterns mirror
-# VR_PROSE_SOURCE_RE_ / VR_PROSE_DOMAIN_RE_ / VR_PROSE_PROCESS_RE_ in the
-# sheet script, where "Vinyl Curator > Check catalogue prose (read only)"
-# finds and rewrites the rows - keep the two in step.
+# PROSE GUARD (2026-09-18): the published text describes the record itself.
+# An export whose text says where a fact came from (a site, a database, a
+# forum, a release number, a web address the record does not print) or how it
+# was checked is refused, like a price. Keep these patterns in step with the
+# sheet's own check.
 $proseSourceRx = [regex]"(?i)\b(discogs|popsike|e-?bay|steve hoffman|stevehoffman|hoffman(?:'s)? forums?|bsnpubs|london ?jazz ?collector|45worlds|45cat|musicbrainz|analog ?planet|acoustic sounds(?!\s+series)|elusive disc|music direct|valueyourmusic|vinylbeat|cvinyl|globaldog|organissimo|wikipedia|rateyourmusic|catalogue server|evidence block|price evidence|the evidence on file|the catalogue's other cells|the sheet's)\b|\breleases?\s+#?\d{5,9}(?:\s*(?:,|and|/|&|;)\s*(?:r)?\d{5,9})*\b|\br\d{6,9}\b"
 $proseDomainRx = [regex]"(?i)(?<!(?:address|printed|prints|reads|text|barcode|contact block|carries|shows|url)[:,]?\s*(?:the\s+)?[""']?)(https?://[^\s)]+|\bwww\.[a-z0-9.-]+|\b[a-z0-9][a-z0-9-]*\.(?:com|org|net|tv|info|de|fr|co\.uk)\b)(?!\s+(?:web address|address|printed|on the (?:back|jacket|cover|label|sleeve)))"
 $proseProcessRx = [regex]"(?i)\b(the collector's|the collector\b(?! (?:hierarchy|market|world|community|base))|recorded by the collector|collector-recorded|deep groove: ?(?:seen|not seen|cannot tell|recorded)|(?:supplied|provided|attached|uploaded|available) (?:label |cover |side[- ]label |back[- ]cover |front[- ]cover )?(?:photo|photograph|scan)s?|(?:in|from|on|per) (?:the|these|both|this|any|either) (?:label |cover |side[- ]label |side |back[- ]cover |front[- ]cover |supplied |provided |available |two |four )?(?:photo|photograph|scan)s?\b(?! (?:by|credit|of the|of a|taken|shot))|(?:the|these|both) (?:label |cover |side |supplied )?(?:photo|photograph|scan)s? (?:supplied|provided|show|shows|showed|do not|does not|did not|confirm|confirms|cannot|can't|are|is|were|was)|(?:runout|matrix|dead-?wax|typed|collector's) transcriptions?|transcription (?:slip|error|variance|misread)|as transcribed|transcribed (?:here|as|by the collector)|as typed|typed (?:runout|matrix|entry|transcription|dead-?wax)s?|\bOCR\b|not (?:visible|seen|legible|shown) (?:in|on|from) (?:the|any|this|these|either)|not (?:confirmed|asserted|verified|verifiable)|un(?:confirmed|verified)|cannot (?:tell|be confirmed|be verified|be pinned|be determined|be ruled|be checked)|could not be (?:confirmed|verified|determined|pinned|ruled|measured|checked)|can't be (?:confirmed|verified|determined)|worth (?:re)?check(?:ing)?|to rule out|flagged|noted only|a question,? not|this block|the evidence block|(?:the|our|this) research(?! (?:into|by|of))|research (?:found|confirms|confirmed|shows|showed|indicates|did not|could not)|web search|was searched|search(?:es)? (?:found|returned|turned up)|no (?:[A-Za-z'-]+ ){0,5}(?:thread|consensus|reference|source|listing|shootout|review)s? (?:was|were|has been|have been|could be) (?:found|located|traced|identified)|(?:was|were) (?:found|traced|located) (?:on|at|in) (?:the (?:forums?|archive)|a (?:forum|database)))\b"
-# EVERY PUBLISHED STRING, NOT A NAMED LIST (2026-09-19). This guard was an
-# INCLUDE list of six fields while the price guard eight lines above walks every
-# property of every album recursively - so a model-written field that was not on
-# the list published whatever it liked. Three were: countryOfOrigin, year and
-# monoStereo, all model-written (the guide asks for country "determined from
-# label and rim text, jacket print, matrix/runout conventions" and to "add a
-# brief qualifier when it matters") and all rendered onto the album page and its
-# subtitle. Eight leaks were live on the site on 2026-09-19, among them
-# "US (Made in Mexico per Discogs pressing-plant credit)" and "not established
-# (no dated Discogs listing, bsnpubs entry, or dealer record ... was found in
-# this search)". So the guard is now structural like its neighbour, with an
-# EXCLUDE list for the fields that carry a source on purpose.
+# EVERY PUBLISHED STRING, NOT A NAMED LIST (2026-09-19). This guard began as an
+# INCLUDE list of six fields while the price guard above walks every property
+# of every album recursively, so a field that was not on the list published
+# whatever it held. Three did - countryOfOrigin, year and monoStereo, all
+# rendered onto the album page and its subtitle - and eight such strings were
+# live on the site on 2026-09-19. So the guard is now structural like its
+# neighbour, with an EXCLUDE list for the fields that carry a link on purpose.
 $proseSkip = @{ 'discogsListingUrl' = $true; 'ebayItemUrl' = $true; 'discogsUrl' = $true;
                 'slug' = $true; 'folderId' = $true; 'folderName' = $true; 'albumId' = $true;
                 'images' = $true; 'photos' = $true; 'status' = $true }
@@ -676,12 +666,12 @@ $proseHits = New-Object System.Collections.Generic.List[string]
 function Test-Prose($node, [string]$path, [string]$slug) {
   if ($null -eq $node) { return }
   if ($node -is [string]) {
-    # A DEALER'S NAME IS NOT ALWAYS A CITATION (2026-09-19), and this guard has
-    # to agree with vrProseHits_ in the sheet script or the two disagree about
-    # the same album: the three specialist dealers are also EDITIONS and
-    # COMPANIES in a record's own history. "the 2023 Verve/Acoustic Sounds
-    # audiophile edition" and "the label's relaunch under Mike Ritter/Music
-    # Direct" are facts of the record, not sources.
+    # A SHOP'S NAME IS NOT ALWAYS A CITATION (2026-09-19), and this guard has
+    # to agree with the sheet's own check or the two disagree about the same
+    # album: the three names below are also EDITIONS and COMPANIES in a
+    # record's own history. After "under", "owned by" or a label and a slash,
+    # or before "series", "edition", "reissue" and the like, the name is a
+    # fact of the record, not a source.
     foreach ($prx in @($proseSourceRx, $proseDomainRx, $proseProcessRx)) {
       $pm = $prx.Match($node)
       while ($pm.Success -and $prx -eq $proseSourceRx -and $pm.Value -match '^(?i)(acoustic sounds|elusive disc|music direct)$') {
