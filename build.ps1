@@ -235,10 +235,11 @@ function HtmlEnc([string]$s) { return [System.Net.WebUtility]::HtmlEncode($s) }
 # used, not what the music is (owner, 2026-09-22), so they are no family: the
 # part passes and the record files under the genre of its music ("stage &
 # screen / jazz" is Jazz). A cell naming no main genre at all (a bare
-# "Soundtrack") returns '' and the record files under its ARTIST'S usual
-# genre - the main genre most of that artist's other records carry (owner,
-# 2026-09-22), tallied over the whole export by $ArtistLead before the card
-# loop; an artist with nothing else to go on files under Other.
+# "Soundtrack") returns '' and counts toward nothing. The CARD files under its
+# ARTIST'S main genre - the family most of the artist's records carry, tallied
+# over the whole export by $ArtistLead before the card loop - so one artist
+# never splits across dividers (owner, 2026-09-22); a bare soundtrack goes
+# with its artist the same way, and an artist with nothing to go on is Other.
 $LeadGenres = @(
   @('Jazz',           '\bjazz'),
   @('Soul & Funk',    '\bsoul\b|\bfunk|r\s*&\s*b|rhythm\s*(&|and)\s*blues|\bgospel|\bdisco'),
@@ -830,8 +831,8 @@ $collectionCount = 0; $availableCount = 0; $soldCount = 0; $unlistedCount = 0
 $withdrawnCount = 0; $photosPurged = 0
 $slugSet = @{}
 
-# Each artist's usual main genre, for a record whose Genre cell names none
-# (see LeadGenre): the family most of the artist's records file under, over
+# Each artist's main genre, which every card of that artist files under (see
+# LeadGenre): the family most of the artist's records name as their lead, over
 # every tab of the export; a tie goes to the family listed first in
 # $LeadGenres, so the answer never depends on row order.
 $leadTally = @{}
@@ -1176,8 +1177,13 @@ foreach ($album in $json.albums) {
   $artistKey = ArtistFileKey $album
   $titleKey  = ([string]$album.title).Trim().ToLowerInvariant()
   $genreDisp = MainGenreCell ([string]$album.genre)
-  $leadGenre = LeadGenre $genreDisp
-  if (-not $leadGenre) { $leadGenre = [string]$ArtistLead[$artistKey] }
+  # An artist's records all sit under the artist's main genre (owner,
+  # 2026-09-22: Nina Simone had been split over Jazz, Soul & Funk, Blues and
+  # Pop by her records' own cells). The record's own lead genre is used only
+  # where the artist has no main genre: Various Artists, or a credit whose
+  # every cell names none (then Other).
+  $leadGenre = [string]$ArtistLead[$artistKey]
+  if (-not $leadGenre) { $leadGenre = LeadGenre $genreDisp }
   if (-not $leadGenre) { $leadGenre = 'Other' }
   # The divider a card sits under must be findable by its own name: the
   # filter reads data-search, and "Soul & Funk" is in no Genre cell.
