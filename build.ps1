@@ -740,8 +740,8 @@ foreach ($a in $json.albums) {
 }
 if ($proseHits.Count -gt 0) {
   $proseHits | ForEach-Object { Write-Host "PROSE: $_" -ForegroundColor Red }
-  throw ("Prose guard failed - " + $proseHits.Count + " field(s) name a research source or narrate the checking. " +
-    "Run 'Vinyl Curator > Check catalogue prose (read only)' in the sheet, rewrite the listed rows, re-export. Nothing was built.")
+  throw ("Prose guard failed - " + $proseHits.Count + " field(s) say where a fact came from or how it was checked. " +
+    "Rewrite the listed fields in the sheet and re-export. Nothing was built.")
 }
 
 # EMPTY-EXPORT GUARD: an export carrying zero albums is almost always a failed
