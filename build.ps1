@@ -93,7 +93,8 @@ $dash = [string][char]0x2014
 # refuses without it):
 #   { "photoRoots": ["D:\\More Albums"],
 #     "folderOverrides": { "<album slug>": "C:\\full\\path\\to\\album folder" },
-#     "proseGuard": { "source": "...", "domain": "...", "process": "...", "shops": "..." } }
+#     "proseGuard": { "source": "...", "domain": "...", "process": "...", "shops": "...",
+#                     "short": "...", "shortFields": [ "year", ... ] } }
 $ConfigFile = Join-Path $Site 'build.config.json'
 $FolderOverrides = @{}
 if (Test-Path $ConfigFile) {
@@ -655,12 +656,14 @@ if ($escapeHits.Count -gt 0) {
 #
 # THE PATTERNS ARE NOT IN THIS REPO (2026-09-23). They have to name what they
 # refuse, so they live in build.config.json (gitignored, machine-local) under
-# "proseGuard" - source, domain, process and shops - installed there from a
-# private copy. Without all four the build REFUSES rather than skip the guard:
-# a guard that quietly stops running is how this one went four days refusing
-# nothing.
+# "proseGuard" - source, domain, process, shops, and short + shortFields (a
+# stricter pattern read over the short fields only - year, country, credits -
+# where a qualifier must be a fact, never a hedge) - installed there from a
+# private copy. Without every one of them the build REFUSES rather than skip
+# the guard: a guard that quietly stops running is how this one went four days
+# refusing nothing.
 $pg = if ($cfg) { $cfg.proseGuard } else { $null }
-$pgMissing = @(@('source', 'domain', 'process', 'shops') | Where-Object { -not ($pg -and ([string]$pg.$_).Trim()) })
+$pgMissing = @(@('source', 'domain', 'process', 'shops', 'short', 'shortFields') | Where-Object { -not ($pg -and ([string]$pg.$_).Trim()) })
 if ($pgMissing.Count -gt 0) {
   throw ('build.config.json carries no prose guard patterns (' + ($pgMissing -join ', ') + ' missing under "proseGuard"), ' +
     'so the prose guard cannot run - refusing to build. Install them from the private copy. Nothing was built.')
@@ -669,9 +672,24 @@ $proseSourceRx  = [regex]([string]$pg.source)
 $proseDomainRx  = [regex]([string]$pg.domain)
 $proseProcessRx = [regex]([string]$pg.process)
 $proseShopRx    = [regex]('^(?i)(' + [string]$pg.shops + ')$')
+$proseShortRx   = [regex]([string]$pg.short)
+$proseShortFields = @{}
+foreach ($sf in @($pg.shortFields)) { if ([string]$sf) { $proseShortFields[[string]$sf] = $true } }
+# The short field list is a hand-kept list, so it is checked against the export
+# (2026-09-23): an entry that is not a plain name, or a name no album carries (a
+# typo, a renamed export key), would leave that field unread and say nothing.
+$sfBad = @(@($pg.shortFields) | Where-Object { -not ($_ -is [string]) -or -not $_.Trim() })
+$sfKnown = @{}
+foreach ($a in @($json.albums)) { if ($a) { foreach ($p in $a.PSObject.Properties) { $sfKnown[$p.Name] = $true } } }
+$sfUnknown = @(@($pg.shortFields) | Where-Object { ($_ -is [string]) -and $_.Trim() -and $sfKnown.Count -gt 0 -and -not $sfKnown.ContainsKey($_) })
+if (-not ($pg.shortFields -is [array]) -or $sfBad.Count -gt 0 -or $sfUnknown.Count -gt 0) {
+  throw ('The prose guard''s shortFields in build.config.json must be a list of export field names' +
+    $(if ($sfUnknown.Count) { ' (no album carries: ' + ($sfUnknown -join ', ') + ')' } elseif ($sfBad.Count -or -not ($pg.shortFields -is [array])) { ' (an entry is not a name)' } else { '' }) +
+    ' - refusing to build. Reinstall the patterns from the private copy. Nothing was built.')
+}
 # A pattern that matches empty text matches EVERY field, and would spin the
 # shop-name loop below on a zero-length match - refuse it like a missing one.
-foreach ($rxk in @(@('source', $proseSourceRx), @('domain', $proseDomainRx), @('process', $proseProcessRx), @('shops', $proseShopRx))) {
+foreach ($rxk in @(@('source', $proseSourceRx), @('domain', $proseDomainRx), @('process', $proseProcessRx), @('shops', $proseShopRx), @('short', $proseShortRx))) {
   if ($rxk[1].IsMatch('')) {
     throw ('The prose guard pattern "' + $rxk[0] + '" in build.config.json matches empty text, so it would ' +
       'match every field - refusing to build. Reinstall the patterns from the private copy. Nothing was built.')
@@ -697,7 +715,11 @@ function Test-Prose($node, [string]$path, [string]$slug) {
     # record's own history. After "under", "owned by" or a label and a slash,
     # or before "series", "edition", "reissue" and the like, the name is a
     # fact of the record, not a source.
-    foreach ($prx in @($proseSourceRx, $proseDomainRx, $proseProcessRx)) {
+    # A SHORT field (year, country, the credits) also answers to the short
+    # pattern; the long prose never does (2026-09-23).
+    $rxs = @($proseSourceRx, $proseDomainRx, $proseProcessRx)
+    if ($proseShortFields.ContainsKey(($path -split '[.\[]')[0])) { $rxs += $proseShortRx }
+    foreach ($prx in $rxs) {
       $pm = $prx.Match($node)
       while ($pm.Success -and $pm.Length -gt 0 -and $prx -eq $proseSourceRx -and $proseShopRx.IsMatch($pm.Value)) {
         $b = $node.Substring([Math]::Max(0, $pm.Index - 40), [Math]::Min(40, $pm.Index))
