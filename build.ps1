@@ -307,6 +307,10 @@ function MainGenreCell([string]$genre) {
 }
 
 function Write-Utf8([string]$path, [string]$text) {
+  # LF only: StringBuilder.AppendLine writes the platform's CRLF on Windows, and
+  # this repo keeps core.autocrlf off (the asset hashes are of the content), so
+  # an unnormalised page would commit every line of every page as changed.
+  $text = $text -replace "`r`n", "`n"
   [IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding($false)))
 }
 
