@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-24T03:03:48.812Z",
+ "generated": "2026-09-25T02:21:13.988Z",
  "site": {
   "title": "Vinyl Curator",
   "baseUrl": "https://vinylcurator.net",
@@ -8016,6 +8016,51 @@
    "slug": "the-original-american-folk-blues-festival-the-original-american-folk-blues-festival",
    "tab": "Collection",
    "fileUnder": "Various Artists"
+  },
+  {
+   "artist": "Bobbie Gentry",
+   "title": "The Delta Sweete",
+   "year": "1968",
+   "labelName": "Capitol Records",
+   "labelNumber": "ST 2842",
+   "monoStereo": "Stereo",
+   "countryOfOrigin": "US",
+   "format": "LP",
+   "genre": "Country/Pop - Southern Gothic Concept Album",
+   "speed": "33 1/3 RPM",
+   "producer": "Kelly Gordon",
+   "composer": "",
+   "conductor": "",
+   "performerOrchestra": "",
+   "musicians": "Bobbie Gentry (vocals, guitar); uncredited on the jacket: members of the Wrecking Crew studio ensemble under arrangers Jimmie Haskell and Shorty Rogers",
+   "coverGrade": "EX",
+   "vinylGrade": "NM-",
+   "matrix": {
+    "a": "ST-1-2842-B3 1 *",
+    "b": "ST-2-2842-B3 1 *",
+    "c": "",
+    "d": ""
+   },
+   "sides": [
+    "1. Okolona River Bottom Band\n2. Big Boss Man\n3. Reunion\n4. Parchman Farm\n5. Mornin' Glory\n6. Sermon",
+    "1. Tobacco Road\n2. Penduli Pendulum\n3. Jessye' Lisabeth\n4. Refractions\n5. Louisiana Man\n6. Courtyard",
+    "",
+    ""
+   ],
+   "albumStory": "Bobbie Gentry made this record in the year following the unexpected, massive success of her debut single, using it to expand the rural Mississippi Delta imagery of that hit into a full song-cycle rather than repeat its formula. She wrote the bulk of the material herself, weaving originals about childhood, family, and small-town Delta life around a handful of well-chosen covers, and she takes explicit aim at a folk and blues lineage by including songs associated with Lightnin' Hopkins-adjacent country blues, Jimmy Reed, John D. Loudermilk, and Mose Allison alongside her own writing. The album is conceived as a loose song-suite -",
+   "lpNotes": "1st press (stereo, 1968) - Capitol black rainbow-rim label with the shorter \"Mfd. by Capitol...\" rim text, ahead of the following year's \"a subsidiary of...\" repress wording.",
+   "labelNotes": "The labels on this copy are the black Capitol design with the rainbow color band around the rim and the oval Capitol Records logo at the top, with \"Mfd. by Capitol...\" text running along the bottom rim - this is the earlier of the two rim-text settings used for this catalogue number, the later repress substituting a longer \"a subsidiary of...\" credit in the same spot. That places this pressing in the first issue window rather than the following year's repress, which used the revised rim wording on an otherwise identical black rainbow design. No pressing-plant code or design table exists for this label beyond that rim-text distinction, so finer stamper-era dating rests on the runout etchings alone.",
+   "fidelity": "This is an original-era Capitol pressing cut from the 1968 master tapes rather than any later remaster, with the arrangement work of Jimmie Haskell and Shorty Rogers carrying a fuller, more layered production than Gentry's debut. Collectors on the forums generally regard the era-correct Capitol stereo pressings as the most natural-sounding versions of this record, ahead of the flatter-sounding club and budget reissues from the early 1970s and well ahead of the compressed CD transfers that circulated for years before the 2020 reissue program. Against later specialist reissue work, most listeners still rate a clean original Capitol pressing as sonically comparable if not preferable, since no widely acclaimed audiophile remaster of this specific title predates the 2020 series.",
+   "generalNotes": "1968 Capitol ST 2842 stereo - an original-issue pressing. The black rainbow-band label carries the shorter \"Mfd. by Capitol...\" rim credit rather than the revised \"a subsidiary of...\" wording used on the 1969 repress of the same catalogue number, placing this copy in the first issue window. Side 1 runs ST-1-2842-B3 and side 2 ST-2-2842-B3 in the deadwax, consistent with the earliest etching series cut for this release.",
+   "discogsListingUrl": "",
+   "ebayItemUrl": "",
+   "soldDate": "",
+   "variantChronology": "1968 - US black Capitol label, rainbow rim, oval logo, \"Mfd. by Capitol...\" rim text, stereo  <- this copy\n1968 - US mono pressing (T 2842)\n1968 - UK pressing (T 2842 mono / ST 2842 stereo)\n1969 - US repress with revised rim text (\"a subsidiary of...\") - no documented sale of this variant\n1971-1972 - UK/Australia budget reissues (Music For Pleasure, World Record Club) - no documented sale of this variant\n2020 - deluxe/reissue LP editions - no documented sale of this variant",
+   "folderName": "Bobue Gentry_The Delta Sweete",
+   "folderId": "11cw0PPNQb0S1JaisXPAS3LfUdZrJ9jTQ",
+   "slug": "bobue-gentry-the-delta-sweete",
+   "tab": "Collection",
+   "fileUnder": "Bobbie Gentry"
   },
   {
    "artist": "Aretha Franklin",
