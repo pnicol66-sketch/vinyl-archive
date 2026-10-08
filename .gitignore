@@ -15,3 +15,4 @@ collections/*/.urls.txt
 # already committed: `git rm -r --cached albums/*/img` (this does not reclaim
 # history, it only stops future growth).
 albums/*/img/
+publish-alert.local.xml
