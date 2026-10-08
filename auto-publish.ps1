@@ -36,6 +36,44 @@ function Finish([int]$code) {
   if ($Manual) { Read-Host 'Press Enter to close' | Out-Null }
   exit $code
 }
+function Save-State {
+  @{ published = $state.published; attempted = $state.attempted; attempts = $state.attempts
+     failure = $state.failure; alerted = $state.alerted; alertTries = $state.alertTries; alertNote = $state.alertNote } |
+    ConvertTo-Json | Set-Content -Path $StateFile -Encoding UTF8
+}
+
+# A held export (3 failed attempts) is emailed once - see publish-alert.ps1.
+# An email that does not go is tried again on the next ticks, five times in all.
+try { . (Join-Path $Site 'publish-alert.ps1') } catch {}
+function Send-HoldAlert([string]$gen) {
+  if (-not (Get-Command Send-PublishAlert -ErrorAction SilentlyContinue)) { return }
+  if ($state.alerted -eq $gen -or $state.alertTries -ge 5) { return }
+  if (-not (Test-Path $AlertFile)) {   # not set up: say so once per export, keep the tries
+    if ($state.alertNote -ne $gen) {
+      $state.alertNote = $gen; Save-State
+      Log "ALERT EMAIL NOT SENT: not set up - run setup-publish-alert.ps1"
+    }
+    return
+  }
+  $reason = $state.failure
+  if ($reason -eq '') { $reason = '(not captured - see the log)' }
+  $body = "The vinylcurator.net publish FAILED 3 times on the same export and is holding.`r`n`r`n" +
+    "Export:        $gen`r`n" +
+    "Live site is:  the export of $(if ($state.published) { $state.published } else { '(unknown)' })`r`n`r`n" +
+    "What the build said:`r`n$reason`r`n`r`n" +
+    "Fix what it names in the sheet, then publish again from the sheet (Website > Publish Vinyl Site...).`r`n" +
+    "A new export clears the hold.`r`n`r`n" +
+    "Full log: $LogFile on $env:COMPUTERNAME"
+  $why = Send-PublishAlert "vinylcurator.net publish FAILED (export $gen)" $body
+  if ($why -eq '') {
+    $state.alerted = $gen; $state.alertTries = 0
+    Log "alert email sent for $gen"
+  } else {
+    $state.alertTries = $state.alertTries + 1
+    Log ("ALERT EMAIL NOT SENT (try " + $state.alertTries + " of 5): " + $why)
+  }
+  Save-State
+}
 
 # Skip when Drive is not mounted or the file is mid-sync.
 try {
@@ -51,13 +89,17 @@ try {
   Finish 0
 }
 
-$state = @{ published = ''; attempted = ''; attempts = 0 }
+$state = @{ published = ''; attempted = ''; attempts = 0; failure = ''; alerted = ''; alertTries = 0; alertNote = '' }
 if (Test-Path $StateFile) {
   try {
     $s = Get-Content -Raw $StateFile | ConvertFrom-Json
     $state.published = [string]$s.published
     $state.attempted = [string]$s.attempted
     $state.attempts = [int]$s.attempts
+    $state.failure = [string]$s.failure
+    $state.alerted = [string]$s.alerted
+    $state.alertTries = [int]$s.alertTries
+    $state.alertNote = [string]$s.alertNote
   } catch {}
 }
 # Scheduled (windowless) mode acts ONLY on a publish request queued by the
@@ -77,7 +119,10 @@ if ($gen -eq $state.published) {
   if ($Manual) { Write-Host "Site is already up to date with the latest export ($gen)." }
   Finish 0
 }
-if (-not $Manual -and $gen -eq $state.attempted -and $state.attempts -ge 3) { exit 0 }
+if (-not $Manual -and $gen -eq $state.attempted -and $state.attempts -ge 3) {
+  Send-HoldAlert $gen
+  exit 0
+}
 
 Log "new export detected (generated $gen) - building"
 try { git -C $Site pull --rebase --autostash | Out-Null } catch {}
@@ -87,18 +132,21 @@ if ($Manual) {
   $buildOut | Out-String -Stream | Out-File -FilePath $LogFile -Append -Encoding utf8
 } else {
   & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Site 'build.ps1') -Push *>&1 |
-    Out-String -Stream | Out-File -FilePath $LogFile -Append -Encoding utf8
+    Out-String -Stream | Tee-Object -Variable buildOut | Out-File -FilePath $LogFile -Append -Encoding utf8
 }
-if ($LASTEXITCODE -eq 0) {
-  $state.published = $gen; $state.attempted = ''; $state.attempts = 0
+$buildCode = $LASTEXITCODE
+if ($buildCode -eq 0) {
+  $state.published = $gen; $state.attempted = ''; $state.attempts = 0; $state.failure = ''
   Log "published $gen"
 } else {
+  if ($state.attempted -ne $gen) { $state.attempts = 0; $state.alertTries = 0 }   # a new export starts its own count
   $state.attempted = $gen; $state.attempts = $state.attempts + 1
+  try { $state.failure = Get-FailureSummary $buildOut } catch { $state.failure = '' }
   Log ("BUILD/PUSH FAILED (attempt " + $state.attempts + " of 3) - see output above")
   if ($state.attempts -ge 3) { Log "holding until a new export appears" }
 }
-@{ published = $state.published; attempted = $state.attempted; attempts = $state.attempts } |
-  ConvertTo-Json | Set-Content -Path $StateFile -Encoding UTF8
+Save-State
+if ($buildCode -ne 0 -and $state.attempts -ge 3 -and -not $Manual) { Send-HoldAlert $gen }
 
 # Cap the log.
 try {
