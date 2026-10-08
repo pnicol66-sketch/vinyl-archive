@@ -13,8 +13,11 @@ if ($from -eq '') { Write-Host 'No address - nothing saved.'; Read-Host 'Press E
 $to = (Read-Host "Send alerts TO (press Enter for $from)").Trim()
 if ($to -eq '') { $to = $from }
 
-$cred = Get-Credential -UserName $from -Message 'Paste the 16-letter Gmail APP PASSWORD as the password'
-if (-not $cred) { Write-Host 'Cancelled - nothing saved.'; Read-Host 'Press Enter to close' | Out-Null; exit 1 }
+# Asked in the console, never a pop-up: Get-Credential's dialog can open behind
+# the console and leave the script waiting on a window nobody can find.
+$pw = Read-Host 'Paste the 16-letter Gmail APP PASSWORD (right-click pastes; nothing shows as you paste), then Enter' -AsSecureString
+if ($pw.Length -eq 0) { Write-Host 'No password - nothing saved.'; Read-Host 'Press Enter to close' | Out-Null; exit 1 }
+$cred = New-Object Management.Automation.PSCredential ($from, $pw)
 
 @{ From = $from; To = $to; Credential = $cred } | Export-Clixml -Path $AlertFile
 
