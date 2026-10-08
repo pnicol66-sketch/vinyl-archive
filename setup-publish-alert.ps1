@@ -19,7 +19,12 @@ $pw = Read-Host 'Paste the 16-letter Gmail APP PASSWORD (right-click pastes; not
 if ($pw.Length -eq 0) { Write-Host 'No password - nothing saved.'; Read-Host 'Press Enter to close' | Out-Null; exit 1 }
 $cred = New-Object Management.Automation.PSCredential ($from, $pw)
 
-@{ From = $from; To = $to; Credential = $cred } | Export-Clixml -Path $AlertFile
+# The production sheet's link, so the alert can open it in one click.
+$oldUrl = Get-AlertSheetUrl
+$sheet = (Read-Host "Production sheet link (optional; press Enter to $(if ($oldUrl) { 'keep the saved one' } else { 'skip' }))").Trim()
+if ($sheet -eq '') { $sheet = $oldUrl }
+
+@{ From = $from; To = $to; Credential = $cred; SheetUrl = $sheet } | Export-Clixml -Path $AlertFile
 
 $why = Send-PublishAlert 'vinylcurator.net publish alert - test' (
   "This is a test from setup-publish-alert.ps1 on $env:COMPUTERNAME.`r`n`r`n" +

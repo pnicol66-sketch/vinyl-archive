@@ -38,7 +38,7 @@ function Finish([int]$code) {
 }
 function Save-State {
   @{ published = $state.published; attempted = $state.attempted; attempts = $state.attempts
-     failure = $state.failure; alerted = $state.alerted; alertTries = $state.alertTries; alertNote = $state.alertNote } |
+     failure = $state.failure; guide = $state.guide; alerted = $state.alerted; alertTries = $state.alertTries; alertNote = $state.alertNote } |
     ConvertTo-Json | Set-Content -Path $StateFile -Encoding UTF8
 }
 
@@ -55,16 +55,8 @@ function Send-HoldAlert([string]$gen) {
     }
     return
   }
-  $reason = $state.failure
-  if ($reason -eq '') { $reason = '(not captured - see the log)' }
-  $body = "The vinylcurator.net publish FAILED 3 times on the same export and is holding.`r`n`r`n" +
-    "Export:        $gen`r`n" +
-    "Live site is:  the export of $(if ($state.published) { $state.published } else { '(unknown)' })`r`n`r`n" +
-    "What the build said:`r`n$reason`r`n`r`n" +
-    "Fix what it names in the sheet, then publish again from the sheet (Website > Publish Vinyl Site...).`r`n" +
-    "A new export clears the hold.`r`n`r`n" +
-    "Full log: $LogFile on $env:COMPUTERNAME"
-  $why = Send-PublishAlert "vinylcurator.net publish FAILED (export $gen)" $body
+  $mail = New-HoldAlert $gen $state.published $state.failure $state.guide (Get-AlertSheetUrl) $LogFile
+  $why = Send-PublishAlert $mail.Subject $mail.Body
   if ($why -eq '') {
     $state.alerted = $gen; $state.alertTries = 0
     Log "alert email sent for $gen"
@@ -89,7 +81,7 @@ try {
   Finish 0
 }
 
-$state = @{ published = ''; attempted = ''; attempts = 0; failure = ''; alerted = ''; alertTries = 0; alertNote = '' }
+$state = @{ published = ''; attempted = ''; attempts = 0; failure = ''; guide = ''; alerted = ''; alertTries = 0; alertNote = '' }
 if (Test-Path $StateFile) {
   try {
     $s = Get-Content -Raw $StateFile | ConvertFrom-Json
@@ -97,6 +89,7 @@ if (Test-Path $StateFile) {
     $state.attempted = [string]$s.attempted
     $state.attempts = [int]$s.attempts
     $state.failure = [string]$s.failure
+    $state.guide = [string]$s.guide
     $state.alerted = [string]$s.alerted
     $state.alertTries = [int]$s.alertTries
     $state.alertNote = [string]$s.alertNote
@@ -136,12 +129,13 @@ if ($Manual) {
 }
 $buildCode = $LASTEXITCODE
 if ($buildCode -eq 0) {
-  $state.published = $gen; $state.attempted = ''; $state.attempts = 0; $state.failure = ''
+  $state.published = $gen; $state.attempted = ''; $state.attempts = 0; $state.failure = ''; $state.guide = ''
   Log "published $gen"
 } else {
   if ($state.attempted -ne $gen) { $state.attempts = 0; $state.alertTries = 0 }   # a new export starts its own count
   $state.attempted = $gen; $state.attempts = $state.attempts + 1
   try { $state.failure = Get-FailureSummary $buildOut } catch { $state.failure = '' }
+  try { $state.guide = Get-ProseGuidance $buildOut $json.albums } catch { $state.guide = '' }
   Log ("BUILD/PUSH FAILED (attempt " + $state.attempts + " of 3) - see output above")
   if ($state.attempts -ge 3) { Log "holding until a new export appears" }
 }
