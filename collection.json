@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-11T21:50:50.926Z",
+ "generated": "2026-10-11T22:50:20.172Z",
  "site": {
   "title": "Vinyl Curator",
   "baseUrl": "https://vinylcurator.net",
@@ -9712,6 +9712,52 @@
    "slug": "wild-bill-moore-quintet-bottom-groove",
    "tab": "Collection",
    "fileUnder": "Wild Bill Moore"
+  },
+  {
+   "artist": "Jimmy Smith",
+   "title": "The Incredible Jimmy Smith (Jimmy Smith at the Organ, Vol. 2)",
+   "year": "c. 1958-1962",
+   "labelName": "Blue Note",
+   "labelNumber": "BLP 1552",
+   "monoStereo": "Mono",
+   "countryOfOrigin": "US",
+   "format": "LP",
+   "genre": "Jazz - Hard Bop/Soul Jazz",
+   "speed": "33 1/3 RPM",
+   "producer": "Alfred Lion",
+   "composer": "",
+   "conductor": "",
+   "performerOrchestra": "",
+   "musicians": "Jimmy Smith (organ), Lou Donaldson (alto sax), Kenny Burrell (guitar), Eddie McFadden (guitar), Art Blakey (drums), Donald Bailey (drums)",
+   "coverGrade": "NM",
+   "vinylGrade": "VG+",
+   "matrix": {
+    "a": "BN-LP-1552-A EAR RVG",
+    "b": "BN-LP-1552-B EAR RVG",
+    "c": "",
+    "d": ""
+   },
+   "sides": [
+    "1. Plum Nellie (Smith)\n2. Billie's Bounce (Parker)",
+    "1. The Duel (Smith)\n2. Buns A Plenty (Smith)",
+    "",
+    ""
+   ],
+   "albumStory": "Jimmy Smith arrived at Blue Note in 1956 as the artist who single-handedly made the Hammond B-3 a serious jazz instrument, and the label documented his explosive early development with an unusually dense run of trio and quartet sessions. This volume gathers additional cuts from the same prolific 1957 sessions that produced the first At the Organ album, pairing Smith with altoist Lou Donaldson, guitarists Kenny Burrell and Eddie McFadden, and drummers Art Blakey and Donald Bailey in shifting combinations. The material ranges from Smith's own blues-drenched originals to a brisk reading of Charlie Parker's Billie's Bounce, showing the group moving comfortably between bebop vocabulary and the greasy, gospel-inflected feel that would define soul jazz. The Duel is a stripped-down showcase for Smith and Blakey alone, a rhythmic sparring match that highlights both men's percussive attack. Smith's effortless command of the organ's registers and pedals, combined with the unforced swing of these small groups, helped cement the instrument's place in modern jazz and opened the door for the wave of organ combos that followed through the 1960s. Critics of the era praised the loose, after-hours intimacy of these dates, and the album remains a key document of Smith's foundational Blue Note period.",
+   "lpNotes": "Original-era pressing (mono, c.1958-62) - deep-groove 47 West 63rd label on side 1, deep-groove New York USA label on side 2, Van Gelder stamp and Plastylite ear in both runouts.",
+   "labelNotes": "Side 1 carries the deep-groove, white-and-blue Blue Note label with the full street address - BLUE NOTE RECORDS, 47 WEST 63RD ST. N.Y.C. - and the BLU-E ear-shaped logo at left, the earliest state of this label design used from 1956 into the early 1960s. Side 2 carries a deep-groove label of the same blue-and-white family but with the address shortened to BLUE NOTE RECORDS INC., NEW YORK, U.S.A. and the script Blue Note logo with a vertical BLUE NOTE stripe, a slightly later printing within the same deep-groove era. The two sides therefore show adjacent but not identical label print-runs on one copy, both still within the original deep-groove mono period rather than the later flat-edge New York USA design. The label prints the catalogue number as BLP 1552, agreeing with the sleeve's Blue Note 1552.",
+   "fidelity": "Mastered by Rudy Van Gelder directly from the session tapes, as the Plastylite ear and RVG stamp in the runouts attest. Pressings from this deep-groove, 47 West 63rd/New York USA era are generally rated by collectors as sonically superior to the later flat-edge Liberty-era reissues, with warmer, more present organ tone and better low end. Among the many reissues of this title, including the Japanese Toshiba-EMI pressings, an original deep-groove mono copy such as this one ranks at or near the top of the fidelity hierarchy for the album.",
+   "generalNotes": "Both sides carry deep-groove Blue Note labels with Van Gelder mastering stamps and the Plastylite ear, the hallmarks of an original-era Blue Note pressing rather than a later flat-edge reissue. Side 1 shows the fuller '47 West 63rd St, N.Y.C.' address text while side 2 shows the shortened 'New York, U.S.A.' address, two adjacent label printings from the same deep-groove period rather than two different eras. The mono BLP prefix and deep-groove construction place this within the original pressing run for the catalogue number, ahead of the later flat-edge and stereo issues of the same title.",
+   "discogsListingUrl": "",
+   "ebayItemUrl": "",
+   "soldDate": "",
+   "variantChronology": "1958 - deep-groove mono label, 47 West 63rd St address, Van Gelder stamp and Plastylite ear  <- this copy\n1959-62 - deep-groove mono label, address shortened to New York, U.S.A.\n1963-65 - flat-edge mono label, New York, U.S.A., no deep groove - value band not established from the evidence at hand\nc. 1965 - stereo pressing, catalogue BST 81552\nc. 1966-72 - Liberty-era reissue labels - value band not established from the evidence at hand\nJapanese Toshiba-EMI reissue (mono/stereo)",
+   "folderName": "Jimmy Smith_Jimmy Smith At The Organ Volume 2",
+   "folderId": "1yrwQk2bPU4xlJHu-615Ad0mLAYqpBm4_",
+   "albumId": "1yrwQk2bPU4xlJHu-615Ad0mLAYqpBm4_",
+   "slug": "jimmy-smith-jimmy-smith-at-the-organ-volume-2",
+   "tab": "Collection",
+   "fileUnder": "Jimmy Smith"
   },
   {
    "artist": "Aretha Franklin",
