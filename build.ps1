@@ -782,6 +782,210 @@ if (@($json.albums).Count -eq 0 -and -not $AllowEmpty) {
     '-AllowEmpty.')
 }
 
+# ---------- source folder scan cache ----------
+# Enumerating every album's source folder on the Drive stream mount costs
+# minutes at collection scale, and between two builds almost nothing has
+# changed. Cache each folder's parsed shot list against the folder's own
+# LastWriteTimeUtc.
+#
+# A folder's mtime moves when a file is added, removed or renamed, but not when
+# an existing file is overwritten in place - and the sheet's Rotate now writes
+# the turned picture into the SAME file. So a cache hit also checks each cached
+# photo's own time and size (Test-ShotsUnchanged) and re-scans the folder when
+# any differs or is gone. Measured 2026-10-06 on the Drive mount: 2,373 cached
+# photos over 209 folders checked in about 10 s. -Force still re-scans all.
+#
+# The entry also keeps the folder's typed runout files ("NN Side N Matrix
+# Runout.txt": path, time, size and text) for the folder guard below, checked
+# the same way, so the guard costs no second walk of the folders (2026-10-13).
+# An entry written before then carries no runouts and is re-scanned once.
+$ScanCacheFile = Join-Path $Site '.foldercache.json'
+$ScanCache = @{}
+if ((Test-Path $ScanCacheFile) -and -not $Force) {
+  try {
+    $rawCache = [IO.File]::ReadAllText($ScanCacheFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
+    foreach ($p in $rawCache.PSObject.Properties) { $ScanCache[$p.Name] = $p.Value }
+  } catch {
+    # A corrupt or half-written cache is a re-scan, never a failed build.
+    $ScanCache = @{}
+  }
+}
+$ScanCacheNew = @{}
+$scanHits = 0; $scanMisses = 0
+
+# Parsed, filtered and ordered shot list for one album source folder. Shape is
+# flat on purpose (no FileInfo) so it round-trips through the cache file.
+function Test-ShotsUnchanged($files) {
+  foreach ($f in @($files)) {
+    $fi = New-Object IO.FileInfo ([string]$f.Path)
+    if (-not $fi.Exists) { return $false }
+    if ([string]$fi.LastWriteTimeUtc.Ticks -ne [string]$f.Ticks) { return $false }
+    if ([long]$fi.Length -ne [long]$f.Length) { return $false }
+  }
+  return $true
+}
+
+# One folder's scan - { stamp, files (the shots), runouts } - from this build's
+# own scans, else the cache, else the folder itself. A runout file that could
+# not be read is kept as Unread and never cached as read.
+$RunoutFileRx = [regex]' - (14|16|18|20) Side ([1-4]) Matrix Runout\.txt$'
+function Get-FolderScan([string]$folder) {
+  if ($script:ScanCacheNew.ContainsKey($folder)) { return $script:ScanCacheNew[$folder] }
+  $stamp = [string](Get-Item -LiteralPath $folder).LastWriteTimeUtc.Ticks
+  $hit = $ScanCache[$folder]
+  if ($hit -and ([string]$hit.stamp) -eq $stamp -and ($null -ne $hit.runouts) -and
+      -not @(@($hit.runouts) | Where-Object { $_.Unread }).Count -and
+      (Test-ShotsUnchanged $hit.files) -and (Test-ShotsUnchanged $hit.runouts)) {
+    $script:scanHits++
+    $script:ScanCacheNew[$folder] = $hit
+    return $hit
+  }
+  $script:scanMisses++
+  $all = @(Get-ChildItem -LiteralPath $folder -File)
+  $found = @($all | Where-Object {
+      $_.Extension -match '(?i)^\.(jpe?g|png)$' -and $_.Name -match ' - (\d\d) (.+)\.[^.]+$'
+    } | ForEach-Object {
+      $m = [regex]::Match($_.Name, ' - (\d\d) (.+)\.[^.]+$')
+      [pscustomobject]@{ Path = $_.FullName; Name = $_.Name
+                         Length = $_.Length; Ticks = [string]$_.LastWriteTimeUtc.Ticks
+                         Num = $m.Groups[1].Value; Shot = $m.Groups[2].Value }
+    } | Where-Object { $ShotNums -contains $_.Num } |
+      Sort-Object @{ e = { $ShotOrder.IndexOf($_.Num) } }, @{ e = { $_.Shot } })
+  $runouts = @($all | ForEach-Object {
+      $rfile = $_   # inside a catch, $_ is the error, not the file
+      $m = $RunoutFileRx.Match($rfile.Name)
+      if ($m.Success -and [int]$m.Groups[1].Value -eq 12 + 2 * [int]$m.Groups[2].Value) {
+        $text = ''; $unread = $false
+        try { $text = [IO.File]::ReadAllText($rfile.FullName, [Text.Encoding]::UTF8).Trim() }
+        catch {
+          # A path past the old 260-character limit (two album folders' names
+          # carry their whole title) opens only through its long-path form.
+          try { $text = [IO.File]::ReadAllText('\\?\' + $rfile.FullName, [Text.Encoding]::UTF8).Trim() } catch { $unread = $true }
+        }
+        [pscustomobject]@{ Path = $rfile.FullName; Name = $rfile.Name
+                           Length = $rfile.Length; Ticks = [string]$rfile.LastWriteTimeUtc.Ticks
+                           Side = 'abcd'.Substring([int]$m.Groups[2].Value - 1, 1); Text = $text; Unread = $unread }
+      }
+    })
+  $entry = [pscustomobject]@{ stamp = $stamp; files = $found; runouts = $runouts }
+  $script:ScanCacheNew[$folder] = $entry
+  return $entry
+}
+
+function Get-SourceShots([string]$folder) {
+  return @(@((Get-FolderScan $folder).files) | Where-Object { $_ } | ForEach-Object {
+    [pscustomobject]@{ Path = [string]$_.Path; Name = [string]$_.Name
+                       Length = [long]$_.Length; Ticks = [string]$_.Ticks
+                       Num = [string]$_.Num; Shot = [string]$_.Shot }
+  })
+}
+
+# An album's photo folder: its folderOverrides entry while that path exists,
+# else its folder name under the first photo root holding it. ONE resolution
+# for the folder guard and the build, so the folder the guard reads is the one
+# whose photos are published. -Quiet: the guard says nothing of a folder it
+# cannot find; the build warns once.
+function Resolve-AlbumFolder($album, [switch]$Quiet) {
+  $slug = [string]$album.slug
+  if ($FolderOverrides.ContainsKey($slug)) {
+    if (Test-Path $FolderOverrides[$slug]) { return $FolderOverrides[$slug] }
+    if (-not $Quiet) {
+      $warnings.Add("$($album.artist) - $($album.title): folderOverrides path does not exist: $($FolderOverrides[$slug])")
+    }
+  }
+  foreach ($root in $PhotoRoots) {
+    $candidate = Join-Path $root $album.folderName
+    if (Test-Path $candidate) { return $candidate }
+  }
+  return $null
+}
+
+# FOLDER GUARD (2026-10-13): a photo folder holding ANOTHER record is never
+# published as this album's. On 10 October one album's folder was overwritten
+# with the photos of another copy of the same title - another pressing, its
+# runout MFSL2-380 A2 20596.1(3) KW@MOFI where the album's own reads
+# XLP-79421-1C 0 A - and the next builds published those photos on the
+# album's page, because the build takes its photos from the folder. So the
+# album's own runout (the export's "matrix", side by side) is compared with
+# the runout file the folder holds for that side ("NN Side N Matrix
+# Runout.txt"), the sheet's own comparison ported line for line: upper case,
+# letters and digits only; equal is the same record; differing within the
+# first eight characters - or either shorter than four - is ANOTHER record;
+# agreeing there and differing after is one record typed twice (a typo, never
+# refused: "OWL 044A1 MPO" against "OWL 044A1 MPO TL"). Another record on any
+# side refuses the build, like the guards above; nothing to compare on a side,
+# or a file that could not be read, refuses nothing. Proven by running
+# -CheckOnly -Data on a copy of the export with one album's runout changed to
+# another record's.
+function Get-RunoutNorm([string]$s) { return ([string]$s).ToUpperInvariant() -creplace '[^A-Z0-9]', '' }
+function Get-RunoutVerdict([string]$a, [string]$b) {
+  if ($a -ceq $b) { return '' }
+  $head = [Math]::Min(8, [Math]::Min($a.Length, $b.Length))
+  if ($head -lt 4) { return 'different' }
+  if ($a.Substring(0, $head) -ceq $b.Substring(0, $head)) { return 'typo' }
+  return 'different'
+}
+# The album's runouts against its folder's, by side (A only with A). Returns
+# { verdict: same | typo | different | unknown; side; row; folder }.
+function Get-RunoutBind($rowRuns, $folderRuns, $unread) {
+  $diff = $null; $typo = $null; $gap = $false; $compared = 0
+  foreach ($s in 'a', 'b', 'c', 'd') {
+    $r = Get-RunoutNorm ([string]$rowRuns[$s])
+    $f = Get-RunoutNorm ([string]$folderRuns[$s])
+    if (-not $r) { continue }
+    if ($unread[$s]) { $gap = $true; continue }
+    if (-not $f) { continue }
+    $compared++
+    if ($r -ceq $f) { continue }
+    $v = Get-RunoutVerdict $r $f
+    $at = [pscustomobject]@{ side = $s; row = ([string]$rowRuns[$s]).Trim(); folder = ([string]$folderRuns[$s]).Trim() }
+    if ($v -ceq 'different' -and -not $diff) { $diff = $at }
+    elseif ($v -ceq 'typo' -and -not $typo) { $typo = $at }
+  }
+  $verdict = if ($diff) { 'different' } elseif ($gap -or $compared -eq 0) { 'unknown' } elseif ($typo) { 'typo' } else { 'same' }
+  $pick = if ($diff) { $diff } else { $typo }
+  return [pscustomobject]@{ verdict = $verdict; side = $(if ($pick) { $pick.side } else { '' })
+    row = $(if ($pick) { $pick.row } else { '' }); folder = $(if ($pick) { $pick.folder } else { '' }) }
+}
+$runoutHits = New-Object System.Collections.Generic.List[string]
+$runoutRead = 0; $runoutCounts = @{}
+foreach ($a in $json.albums) {
+  if ([string]$a.status -eq 'withdrawn' -or -not $a.matrix) { continue }
+  $rowRuns = @{}; $anyRun = $false
+  foreach ($s in 'a', 'b', 'c', 'd') {
+    $rowRuns[$s] = [string]$a.matrix.$s
+    if ($rowRuns[$s].Trim()) { $anyRun = $true }
+  }
+  if (-not $anyRun) { continue }
+  $rf = Resolve-AlbumFolder $a -Quiet
+  if (-not $rf) { continue }
+  $scan = Get-FolderScan $rf
+  $folderRuns = @{}; $unreadRuns = @{}
+  foreach ($ro in @($scan.runouts)) {
+    if (-not $ro) { continue }
+    $side = [string]$ro.Side
+    if ($folderRuns.ContainsKey($side) -or $unreadRuns.ContainsKey($side)) { continue }
+    if ($ro.Unread) { $unreadRuns[$side] = $true } else { $folderRuns[$side] = [string]$ro.Text }
+  }
+  $runoutRead++
+  $rb = Get-RunoutBind $rowRuns $folderRuns $unreadRuns
+  $runoutCounts[$rb.verdict] = 1 + [int]$runoutCounts[$rb.verdict]
+  if ($rb.verdict -ceq 'different') {
+    $runoutHits.Add(("{0} ({1} - {2}): side {3} of the export reads ""{4}"" but the Side {5} runout file in its photo folder ""{6}"" reads ""{7}""" -f
+      [string]$a.slug, [string]$a.artist, [string]$a.title, $rb.side.ToUpper(), $rb.row, ('abcd'.IndexOf($rb.side) + 1), $rf, $rb.folder))
+  }
+}
+if ($runoutHits.Count -gt 0) {
+  $runoutHits | ForEach-Object { Write-Host "RUNOUT: $_" -ForegroundColor Red }
+  throw ("Folder guard failed - " + $runoutHits.Count + " album(s) whose photo folder holds another record: " +
+    "its runout file is not the same pressing as the album's own runout, so its photos would be published " +
+    "on the wrong page. Settle each with its Side 1 Label photo, never with the names, put the folder right " +
+    "and re-export. Nothing was built.")
+}
+Write-Host ("Folder guard: $runoutRead photo folder(s) read against their album's runouts - " +
+  [int]$runoutCounts['same'] + " the same, " + [int]$runoutCounts['typo'] + " typed slightly differently, " +
+  [int]$runoutCounts['unknown'] + " with nothing to compare.") -ForegroundColor DarkGray
+
 if ($CheckOnly) {
   Write-Host ("Export passes every guard: " + @($json.albums).Count + " album(s) in $DataFile. Nothing was built.") -ForegroundColor Green
   return
@@ -878,69 +1082,8 @@ if (-not (Test-Path $Albums)) { New-Item -ItemType Directory $Albums | Out-Null 
 # runs on the owner's desktop while they are using it.
 $MaxWorkers = [Math]::Max(1, [Math]::Min(8, [Environment]::ProcessorCount - 1))
 
-# ---------- source folder scan cache ----------
-# Enumerating every album's source folder on the Drive stream mount costs
-# minutes at collection scale, and between two builds almost nothing has
-# changed. Cache each folder's parsed shot list against the folder's own
-# LastWriteTimeUtc.
-#
-# A folder's mtime moves when a file is added, removed or renamed, but not when
-# an existing file is overwritten in place - and the sheet's Rotate now writes
-# the turned picture into the SAME file. So a cache hit also checks each cached
-# photo's own time and size (Test-ShotsUnchanged) and re-scans the folder when
-# any differs or is gone. Measured 2026-10-06 on the Drive mount: 2,373 cached
-# photos over 209 folders checked in about 10 s. -Force still re-scans all.
-$ScanCacheFile = Join-Path $Site '.foldercache.json'
-$ScanCache = @{}
-if ((Test-Path $ScanCacheFile) -and -not $Force) {
-  try {
-    $rawCache = [IO.File]::ReadAllText($ScanCacheFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
-    foreach ($p in $rawCache.PSObject.Properties) { $ScanCache[$p.Name] = $p.Value }
-  } catch {
-    # A corrupt or half-written cache is a re-scan, never a failed build.
-    $ScanCache = @{}
-  }
-}
-$ScanCacheNew = @{}
-$scanHits = 0; $scanMisses = 0
-
-# Parsed, filtered and ordered shot list for one album source folder. Shape is
-# flat on purpose (no FileInfo) so it round-trips through the cache file.
-function Test-ShotsUnchanged($files) {
-  foreach ($f in @($files)) {
-    $fi = New-Object IO.FileInfo ([string]$f.Path)
-    if (-not $fi.Exists) { return $false }
-    if ([string]$fi.LastWriteTimeUtc.Ticks -ne [string]$f.Ticks) { return $false }
-    if ([long]$fi.Length -ne [long]$f.Length) { return $false }
-  }
-  return $true
-}
-
-function Get-SourceShots([string]$folder) {
-  $stamp = [string](Get-Item -LiteralPath $folder).LastWriteTimeUtc.Ticks
-  $hit = $ScanCache[$folder]
-  if ($hit -and ([string]$hit.stamp) -eq $stamp -and (Test-ShotsUnchanged $hit.files)) {
-    $script:scanHits++
-    $script:ScanCacheNew[$folder] = $hit
-    return @($hit.files | ForEach-Object {
-      [pscustomobject]@{ Path = [string]$_.Path; Name = [string]$_.Name
-                         Length = [long]$_.Length; Ticks = [string]$_.Ticks
-                         Num = [string]$_.Num; Shot = [string]$_.Shot }
-    })
-  }
-  $script:scanMisses++
-  $found = @(Get-ChildItem -LiteralPath $folder -File | Where-Object {
-      $_.Extension -match '(?i)^\.(jpe?g|png)$' -and $_.Name -match ' - (\d\d) (.+)\.[^.]+$'
-    } | ForEach-Object {
-      $m = [regex]::Match($_.Name, ' - (\d\d) (.+)\.[^.]+$')
-      [pscustomobject]@{ Path = $_.FullName; Name = $_.Name
-                         Length = $_.Length; Ticks = [string]$_.LastWriteTimeUtc.Ticks
-                         Num = $m.Groups[1].Value; Shot = $m.Groups[2].Value }
-    } | Where-Object { $ShotNums -contains $_.Num } |
-      Sort-Object @{ e = { $ShotOrder.IndexOf($_.Num) } }, @{ e = { $_.Shot } })
-  $script:ScanCacheNew[$folder] = [pscustomobject]@{ stamp = $stamp; files = $found }
-  return $found
-}
+# (The source folder scan cache - Get-FolderScan, Get-SourceShots - sits above
+# the folder guard, which reads every album's folder first.)
 
 # Photos are collected across the whole build and processed in one batch after
 # the album loop (see below), not album by album: 25 albums of nine photos
@@ -1047,20 +1190,8 @@ foreach ($album in $json.albums) {
   }
 
   # ----- photos -----
-  $srcFolder = $null
-  if ($FolderOverrides.ContainsKey($slug)) {
-    if (Test-Path $FolderOverrides[$slug]) {
-      $srcFolder = $FolderOverrides[$slug]
-    } else {
-      $warnings.Add("$($album.artist) - $($album.title): folderOverrides path does not exist: $($FolderOverrides[$slug])")
-    }
-  }
-  if ($null -eq $srcFolder) {
-    foreach ($root in $PhotoRoots) {
-      $candidate = Join-Path $root $album.folderName
-      if (Test-Path $candidate) { $srcFolder = $candidate; break }
-    }
-  }
+  # The folder the folder guard read (Resolve-AlbumFolder): one resolution for both.
+  $srcFolder = Resolve-AlbumFolder $album
   $shots = @()
   if ($null -eq $srcFolder) {
     $warnings.Add("$($album.artist) - $($album.title): photo folder '$($album.folderName)' not found under any photo root - point to it in build.config.json: ""folderOverrides"": { ""$slug"": ""<full path>"" } (or add its parent folder to ""photoRoots"")")
