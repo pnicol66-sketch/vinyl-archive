@@ -918,16 +918,20 @@ function Resolve-AlbumFolder($album, [switch]$Quiet) {
 # -CheckOnly -Data on a copy of the export with one album's runout changed to
 # another record's.
 # The first eight characters were too blunt both ways (review, 2026-10-13), so
-# side by side (Get-RunoutPair): a SLIP is never another record - the same
-# digit runs with at most two characters' difference, or one digit run with
-# one digit dropped or added ("XLP11068-1A" against "XLP110638-1A"), never on a
-# runout under four characters; ANOTHER RECORD is the eight-character call, or
-# a first digit run of the same length that differs ("BNST-84226A" against
-# "BNST-84229.A", "PHM200202A" against "PHM200207A": another catalogue number),
-# or a folder runout that EQUALS another album's own runout for that side in
-# this export and not this album's ("PRLP-7094-A RVG" against "PRLP 7094-A
-# KEVIN GRAY", another copy of the same title) - that album named; anything
-# else agreeing at the head stays a typo.
+# side by side (Get-RunoutPair), in this order: a folder runout that EQUALS
+# another album's own runout for that side in this export and not this album's
+# is ANOTHER RECORD ("PRLP-7094-A RVG" against "PRLP 7094-A KEVIN GRAY",
+# another copy of the same title) - that album named - even within slip
+# distance of this album's ("PRLP-7005-A-1 RVG" against "PRLP-7005-A-1 A
+# RVG"); then a SLIP is never another record - the same digit runs with at
+# most two characters' difference, or one digit run with one digit dropped or
+# added ("XLP11068-1A" against "XLP110638-1A"), or one digit dropped or added
+# in the first digit run with the rest of the head equal, whatever trails
+# after ("XLP11068-1A 0" against "XLP110638-1A 0 TL"), never on a runout under
+# four characters; then ANOTHER RECORD is the eight-character call, or a first
+# digit run of the same length that differs ("BNST-84226A" against
+# "BNST-84229.A", "PHM200202A" against "PHM200207A": another catalogue
+# number); anything else agreeing at the head stays a typo.
 function Get-RunoutNorm([string]$s) { return ([string]$s).ToUpperInvariant() -creplace '[^A-Z0-9]', '' }
 function Get-RunoutVerdict([string]$a, [string]$b) {
   if ($a -ceq $b) { return '' }
@@ -956,9 +960,32 @@ function Get-RunoutEditDistance([string]$a, [string]$b, [int]$cap) {
   }
   return [Math]::Min($prev[$b.Length], $cap + 1)
 }
+# The dropped digit with a trailing mark (review, 2026-10-13): "XLP11068-1A 0"
+# against "XLP110638-1A 0 TL" is one digit dropped in the matrix number AND a
+# mark the other typing left off - three characters apart, past the slip
+# below, and the eight-character call read it as another record. The first
+# digit runs start at the same place, one is the other with ONE digit taken
+# out, and with it taken out the two agree over the head (the first eight
+# characters, and at least through the first digit run), whatever trails after.
+function Test-RunoutFirstRunSlip([string]$a, [string]$b) {
+  $ma = [regex]::Match($a, '[0-9]+'); $mb = [regex]::Match($b, '[0-9]+')
+  if (-not $ma.Success -or -not $mb.Success -or ($ma.Index -ne $mb.Index) -or ([Math]::Abs($ma.Value.Length - $mb.Value.Length) -ne 1)) { return $false }
+  if ($ma.Value.Length -gt $mb.Value.Length) { $longer = $a; $shorter = $b; $hi = $ma.Value; $lo = $mb.Value }
+  else { $longer = $b; $shorter = $a; $hi = $mb.Value; $lo = $ma.Value }
+  $at = $ma.Index
+  $head = [Math]::Min([Math]::Max(8, $at + $lo.Length), [Math]::Min($longer.Length - 1, $shorter.Length))
+  if ($head -lt 4) { return $false }
+  for ($k = 0; $k -lt $hi.Length; $k++) {
+    if (($hi.Substring(0, $k) + $hi.Substring($k + 1)) -cne $lo) { continue }
+    $cut = $longer.Substring(0, $at + $k) + $longer.Substring($at + $k + 1)
+    if ($cut.Substring(0, $head) -ceq $shorter.Substring(0, $head)) { return $true }
+  }
+  return $false
+}
 # One runout typed twice with a slip: never another record.
 function Test-RunoutSlip([string]$a, [string]$b) {
   if (($a -ceq $b) -or [Math]::Min($a.Length, $b.Length) -lt 4) { return $false }
+  if (Test-RunoutFirstRunSlip $a $b) { return $true }
   if ((Get-RunoutEditDistance $a $b 2) -gt 2) { return $false }
   $da = @(Get-RunoutDigitRuns $a); $db = @(Get-RunoutDigitRuns $b)
   if (($da -join ',') -ceq ($db -join ',')) { return $true }
@@ -978,16 +1005,19 @@ function Test-RunoutSlip([string]$a, [string]$b) {
   return $false
 }
 # One side, both normalised. $other names the album (not this one) whose own
-# runout for this side equals the folder's, or ''.
+# runout for this side equals the folder's, or ''. Another album's own runout
+# ranks FIRST (review, 2026-10-13): it is that album's file even within slip
+# distance of this one's - the two copies of one title typed a letter apart
+# ("PRLP-7005-A-1 RVG" against "PRLP-7005-A-1 A RVG").
 function Get-RunoutPair([string]$r, [string]$f, [string]$other) {
   if ($r -ceq $f) { return [pscustomobject]@{ verdict = 'same'; why = ''; other = '' } }
+  if ($other) { return [pscustomobject]@{ verdict = 'different'; why = 'other'; other = $other } }
   if (Test-RunoutSlip $r $f) { return [pscustomobject]@{ verdict = 'typo'; why = 'slip'; other = '' } }
   if ((Get-RunoutVerdict $r $f) -ceq 'different') { return [pscustomobject]@{ verdict = 'different'; why = 'head'; other = '' } }
   $dr = @(Get-RunoutDigitRuns $r); $df = @(Get-RunoutDigitRuns $f)
   if ($dr.Count -and $df.Count -and ($dr[0].Length -eq $df[0].Length) -and ($dr[0] -cne $df[0])) {
     return [pscustomobject]@{ verdict = 'different'; why = 'number'; other = '' }
   }
-  if ($other) { return [pscustomobject]@{ verdict = 'different'; why = 'other'; other = $other } }
   return [pscustomobject]@{ verdict = 'typo'; why = ''; other = '' }
 }
 # Every album's own runouts in the export, by side: norm -> the albums typing it.
