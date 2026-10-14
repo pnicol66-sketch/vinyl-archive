@@ -917,6 +917,17 @@ function Resolve-AlbumFolder($album, [switch]$Quiet) {
 # or a file that could not be read, refuses nothing. Proven by running
 # -CheckOnly -Data on a copy of the export with one album's runout changed to
 # another record's.
+# The first eight characters were too blunt both ways (review, 2026-10-13), so
+# side by side (Get-RunoutPair): a SLIP is never another record - the same
+# digit runs with at most two characters' difference, or one digit run with
+# one digit dropped or added ("XLP11068-1A" against "XLP110638-1A"), never on a
+# runout under four characters; ANOTHER RECORD is the eight-character call, or
+# a first digit run of the same length that differs ("BNST-84226A" against
+# "BNST-84229.A", "PHM200202A" against "PHM200207A": another catalogue number),
+# or a folder runout that EQUALS another album's own runout for that side in
+# this export and not this album's ("PRLP-7094-A RVG" against "PRLP 7094-A
+# KEVIN GRAY", another copy of the same title) - that album named; anything
+# else agreeing at the head stays a typo.
 function Get-RunoutNorm([string]$s) { return ([string]$s).ToUpperInvariant() -creplace '[^A-Z0-9]', '' }
 function Get-RunoutVerdict([string]$a, [string]$b) {
   if ($a -ceq $b) { return '' }
@@ -925,9 +936,86 @@ function Get-RunoutVerdict([string]$a, [string]$b) {
   if ($a.Substring(0, $head) -ceq $b.Substring(0, $head)) { return 'typo' }
   return 'different'
 }
+function Get-RunoutDigitRuns([string]$s) { return @([regex]::Matches($s, '[0-9]+') | ForEach-Object { $_.Value }) }
+# Insert, drop or change one character at a time; given up once past $cap.
+function Get-RunoutEditDistance([string]$a, [string]$b, [int]$cap) {
+  if ([Math]::Abs($a.Length - $b.Length) -gt $cap) { return $cap + 1 }
+  $prev = New-Object int[] ($b.Length + 1)
+  for ($j = 0; $j -le $b.Length; $j++) { $prev[$j] = $j }
+  for ($i = 1; $i -le $a.Length; $i++) {
+    $cur = New-Object int[] ($b.Length + 1)
+    $cur[0] = $i; $lo = $i
+    for ($j = 1; $j -le $b.Length; $j++) {
+      $cost = if ($a[$i - 1] -ceq $b[$j - 1]) { 0 } else { 1 }
+      $v = [Math]::Min([Math]::Min($prev[$j] + 1, $cur[$j - 1] + 1), $prev[$j - 1] + $cost)
+      $cur[$j] = $v
+      if ($v -lt $lo) { $lo = $v }
+    }
+    if ($lo -gt $cap) { return $cap + 1 }
+    $prev = $cur
+  }
+  return [Math]::Min($prev[$b.Length], $cap + 1)
+}
+# One runout typed twice with a slip: never another record.
+function Test-RunoutSlip([string]$a, [string]$b) {
+  if (($a -ceq $b) -or [Math]::Min($a.Length, $b.Length) -lt 4) { return $false }
+  if ((Get-RunoutEditDistance $a $b 2) -gt 2) { return $false }
+  $da = @(Get-RunoutDigitRuns $a); $db = @(Get-RunoutDigitRuns $b)
+  if (($da -join ',') -ceq ($db -join ',')) { return $true }
+  if ($da.Count -ne $db.Count) { return $false }
+  $at = -1
+  for ($i = 0; $i -lt $da.Count; $i++) {
+    if ($da[$i] -ceq $db[$i]) { continue }
+    if ($at -ge 0) { return $false }
+    $at = $i
+  }
+  $lo = if ($da[$at].Length -lt $db[$at].Length) { $da[$at] } else { $db[$at] }
+  $hi = if ($da[$at].Length -lt $db[$at].Length) { $db[$at] } else { $da[$at] }
+  if ($hi.Length - $lo.Length -ne 1) { return $false }
+  for ($k = 0; $k -lt $hi.Length; $k++) {
+    if (($hi.Substring(0, $k) + $hi.Substring($k + 1)) -ceq $lo) { return $true }
+  }
+  return $false
+}
+# One side, both normalised. $other names the album (not this one) whose own
+# runout for this side equals the folder's, or ''.
+function Get-RunoutPair([string]$r, [string]$f, [string]$other) {
+  if ($r -ceq $f) { return [pscustomobject]@{ verdict = 'same'; why = ''; other = '' } }
+  if (Test-RunoutSlip $r $f) { return [pscustomobject]@{ verdict = 'typo'; why = 'slip'; other = '' } }
+  if ((Get-RunoutVerdict $r $f) -ceq 'different') { return [pscustomobject]@{ verdict = 'different'; why = 'head'; other = '' } }
+  $dr = @(Get-RunoutDigitRuns $r); $df = @(Get-RunoutDigitRuns $f)
+  if ($dr.Count -and $df.Count -and ($dr[0].Length -eq $df[0].Length) -and ($dr[0] -cne $df[0])) {
+    return [pscustomobject]@{ verdict = 'different'; why = 'number'; other = '' }
+  }
+  if ($other) { return [pscustomobject]@{ verdict = 'different'; why = 'other'; other = $other } }
+  return [pscustomobject]@{ verdict = 'typo'; why = ''; other = '' }
+}
+# Every album's own runouts in the export, by side: norm -> the albums typing it.
+$RunoutOwners = @{ a = @{}; b = @{}; c = @{}; d = @{} }
+foreach ($ao in $json.albums) {
+  if (-not $ao.matrix) { continue }
+  foreach ($s in 'a', 'b', 'c', 'd') {
+    $n = Get-RunoutNorm ([string]$ao.matrix.$s)
+    if (-not $n) { continue }
+    if (-not $RunoutOwners[$s].ContainsKey($n)) { $RunoutOwners[$s][$n] = New-Object System.Collections.Generic.List[object] }
+    $RunoutOwners[$s][$n].Add($ao)
+  }
+}
+# The other album whose own runout for side $s equals $f, as "slug (artist -
+# title)"; else ''. Asked only where $f is not this album's own runout for that
+# side, so this album can never answer; an entry carrying its Album ID (a
+# duplicate of the same album) is never another album.
+function Get-RunoutOther($album, [string]$s, [string]$f) {
+  if (-not $RunoutOwners[$s].ContainsKey($f)) { return '' }
+  foreach ($o in $RunoutOwners[$s][$f]) {
+    if ([string]$album.albumId -and ([string]$o.albumId -ceq [string]$album.albumId)) { continue }
+    return ("{0} ({1} - {2})" -f [string]$o.slug, [string]$o.artist, [string]$o.title)
+  }
+  return ''
+}
 # The album's runouts against its folder's, by side (A only with A). Returns
-# { verdict: same | typo | different | unknown; side; row; folder }.
-function Get-RunoutBind($rowRuns, $folderRuns, $unread) {
+# { verdict: same | typo | different | unknown; side; row; folder; why; other }.
+function Get-RunoutBind($rowRuns, $folderRuns, $unread, $album) {
   $diff = $null; $typo = $null; $gap = $false; $compared = 0
   foreach ($s in 'a', 'b', 'c', 'd') {
     $r = Get-RunoutNorm ([string]$rowRuns[$s])
@@ -937,15 +1025,17 @@ function Get-RunoutBind($rowRuns, $folderRuns, $unread) {
     if (-not $f) { continue }
     $compared++
     if ($r -ceq $f) { continue }
-    $v = Get-RunoutVerdict $r $f
-    $at = [pscustomobject]@{ side = $s; row = ([string]$rowRuns[$s]).Trim(); folder = ([string]$folderRuns[$s]).Trim() }
-    if ($v -ceq 'different' -and -not $diff) { $diff = $at }
-    elseif ($v -ceq 'typo' -and -not $typo) { $typo = $at }
+    $other = if ($album) { Get-RunoutOther $album $s $f } else { '' }
+    $pv = Get-RunoutPair $r $f $other
+    $at = [pscustomobject]@{ side = $s; row = ([string]$rowRuns[$s]).Trim(); folder = ([string]$folderRuns[$s]).Trim(); why = $pv.why; other = $pv.other }
+    if ($pv.verdict -ceq 'different' -and -not $diff) { $diff = $at }
+    elseif ($pv.verdict -ceq 'typo' -and -not $typo) { $typo = $at }
   }
   $verdict = if ($diff) { 'different' } elseif ($gap -or $compared -eq 0) { 'unknown' } elseif ($typo) { 'typo' } else { 'same' }
   $pick = if ($diff) { $diff } else { $typo }
   return [pscustomobject]@{ verdict = $verdict; side = $(if ($pick) { $pick.side } else { '' })
-    row = $(if ($pick) { $pick.row } else { '' }); folder = $(if ($pick) { $pick.folder } else { '' }) }
+    row = $(if ($pick) { $pick.row } else { '' }); folder = $(if ($pick) { $pick.folder } else { '' })
+    why = $(if ($pick) { $pick.why } else { '' }); other = $(if ($pick) { $pick.other } else { '' }) }
 }
 $runoutHits = New-Object System.Collections.Generic.List[string]
 $runoutRead = 0; $runoutCounts = @{}
@@ -968,11 +1058,12 @@ foreach ($a in $json.albums) {
     if ($ro.Unread) { $unreadRuns[$side] = $true } else { $folderRuns[$side] = [string]$ro.Text }
   }
   $runoutRead++
-  $rb = Get-RunoutBind $rowRuns $folderRuns $unreadRuns
+  $rb = Get-RunoutBind $rowRuns $folderRuns $unreadRuns $a
   $runoutCounts[$rb.verdict] = 1 + [int]$runoutCounts[$rb.verdict]
   if ($rb.verdict -ceq 'different') {
-    $runoutHits.Add(("{0} ({1} - {2}): side {3} of the export reads ""{4}"" but the Side {5} runout file in its photo folder ""{6}"" reads ""{7}""" -f
-      [string]$a.slug, [string]$a.artist, [string]$a.title, $rb.side.ToUpper(), $rb.row, ('abcd'.IndexOf($rb.side) + 1), $rf, $rb.folder))
+    $runoutHits.Add(("{0} ({1} - {2}): side {3} of the export reads ""{4}"" but the Side {5} runout file in its photo folder ""{6}"" reads ""{7}""{8}" -f
+      [string]$a.slug, [string]$a.artist, [string]$a.title, $rb.side.ToUpper(), $rb.row, ('abcd'.IndexOf($rb.side) + 1), $rf, $rb.folder,
+      $(if ($rb.other) { " - the runout of " + $rb.other } else { '' })))
   }
 }
 if ($runoutHits.Count -gt 0) {
