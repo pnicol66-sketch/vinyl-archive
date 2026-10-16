@@ -93,7 +93,7 @@ $dash = [string][char]0x2014
 # refuses without it):
 #   { "photoRoots": ["D:\\More Albums"],
 #     "folderOverrides": { "<album slug>": "C:\\full\\path\\to\\album folder" },
-#     "proseGuard": { "source": "...", "domain": "...", "process": "...", "shops": "...",
+#     "proseGuard": { "source": "...", "domain": "...", "process": "...", "shops": "...", "ids": "...",
 #                     "short": "...", "shortFields": [ "year", ... ] } }
 $ConfigFile = Join-Path $Site 'build.config.json'
 $FolderOverrides = @{}
@@ -667,7 +667,7 @@ if ($escapeHits.Count -gt 0) {
 # the guard: a guard that quietly stops running is how this one went four days
 # refusing nothing.
 $pg = if ($cfg) { $cfg.proseGuard } else { $null }
-$pgMissing = @(@('source', 'domain', 'process', 'shops', 'short', 'shortFields') | Where-Object { -not ($pg -and ([string]$pg.$_).Trim()) })
+$pgMissing = @(@('source', 'domain', 'process', 'shops', 'short', 'shortFields', 'ids') | Where-Object { -not ($pg -and ([string]$pg.$_).Trim()) })
 if ($pgMissing.Count -gt 0) {
   throw ('build.config.json carries no prose guard patterns (' + ($pgMissing -join ', ') + ' missing under "proseGuard"), ' +
     'so the prose guard cannot run - refusing to build. Install them from the private copy. Nothing was built.')
@@ -677,6 +677,14 @@ $proseDomainRx  = [regex]([string]$pg.domain)
 $proseProcessRx = [regex]([string]$pg.process)
 $proseShopRx    = [regex]('^(?i)(' + [string]$pg.shops + ')$')
 $proseShortRx   = [regex]([string]$pg.short)
+# "ids" (2026-10-16): a CASE-SENSITIVE pattern read over every published string - its lower-case form is the one
+# refused while the upper-case form of the same letters is a catalogue number the record prints - so it is used as
+# written, never with (?i); a copy that carries (?i) is refused below like an empty one.
+$proseIdRx      = [regex]([string]$pg.ids)
+if (([string]$pg.ids) -match '^\(\?i\)') {
+  throw ('The prose guard pattern "ids" in build.config.json is case-blind, so it would refuse catalogue numbers - ' +
+    'refusing to build. Reinstall the patterns from the private copy. Nothing was built.')
+}
 $proseShortFields = @{}
 foreach ($sf in @($pg.shortFields)) { if ([string]$sf) { $proseShortFields[[string]$sf] = $true } }
 # The short field list is a hand-kept list, so it is checked against the export
@@ -693,7 +701,7 @@ if (-not ($pg.shortFields -is [array]) -or $sfBad.Count -gt 0 -or $sfUnknown.Cou
 }
 # A pattern that matches empty text matches EVERY field, and would spin the
 # shop-name loop below on a zero-length match - refuse it like a missing one.
-foreach ($rxk in @(@('source', $proseSourceRx), @('domain', $proseDomainRx), @('process', $proseProcessRx), @('shops', $proseShopRx), @('short', $proseShortRx))) {
+foreach ($rxk in @(@('source', $proseSourceRx), @('domain', $proseDomainRx), @('process', $proseProcessRx), @('shops', $proseShopRx), @('short', $proseShortRx), @('ids', $proseIdRx))) {
   if ($rxk[1].IsMatch('')) {
     throw ('The prose guard pattern "' + $rxk[0] + '" in build.config.json matches empty text, so it would ' +
       'match every field - refusing to build. Reinstall the patterns from the private copy. Nothing was built.')
@@ -721,7 +729,7 @@ function Test-Prose($node, [string]$path, [string]$slug) {
     # fact of the record, not a source.
     # A SHORT field (year, country, the credits) also answers to the short
     # pattern; the long prose never does (2026-09-23).
-    $rxs = @($proseSourceRx, $proseDomainRx, $proseProcessRx)
+    $rxs = @($proseSourceRx, $proseDomainRx, $proseProcessRx, $proseIdRx)
     if ($proseShortFields.ContainsKey(($path -split '[.\[]')[0])) { $rxs += $proseShortRx }
     foreach ($prx in $rxs) {
       $pm = $prx.Match($node)
