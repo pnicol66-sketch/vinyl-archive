@@ -837,6 +837,10 @@ function Test-ShotsUnchanged($files) {
 # own scans, else the cache, else the folder itself. A runout file that could
 # not be read is kept as Unread and never cached as read.
 $RunoutFileRx = [regex]' - (14|16|18|20) Side ([1-4]) Matrix Runout\.txt$'
+# A photo is "Artist - Title - NN Shot Name.jpg": the shot number opens the
+# LAST " - " part, so a title starting with two digits ("10 New Songs", "21")
+# is never read as the shot.
+$ShotFileRx = ' - (\d\d)(?!.* - ) (.+)\.[^.]+$'
 function Get-FolderScan([string]$folder) {
   if ($script:ScanCacheNew.ContainsKey($folder)) { return $script:ScanCacheNew[$folder] }
   $stamp = [string](Get-Item -LiteralPath $folder).LastWriteTimeUtc.Ticks
@@ -851,9 +855,9 @@ function Get-FolderScan([string]$folder) {
   $script:scanMisses++
   $all = @(Get-ChildItem -LiteralPath $folder -File)
   $found = @($all | Where-Object {
-      $_.Extension -match '(?i)^\.(jpe?g|png)$' -and $_.Name -match ' - (\d\d) (.+)\.[^.]+$'
+      $_.Extension -match '(?i)^\.(jpe?g|png)$' -and $_.Name -match $ShotFileRx
     } | ForEach-Object {
-      $m = [regex]::Match($_.Name, ' - (\d\d) (.+)\.[^.]+$')
+      $m = [regex]::Match($_.Name, $ShotFileRx)
       [pscustomobject]@{ Path = $_.FullName; Name = $_.Name
                          Length = $_.Length; Ticks = [string]$_.LastWriteTimeUtc.Ticks
                          Num = $m.Groups[1].Value; Shot = $m.Groups[2].Value }
