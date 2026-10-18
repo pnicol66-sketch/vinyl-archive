@@ -1605,8 +1605,14 @@ foreach ($album in $json.albums) {
   $genreKey  = $genreDisp.ToLowerInvariant()
   $labelKey  = ([string]$album.labelName).Trim().ToLowerInvariant()
   $yearNum   = if ([string]$album.year -match '(\d{4})') { $matches[1] } else { '9999' }
-  # Card meta line: year · label · genre (primary), matching the streaming tiles.
-  $metaLine = (($enc.year, $enc.labelName, (HtmlEnc $genreDisp) |
+  # Card meta line: year · label + channel · genre (primary), matching the
+  # streaming tiles. The channel is the cell's leading Mono / Stereo word only
+  # ("CBS Stereo"); the album page carries the cell in full.
+  $labelLine = $enc.labelName
+  if ([string]$album.monoStereo -match '^\s*(Mono|Stereo)\b') {
+    $labelLine = ($labelLine + ' ' + $matches[1]).Trim()
+  }
+  $metaLine = (($enc.year, $labelLine, (HtmlEnc $genreDisp) |
     Where-Object { $_ -ne '' }) -join " $mid ")
   $cardHtml = '<a class="card" href="' + $p + $slug + '/" data-search="' +
     (HtmlEnc $search) + '" data-artist="' + (HtmlEnc $artistKey) + '" data-title="' +
