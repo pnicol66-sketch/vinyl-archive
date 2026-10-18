@@ -246,11 +246,30 @@
       var attr = function (el, k) { return el.getAttribute('data-' + k) || ''; };
       cards.forEach(function (c, i) { c.dataset.seq = i; });
       var seq = function (el) { return parseInt(el.dataset.seq, 10); };
+      // Copies of one title by one artist sit together (owner, 2026-10-18: the
+      // 1971, c.1977 and 2021 Songs of Love and Hate had been spread over the
+      // year order). A year ordering places the whole group at its EARLIEST
+      // copy's year, then the copies by their own years inside it. The title
+      // is folded (case, punctuation) so "Songs Of Love And Hate" and "Songs of
+      // Love and Hate" are one group.
+      var yearOf = function (el) { return parseInt(attr(el, 'year'), 10) || 9999; };
+      var groupOf = function (el) {
+        return attr(el, 'artist') + '|' + attr(el, 'title').toLowerCase().replace(/[^a-z0-9]+/g, '');
+      };
+      var groupYear = {};
+      cards.forEach(function (c) {
+        var g = groupOf(c);
+        if (!(g in groupYear) || yearOf(c) < groupYear[g]) groupYear[g] = yearOf(c);
+      });
       var cmpKey = function (a, b, key) {
         if (!key) return 0;
         if (key === 'default') return seq(a) - seq(b);
         if (key === 'year') {
-          return (parseInt(attr(a, 'year'), 10) || 9999) - (parseInt(attr(b, 'year'), 10) || 9999);
+          var ga = groupOf(a), gb = groupOf(b);
+          if (ga !== gb) {
+            return (groupYear[ga] - groupYear[gb]) || collator.compare(ga, gb);
+          }
+          return yearOf(a) - yearOf(b);
         }
         return collator.compare(attr(a, key), attr(b, key));
       };
