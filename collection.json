@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-04T02:22:08.266Z",
+ "generated": "2026-11-05T02:33:30.479Z",
  "site": {
   "title": "Vinyl Curator",
   "baseUrl": "https://vinylcurator.net",
@@ -75,7 +75,7 @@
    "conductor": "",
    "performerOrchestra": "",
    "musicians": "Abner Jay (electric six-string banjo, harmonica, bass drum, cymbals, vocals - one-man band)",
-   "coverGrade": "NM/NAME MINT WITH BIOGRAPHY",
+   "coverGrade": "NM",
    "vinylGrade": "NM",
    "matrix": {
     "a": "MRP/MR-036A CP16-0053A TELEGRAPH-GONSA",
@@ -2260,7 +2260,7 @@
    "performerOrchestra": "",
    "musicians": "Bob Dylan (vocals, guitar, harmonica); on screen in the film: Janie Cowan (bass), Alex Burke, Buck Meek, Joshua Crumbly (guitars), Shahzad Ismaily (guitar, accordion); uncredited on the jacket, the actual studio musicians: T Bone Burnett (electric guitar), Ira Ingber (electric guitar), Greg Leisz (mandolin), Tim Pierce (acoustic guitar), Don Was (bass)",
    "coverGrade": "NM",
-   "vinylGrade": "NM/NM/NM/MUSIC BLANK PATTERN EMBOSSED",
+   "vinylGrade": "NM",
    "matrix": {
     "a": "19658767481-A 254435E1 1518598 RKS STERLING MRP4265/19658767481-A #23",
     "b": "19658767481-B 254435E2 1520126 RKS STERLING MRP4265/19658767481-B #23",
@@ -2282,7 +2282,7 @@
     "NM",
     "NM",
     "NM",
-    "MUSIC BLANK PATTERN EMBOSSED"
+    "NO MUSIC"
    ],
    "discogsListingUrl": "",
    "ebayItemUrl": "",
@@ -4652,7 +4652,7 @@
    "performerOrchestra": "",
    "musicians": "John Coltrane (tenor sax), McCoy Tyner (piano), Jimmy Garrison (bass), Elvin Jones (drums)",
    "coverGrade": "NM",
-   "vinylGrade": "EX",
+   "vinylGrade": "EX+",
    "matrix": {
     "a": "A-77-A VAN GELDER LW",
     "b": "A-77-B VAN GELDER LW",
@@ -4671,7 +4671,7 @@
    "fidelity": "This copy carries the Van Gelder hand-etched runout (\"A-77-A/B VAN GELDER\"), indicating it was cut at Van Gelder's studio rather than by Bell Sound, whose competing cutting facility is described by collectors on the forums as noticeably murkier and less precise on other 1960s Impulse titles. Collectors on the forums debate whether Impulse mono pressings of this era, including A-77, were true discrete mono mixes or fold-downs from the stereo master tape, with some threads posing it plainly - this LP...is it a fold down? Collectors on the forums, comparing surface noise between the needles and the grooves of various copies, also note that Van Gelder's original A Love Supreme master tape was reportedly lost by Bell Sound decades ago, with only a second-generation copy later recovered from EMI's vaults, a fact that bears on the fidelity ceiling of all vintage pressings of this title, original or otherwise.",
    "generalNotes": "1965 Impulse! A-77 mono - original pressing window. Label design (orange field, mirrored \"impulse!\" band, ABC-Paramount credit, no street address) matches Impulse's mid-1960s design, and the hand-etched \"A-77-A/B VAN GELDER\" runout indicates a Van Gelder-cut lacquer rather than a later Bell Sound or reissue cut. Whether this specific stamper is a true mono mix or an early fold-down from the stereo master is disputed among collectors on the forums, some of whom frame the question bluntly - this LP...is it a fold down? - without a settled answer.",
    "vinylGradeSides": [
-    "VG+ /EX",
+    "EX",
     "NM-",
     "",
     ""
@@ -8396,7 +8396,7 @@
    "performerOrchestra": "",
    "musicians": "Lester Young (tenor sax), Oscar Peterson (piano), Barney Kessel (guitar), Ray Brown (bass), J.C. Heard (drums) - personnel per the 1952 Norman Granz session that produced most of this LP's material; some tracks document alternate rhythm sections under the same Verve/Norgran studio dates",
    "coverGrade": "VG+",
-   "vinylGrade": "VG",
+   "vinylGrade": "VG+",
    "matrix": {
     "a": "MGN-1100A MGV-8187A H",
     "b": "MGN-1100B MGV-8187B H",
@@ -8416,7 +8416,7 @@
    "generalNotes": "This is the 1957 Verve Clef Series first pressing of MGV-8187, reissuing the Norgran MGN-1022 recordings under a new catalog number. The grey trumpeter-logo label with deep groove and the runout's retained MGN-1100 prefix (alongside MGV-8187) are the decisive markers of this first Verve issue, predating the plain black-script Verve label used from circa 1961 onward. No later reissue elements (e.g. re-cut block-\"S\" matrix, non-deep-groove stampers) are present on this copy.",
    "vinylGradeSides": [
     "VG+ DEEP GROOVE",
-    "VG + DEEP GROOVE",
+    "VG+ DEEP GROOVE",
     "",
     ""
    ],
@@ -9643,7 +9643,7 @@
    "conductor": "",
    "performerOrchestra": "",
    "musicians": "Miles Davis (trumpet), Sonny Rollins (tenor sax, side 2), Milt Jackson (vibraphone, side 1), Thelonious Monk (piano, side 1), Horace Silver (piano, side 2), Percy Heath (bass), Kenny Clarke (drums)",
-   "coverGrade": "EX/EX-",
+   "coverGrade": "EX",
    "vinylGrade": "VG+",
    "matrix": {
     "a": "PRLP-7109-A RVG A AB",
@@ -9871,8 +9871,8 @@
    "fidelity": "The back cover documents the original 1955 mastering approach: cut at 160 lines per inch instead of the usual 210-260, deliberately widening and deepening the grooves to allow greater bass extension and level - a hallmark of the Debut/Mingus-supervised Van Gelder cutting rather than a later remaster. This Danish pressing reproduces that mastering philosophy via a European-cut lacquer derived from the US plates/tape rather than the original US metal parts, so fidelity is generally regarded by collectors as respectable but a step below a clean US first pressing pressed directly from Van Gelder's original masters. Collectors on the forums favor the original 1955 US Debut pressing or the 1962 Fantasy red-vinyl reissue for the most faithful, full-bodied transfer, with the Danish pressing occupying a middle tier and the later French fake-stereo and OJC reissues ranked lowest in the overall fidelity hierarchy. Surface quality on Danish Debut pressings varies by copy.",
    "generalNotes": "This is a Danish licensed Debut pressing of DEB-120, not the 1955 US first pressing, produced under the Brande Boghandel/Skandinavisk Grammofon A/S arrangement that began in 1957. The \"MADE IN DENMARK\" rim text on an otherwise US-style grey Debut label, paired with stamped (not later fake-stereo etched) DEB-120-A/B matrices, places this within the early Danish run rather than the 1960s French or US reissue lines. Cover and label copy reproduce the original 1955 back-cover text and mastering notes verbatim, indicating the Danish pressing used plates derived from the US artwork and liner notes rather than a redesigned Scandinavian issue.",
    "vinylGradeSides": [
-    "VG+ FACTORY IMPERFECTIONS",
-    "VG+ FACTORY IMPERFECTIONS",
+    "VG+",
+    "VG+",
     "",
     ""
    ],
@@ -10963,7 +10963,7 @@
    "fidelity": "Mastered by Rudy Van Gelder directly from the original 1956 session tapes, with the hand-etched RVG stamp confirming an original-metal cut rather than a later re-mastering. Collectors on the forums consistently rate these original mono Van Gelder-cut Prestige pressings as the most vital and immediate versions of the Marathon sessions material, ahead of the 1960s Bergenfield-address second pressings (still RVG-sourced but later-generation stampers) and well ahead of 1970s-80s Fantasy/OJC reissues, which used more processed remastering. Modern audiophile cuts such as Analogue Productions' 200g APRJ 7094 (Kevin Gray) offer quieter, high-fidelity surfaces but are generally regarded as smoother and less raw than this original. The Abbey Record Mfg. pressing here is a solid, standard-quality period plant job rather than a premium pressing, but the early metal generation is the decisive factor for sound quality.",
    "generalNotes": "1957 Prestige PRLP 7094 mono - original first pressing. Yellow fireworks label with \"446 W. 50th St.\" address and deep groove on both sides confirm the earliest Prestige NY label design, used before the label's move and later blue-label redesign. RVG hand-etched stamps plus AB (Abbey Record Mfg.) plant etch in the runouts, with a low \"1\" stamper code on side A, place this at or near the first stamper generation. Released July 1957.",
    "vinylGradeSides": [
-    "VG+ DEEP GROOVE SOME LIGHT SUPERFICIAL MARKS",
+    "VG+ DEEP GROOVE",
     "EX DEEP GROOVE",
     "",
     ""
@@ -11256,7 +11256,7 @@
    "performerOrchestra": "",
    "musicians": "Milt Jackson (vibraphone), Joe Newman (trumpet, tracks 1-3), Jimmy Cleveland (trombone, tracks 1-3), Cannonball Adderley (alto sax, tracks 1-3), Horace Silver (piano), Percy Heath (bass, tracks 1-3), Art Blakey (drums, tracks 1-3), Lucky Thompson (tenor sax, tracks 4-7), Oscar Pettiford (bass, tracks 4-7), Connie Kay (drums, tracks 4-7)",
    "coverGrade": "EX",
-   "vinylGrade": "EX",
+   "vinylGrade": "NM-",
    "matrix": {
     "a": "11447B AT",
     "b": "11448B AT 3",
@@ -11276,7 +11276,7 @@
    "generalNotes": "1957 Atlantic 1269 mono – consistent with a first pressing. Side labels show the plain black Atlantic design (no fan/target logo) with deep groove on both sides, the title's 1st-release black deep-groove variant. The runouts are hand-etched, with pressings of this variant typically also carrying an RCA Indianapolis plant stamp. The plain black rim design without the later fan logo places this within Atlantic's earliest 1200-series design window, and the deep groove narrows it toward the front of that run.",
    "vinylGradeSides": [
     "NM- DEEP GROOVE",
-    "VG+/NM- DEEP GROOVE",
+    "NM- DEEP GROOVE",
     "",
     ""
    ],
@@ -12367,7 +12367,7 @@
    "fidelity": "This is a standard commercial 1969 Philips/Mercury pressing rather than an audiophile cut; sourced from Simone's 1964-67 studio and live master tapes compiled by producer Hal Mooney, with generally solid if unremarkable dynamics typical of late-60s American pop pressings. Collector commentary on this compilation notes the sound as decent but occasionally quiet, with some listeners preferring a UK-pressed equivalent; there is no known audiophile reissue (Analogue Productions, Mobile Fidelity, etc.) of this specific compilation to rank it against. Within its own pressing history, this Mercury-credited US stereo copy sits alongside the plainer first-label US pressing as essentially equivalent sonically, both outranking later 1970s/80s reissues and CD transfers for tape generation.",
    "generalNotes": "1969 Philips PHS 600-298 stereo - US pressing produced under Mercury Record Corporation distribution, identified by matrix PHS600298A-M1/PHS600298B-M1. The label rim carries the manufacturer/distributor credit, and the front/back cover text names Mercury Record Corp./Chicago. This places the copy as the second (Mercury-credited) US label state rather than the plainer first Philips-only labels, though the release date and content are unchanged.",
    "vinylGradeSides": [
-    "VG+ VISIBLE SCRATCH TRACK 2 ORGERWISE NM",
+    "VG+",
     "NM-",
     "",
     ""
@@ -14167,7 +14167,7 @@
    "conductor": "",
    "performerOrchestra": "King Curtis and the Kingpins, with The Memphis Horns and The Sweethearts of Soul",
    "musicians": "Aretha Franklin (vocals, electric piano), King Curtis (tenor & soprano saxophone, bandleader), Billy Preston (organ), Cornell Dupree (guitar), Jerry Jemmott (electric bass), Bernard 'Pretty' Purdie (drums), Pancho Morales (congas), Truman Thomas (electric piano), Ray Charles (vocals, electric piano on 'Spirit in the Dark' reprise), Memphis Horns: Wayne Jackson, Roger Hopps (trumpet), Andrew Love, Lou Collins (tenor sax), Jimmy Mitchell (baritone sax), Jack Hale (trombone), Sweethearts of Soul: Brenda Bryant, Margaret Branch, Pat Smith (backing vocals); horn arrangements by Arif Mardin",
-   "coverGrade": "NIL",
+   "coverGrade": "NO COVER",
    "vinylGrade": "NM",
    "matrix": {
     "a": "4M-115 A\nS-59426",
@@ -14655,7 +14655,7 @@
    "fidelity": "Recorded live-to-mono in Hollywood in 1954 under Mercury/EmArcy's 'Fine-Fairchild Margin Control' process and mastered/pressed through Mercury's Chicago operation; original deep-groove blue-label pressings like this one are considered the sonic benchmark for the title, with vivid, upfront brass and audible room ambience typical of a well-run live-to-tape jazz date. The 1975 Trip Jazz reissue is a thin, budget-grade cut, and the 1980s EmArcy/Polygram reissue series, while competently mastered, sounds noticeably cooler and more compressed than the original. No modern audiophile remaster (Tone Poet/Analogue Productions/Music Matters-class) of this title exists, so a clean original mono deep-groove pressing such as this one remains the best-sounding option available to collectors.",
    "generalNotes": "1955 EmArcy MG 36002 mono is the original US first pressing of this title. The blue 'drummer' EmArcy labels with deep groove, paired with the blue-printed back cover (which switched to black on c. 1956-57 second issues), place this copy in the earliest pressing window. The runouts read YMG 36002A / YMG 36002B 2, M1, hand-etched with stamped letters, consistent with the original matrix style for this catalog number. Released February 1955, drawn from the August 14, 1954 Hollywood concert, with Dinah Washington's guest vocal on \"Darn That Dream.\"",
    "vinylGradeSides": [
-    "NM- DEEP GROOVE 2 SUPERFICIAL MARKS",
+    "NM- DEEP GROOVE",
     "NM- DEEP GROOVE",
     "",
     ""
