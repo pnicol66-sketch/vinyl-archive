@@ -314,6 +314,25 @@ function Write-Utf8([string]$path, [string]$text) {
   [IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding($false)))
 }
 
+# The site root's public collection.json: the export with albumId, folderId and folderName taken off every album
+# (and nothing else changed). Read as JSON and written back, so the three keys are removed wherever they sit in an
+# album, never matched as text; the album count is checked against the export before anything is written.
+$PublicDropKeys = @('albumId', 'folderId', 'folderName')
+function Write-PublicCollection([string]$from, [string]$to) {
+  $pub = [IO.File]::ReadAllText($from, [Text.Encoding]::UTF8) | ConvertFrom-Json
+  $n = @($pub.albums).Count
+  foreach ($a in @($pub.albums)) { foreach ($k in $PublicDropKeys) { $a.PSObject.Properties.Remove($k) } }
+  $text = $pub | ConvertTo-Json -Depth 32
+  $back = $text | ConvertFrom-Json
+  if (@($back.albums).Count -ne $n) { throw "public collection.json: $n albums read, $(@($back.albums).Count) written - not written." }
+  foreach ($a in @($back.albums)) {
+    foreach ($k in $PublicDropKeys) {
+      if ($a.PSObject.Properties.Name -contains $k) { throw "public collection.json: '$k' is still on an album - not written." }
+    }
+  }
+  Write-Utf8 $to $text
+}
+
 function Slugify([string]$s) {
   $t = $s.ToLowerInvariant() -replace '[^a-z0-9]+', '-'
   $t = $t.Trim('-')
@@ -1901,7 +1920,11 @@ $nf = $tplNotFound.Replace('{{VCSS}}', $vCss).Replace('{{VJS}}', $vJs)
 $nf = $nf.Replace('{{YEAR}}', "$year")
 Write-Utf8 (Join-Path $Site '404.html') $nf
 
-Copy-Item $DataFile (Join-Path $Site 'collection.json') -Force
+# The PUBLIC copy at the site root leaves out the three fields that name the collector's own Drive folders (the
+# owner's ruling of 2026-11-08, "Strip all three"): albumId, folderId and folderName. It used to be a straight copy
+# of the export. The build itself reads the full export from the Drive mount, and nothing on the site reads these
+# three from the public copy. Write-PublicCollection is the one writer; -CheckOnly never reaches it.
+Write-PublicCollection $DataFile (Join-Path $Site 'collection.json')
 }
 
 # ---------- private client: self-contained assets + root page ----------
