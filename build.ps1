@@ -94,7 +94,8 @@ $dash = [string][char]0x2014
 #   { "photoRoots": ["D:\\More Albums"],
 #     "folderOverrides": { "<album slug>": "C:\\full\\path\\to\\album folder" },
 #     "proseGuard": { "source": "...", "domain": "...", "process": "...", "shops": "...", "ids": "...",
-#                     "short": "...", "shortFields": [ "year", ... ] } }
+#                     "short": "...", "shortFields": [ "year", ... ],
+#                     "check": "...", "checkFields": [ "lpNotes", ... ], "checkOn": false } }
 $ConfigFile = Join-Path $Site 'build.config.json'
 $FolderOverrides = @{}
 if (Test-Path $ConfigFile) {
@@ -695,7 +696,9 @@ if ($escapeHits.Count -gt 0) {
 # the guard: a guard that quietly stops running is how this one went four days
 # refusing nothing.
 $pg = if ($cfg) { $cfg.proseGuard } else { $null }
-$pgMissing = @(@('source', 'domain', 'process', 'shops', 'short', 'shortFields', 'ids') | Where-Object { -not ($pg -and ([string]$pg.$_).Trim()) })
+$pgMissing = @(@('source', 'domain', 'process', 'shops', 'short', 'shortFields', 'ids', 'check', 'checkFields') | Where-Object { -not ($pg -and ([string]$pg.$_).Trim()) })
+# "checkOn" (2026-11-12) is a switch, true or false - missing or anything else is refused like a missing pattern.
+if ($pg -and -not ($pg.checkOn -is [bool])) { $pgMissing += 'checkOn (true or false)' }
 if ($pgMissing.Count -gt 0) {
   throw ('build.config.json carries no prose guard patterns (' + ($pgMissing -join ', ') + ' missing under "proseGuard"), ' +
     'so the prose guard cannot run - refusing to build. Install them from the private copy. Nothing was built.')
@@ -727,9 +730,24 @@ if (-not ($pg.shortFields -is [array]) -or $sfBad.Count -gt 0 -or $sfUnknown.Cou
     $(if ($sfUnknown.Count) { ' (no album carries: ' + ($sfUnknown -join ', ') + ')' } elseif ($sfBad.Count -or -not ($pg.shortFields -is [array])) { ' (an entry is not a name)' } else { '' }) +
     ' - refusing to build. Reinstall the patterns from the private copy. Nothing was built.')
 }
+# "check" + "checkFields" + "checkOn" (2026-11-12): a third pattern, read over the listed fields only (the notes,
+# the fidelity, the hierarchy) and only while checkOn is true - it is installed false and switched on once the
+# published text has been rewritten to meet it, so the build never refuses that text in between. The field list is
+# checked against the export like shortFields.
+$proseCheckRx = [regex]([string]$pg.check)
+$proseCheckOn = [bool]$pg.checkOn
+$proseCheckFields = @{}
+foreach ($cf in @($pg.checkFields)) { if ([string]$cf) { $proseCheckFields[[string]$cf] = $true } }
+$cfBad = @(@($pg.checkFields) | Where-Object { -not ($_ -is [string]) -or -not $_.Trim() })
+$cfUnknown = @(@($pg.checkFields) | Where-Object { ($_ -is [string]) -and $_.Trim() -and $sfKnown.Count -gt 0 -and -not $sfKnown.ContainsKey($_) })
+if (-not ($pg.checkFields -is [array]) -or $cfBad.Count -gt 0 -or $cfUnknown.Count -gt 0) {
+  throw ('The prose guard''s checkFields in build.config.json must be a list of export field names' +
+    $(if ($cfUnknown.Count) { ' (no album carries: ' + ($cfUnknown -join ', ') + ')' } else { ' (an entry is not a name)' }) +
+    ' - refusing to build. Reinstall the patterns from the private copy. Nothing was built.')
+}
 # A pattern that matches empty text matches EVERY field, and would spin the
 # shop-name loop below on a zero-length match - refuse it like a missing one.
-foreach ($rxk in @(@('source', $proseSourceRx), @('domain', $proseDomainRx), @('process', $proseProcessRx), @('shops', $proseShopRx), @('short', $proseShortRx), @('ids', $proseIdRx))) {
+foreach ($rxk in @(@('source', $proseSourceRx), @('domain', $proseDomainRx), @('process', $proseProcessRx), @('shops', $proseShopRx), @('short', $proseShortRx), @('ids', $proseIdRx), @('check', $proseCheckRx))) {
   if ($rxk[1].IsMatch('')) {
     throw ('The prose guard pattern "' + $rxk[0] + '" in build.config.json matches empty text, so it would ' +
       'match every field - refusing to build. Reinstall the patterns from the private copy. Nothing was built.')
@@ -759,6 +777,7 @@ function Test-Prose($node, [string]$path, [string]$slug) {
     # pattern; the long prose never does (2026-09-23).
     $rxs = @($proseSourceRx, $proseDomainRx, $proseProcessRx, $proseIdRx)
     if ($proseShortFields.ContainsKey(($path -split '[.\[]')[0])) { $rxs += $proseShortRx }
+    if ($proseCheckOn -and $proseCheckFields.ContainsKey(($path -split '[.\[]')[0])) { $rxs += $proseCheckRx }
     foreach ($prx in $rxs) {
       $pm = $prx.Match($node)
       while ($pm.Success -and $pm.Length -gt 0 -and $prx -eq $proseSourceRx -and $proseShopRx.IsMatch($pm.Value)) {
