@@ -126,13 +126,22 @@ if (Test-Path $ArtistGenreFile) {
 
 # ---------- tenant registry ----------
 # Each collection published to this site is a tenant: its own URL prefix, data
-# file, asset base and watermark (tenants.json, committed). The owner is tenant
+# file, asset base and watermark (tenants.json, in the private ops repo). The owner is tenant
 # zero with an EMPTY prefix, so every path and URL below is exactly what it was.
 # This step scopes the data file, the album output dir, the asset base, the
 # watermark and the prune to the chosen tenant; the per-tenant nav / {{ROOT}}
 # depth and the multi-tenant build loop are later Phase B steps (B3, B5).
 if ([string]::IsNullOrWhiteSpace($Tenant)) { $Tenant = 'owner' }
-$TenantsFile = Join-Path $Site 'tenants.json'
+# The registry describes the private client hosting, so it lives in the PRIVATE
+# vinyl-archive-ops repo beside this one (moved 2026-11-12). A build never falls
+# back to a guessed owner entry: without the registry it stops and says why. A
+# -CheckOnly run builds and writes nothing, so it keeps the owner entry below
+# when the registry is not beside it (a copy of this file run on its own).
+$TenantsFile = Join-Path (Join-Path (Split-Path -Parent $Site) 'vinyl-archive-ops') 'tenants.json'
+if (-not $CheckOnly -and -not (Test-Path $TenantsFile)) {
+  throw ("tenants.json not found at $TenantsFile - the tenant registry lives in the private " +
+    "vinyl-archive-ops repo; clone it beside vinyl-archive.")
+}
 
 # -All: build every active tenant, each in its own process. A per-tenant build
 # is self-contained (it writes only its own prefix / private staging tree), so
