@@ -13,6 +13,11 @@
 #                         built or written. -Data checks another export file
 #                         (a copy) and is refused without -CheckOnly, so a
 #                         stray file can never be built or published.
+#   .\build.ps1 -PlanFolder <album photo folder>
+#                         print the gallery a build would publish from that one
+#                         folder (output names in order, captions, sources, what
+#                         is left out and why) and stop - no export is read and
+#                         nothing is built or written.
 #
 # PRICE GUARD: the export already whitelists fields, but this script refuses
 # to build if any price-like key or any $-amount appears anywhere in the
@@ -20,11 +25,12 @@
 # price-free.
 
 param([switch]$Push, [switch]$Force, [switch]$AllowEmpty, [string]$Tenant = 'owner', [switch]$All,
-      [switch]$CheckOnly, [string]$Data)
+      [switch]$CheckOnly, [string]$Data, [string]$PlanFolder)
 
 $ErrorActionPreference = 'Stop'
 if ($Data -and -not $CheckOnly) { throw '-Data is for -CheckOnly runs only: a build publishes the sheet export, never another file.' }
 if ($CheckOnly -and ($Push -or $All)) { throw '-CheckOnly builds nothing, so it takes neither -Push nor -All.' }
+if ($PlanFolder -and ($Push -or $All -or $CheckOnly -or $Data)) { throw '-PlanFolder reads one photo folder and builds nothing, so it takes no other switch.' }
 Add-Type -AssemblyName System.Drawing
 $Elapsed = [Diagnostics.Stopwatch]::StartNew()
 
@@ -40,7 +46,8 @@ $JpegQ      = 82
 $ShotNums   = @('01','03','05','06','08','10','12','14','16','18','20','22','23','24','25')
 # Gallery order (mirrors websiteImageUrls_ in the sheet script): covers,
 # then each side's label followed by its vinyl surface shot (22-25),
-# matrix close-ups last.
+# matrix close-ups last. A box set's LP files take their places in the same
+# order (THE GALLERY ORDER, $ShotPlace, beside Get-FolderScan below).
 $ShotOrder  = @('01','03','05','06','22','08','23','10','24','12','25','14','16','18','20')
 
 # Corner ownership watermark, on both the web-size images and the thumbs.
@@ -139,7 +146,7 @@ if ([string]::IsNullOrWhiteSpace($Tenant)) { $Tenant = 'owner' }
 # -CheckOnly run builds and writes nothing, so it keeps the owner entry below
 # when the registry is not beside it (a copy of this file run on its own).
 $TenantsFile = Join-Path (Join-Path (Split-Path -Parent $Site) 'vinyl-archive-ops') 'tenants.json'
-if (-not $CheckOnly -and -not (Test-Path $TenantsFile)) {
+if (-not $CheckOnly -and -not $PlanFolder -and -not (Test-Path $TenantsFile)) {
   throw ("tenants.json not found at $TenantsFile - the tenant registry lives in the private " +
     "vinyl-archive-ops repo; clone it beside vinyl-archive.")
 }
@@ -211,7 +218,7 @@ $DataFile  = Join-Path $WebsiteDataDir ([string]$tenantCfg.dataFile)
 if ($Data) { $DataFile = $Data }
 if ($private) {
   $OutRoot = Join-Path $env:LOCALAPPDATA ('vinyl-private\' + [string]$tenantCfg.slug)
-  if (-not $CheckOnly -and -not (Test-Path $OutRoot)) { New-Item -ItemType Directory $OutRoot -Force | Out-Null }
+  if (-not $CheckOnly -and -not $PlanFolder -and -not (Test-Path $OutRoot)) { New-Item -ItemType Directory $OutRoot -Force | Out-Null }
 } else {
   $OutRoot = $Site
 }
@@ -601,6 +608,388 @@ function Build-Nav([string]$current, [string]$root, [string]$albumTab) {
   return $nav + '  </nav>'
 }
 
+# ---------- source folder scan cache ----------
+# Enumerating every album's source folder on the Drive stream mount costs
+# minutes at collection scale, and between two builds almost nothing has
+# changed. Cache each folder's parsed shot list.
+#
+# A cache hit is checked three ways, and any difference re-scans the folder:
+# - the folder's own LastWriteTimeUtc;
+# - the NAMES of the files the scan reads (the photos, the typed runout files
+#   and album.json), listed afresh and equal to the names the entry saw (kept
+#   as a count and a SHA-1, Get-ScanNames). On the Drive mount a folder's time
+#   does NOT move when files are added to it (2026-11-15: a box set's folder
+#   still read 23 October after about 117 photos and runout files were added
+#   that day, and its cached two-photo list would have been published), so the
+#   time alone never proves a folder unchanged;
+# - each cached file's own time and size (Test-ShotsUnchanged), since an
+#   existing file can be overwritten in place - the sheet's Rotate writes the
+#   turned picture into the SAME file.
+# Measured 2026-11-15 on the Drive mount, 340 folders and 4,292 photos, timed
+# part by part in one process: the names check costs 1.3-1.4 s a pass and
+# album.json's own time and size 0.3-0.5 s, beside 6-8.5 s for the folder
+# times and the photo and runout checks that were already there; a whole pass
+# of cache hits took 9-17 s against 7-17 s before (the mount's own spread).
+# -Force still re-scans all.
+#
+# The entry also keeps the folder's typed runout files ("NN Side N Matrix
+# Runout.txt", and a box set's "LPn Side s Matrix Runout.txt": path, time, size
+# and text) for the folder guard below, and album.json's time, size and disc
+# marks, checked the same way, so the guard costs no second walk of the
+# folders. Each entry carries $ScanCacheVersion; an entry written by an older
+# build (no names, no LP files, no album.json) is re-scanned once.
+$ScanCacheVersion = 2
+$ScanCacheFile = Join-Path $Site '.foldercache.json'
+$ScanCache = @{}
+if ((Test-Path $ScanCacheFile) -and -not $Force -and -not $PlanFolder) {
+  try {
+    $rawCache = [IO.File]::ReadAllText($ScanCacheFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
+    foreach ($p in $rawCache.PSObject.Properties) { $ScanCache[$p.Name] = $p.Value }
+  } catch {
+    # A corrupt or half-written cache is a re-scan, never a failed build.
+    $ScanCache = @{}
+  }
+}
+$ScanCacheNew = @{}
+$scanHits = 0; $scanMisses = 0
+
+# Parsed, filtered and ordered shot list for one album source folder. Shape is
+# flat on purpose (no FileInfo) so it round-trips through the cache file.
+function Test-ShotsUnchanged($files) {
+  foreach ($f in @($files)) {
+    $fi = New-Object IO.FileInfo ([string]$f.Path)
+    if (-not $fi.Exists) { return $false }
+    if ([string]$fi.LastWriteTimeUtc.Ticks -ne [string]$f.Ticks) { return $false }
+    if ([long]$fi.Length -ne [long]$f.Length) { return $false }
+  }
+  return $true
+}
+
+# One folder's scan - { v, stamp, names, files (the shots), runouts, album, left }
+# - from this build's own scans, else the cache, else the folder itself. A
+# runout file or an album.json that could not be read is kept as Unread and
+# never cached as read.
+$RunoutFileRx = [regex]' - (14|16|18|20) Side ([1-4]) Matrix Runout\.txt$'
+# A photo is "Artist - Title - NN Shot Name.jpg": the shot number opens the
+# LAST " - " part, so a title starting with two digits ("10 New Songs", "21")
+# is never read as the shot.
+$ShotFileRx = ' - (\d\d)(?!.* - ) (.+)\.[^.]+$'
+# A BOX SET's LP files (the phone app, 2026-11-13) carry an LP token where the
+# two-digit number would be: "Artist - Title - LP3 Side 5 Label.jpg", "... -
+# LP3 Side 5 Vinyl.jpg", "... - LP3 Side 5 Matrix Runout 1.jpg" (a runout
+# photo's slot, 1-4), "... - LP3 Side 5 Matrix Runout.txt", "... - LP3 Jacket.jpg"
+# and "... - LP8 Gatefold Inside.jpg". One reader, the twin of the app's own
+# (reimportJobs): the token opens the LAST " - " part; Jacket and Gatefold
+# Inside belong to any LP from 1; the side files only to LP 3 on, and only for
+# its own two sides, 2n-1 and 2n (LP 1 and LP 2's sides are the numbered files
+# above). None of these names is read by $ShotFileRx or $RunoutFileRx.
+$LpFileRx   = [regex]' - LP(\d{1,2}) (?!.* - )(.+?)(?:\.[^.]+)?$'
+$LpSideRx   = [regex]'^Side (\d+) (Label|Vinyl)$'
+$LpGradeRx  = [regex]'^Vinyl Grade Side (\d+)$'
+$LpRunoutRx = [regex]'^Side (\d+) Matrix Runout(?: ([1-4]))?$'
+# { Lp, Rest, Kind (jacket | gatefold | label | vinyl | runout | runouttext |
+# grade), Side, Slot } for an LP file name, else $null. A grade file is read
+# here only so it is known; it is never published.
+function Get-LpFile([string]$name) {
+  $m = $LpFileRx.Match($name)
+  if (-not $m.Success) { return $null }
+  $n = [int]$m.Groups[1].Value; $rest = $m.Groups[2].Value
+  $img = $name -match '(?i)\.(jpe?g|png)$'; $txt = $name -match '(?i)\.txt$'
+  $o = [pscustomobject]@{ Lp = $n; Rest = $rest; Kind = ''; Side = 0; Slot = 0 }
+  if ($rest -ceq 'Jacket') { if ($img -and $n -ge 1) { $o.Kind = 'jacket'; return $o }; return $null }
+  if ($rest -ceq 'Gatefold Inside') { if ($img -and $n -ge 1) { $o.Kind = 'gatefold'; return $o }; return $null }
+  if ($n -lt 3) { return $null }
+  $sm = $LpSideRx.Match($rest)
+  $gm = $LpGradeRx.Match($rest)
+  $rm = $LpRunoutRx.Match($rest)
+  $sd = if ($sm.Success) { $sm.Groups[1].Value } elseif ($gm.Success) { $gm.Groups[1].Value } elseif ($rm.Success) { $rm.Groups[1].Value } else { '' }
+  # the LP's own two sides only (a number too long to be a side is none)
+  $s = if ($sd -and $sd.Length -le 4) { [int]$sd } else { -1 }
+  if ($s -ne 2 * $n - 1 -and $s -ne 2 * $n) { return $null }
+  $o.Side = $s
+  if ($sm.Success) { if ($img) { $o.Kind = $sm.Groups[2].Value.ToLowerInvariant(); return $o }; return $null }
+  if ($gm.Success) { if ($txt) { $o.Kind = 'grade'; return $o }; return $null }
+  if (-not $rm.Groups[2].Success) { if ($txt) { $o.Kind = 'runouttext'; return $o }; return $null }
+  if ($img) { $o.Kind = 'runout'; $o.Slot = [int]$rm.Groups[2].Value; return $o }
+  return $null
+}
+# The names the scan reads in one folder - the numbered photos, the typed runout
+# files, the LP photos and runout files, album.json - sorted, as a count and one
+# SHA-1. The cache's names check compares these, so a file the scan never reads
+# (a grade text) moves nothing. This runs on every folder of every build, so the
+# folder is listed by name only (a quarter of Get-ChildItem's time on the Drive
+# mount), the same listing on a hit and on a scan, and the common names take
+# no call.
+$ImageNameRx = [regex]'(?i)\.(jpe?g|png)$'
+function Get-FolderNames([string]$folder) {
+  try { $paths = [IO.Directory]::GetFiles($folder) }
+  catch { return @(Get-ChildItem -LiteralPath $folder -File -Force | ForEach-Object { $_.Name }) }
+  $n = New-Object string[] $paths.Length
+  for ($i = 0; $i -lt $paths.Length; $i++) { $n[$i] = [IO.Path]::GetFileName($paths[$i]) }
+  return ,$n
+}
+function Get-ScanNames([string]$folder) {
+  $keep = New-Object System.Collections.Generic.List[string]
+  foreach ($nm in (Get-FolderNames $folder)) {
+    if ($nm -eq 'album.json' -or $RunoutFileRx.IsMatch($nm) -or
+        ($ImageNameRx.IsMatch($nm) -and [regex]::IsMatch($nm, $ShotFileRx))) { $keep.Add($nm); continue }
+    if ($nm.IndexOf(' - LP', [StringComparison]::Ordinal) -lt 0) { continue }
+    $lf = Get-LpFile $nm
+    if ($lf -and $lf.Kind -ne 'grade') { $keep.Add($nm) }
+  }
+  $arr = $keep.ToArray()
+  [Array]::Sort($arr, [StringComparer]::Ordinal)
+  $sha = [Security.Cryptography.SHA1]::Create()
+  try { $h = $sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($arr -join '|')) } finally { $sha.Dispose() }
+  return ($arr.Count.ToString() + ':' + [BitConverter]::ToString($h).Replace('-', '').ToLowerInvariant())
+}
+
+# THE GALLERY ORDER. Every shot has a place: the box covers and Other (01, 03,
+# 05); then each LP k from 1 up - its Jacket, its Gatefold Inside, then its
+# labels and vinyl surfaces side by side (LP 1 = 06, 22, 08, 23; LP 2 = 10, 24,
+# 12, 25; LP 3 on = Side 2k-1 Label, Side 2k-1 Vinyl, Side 2k Label, Side 2k
+# Vinyl); then the runout photos by side (14, 16, 18, 20 are sides 1-4, then a
+# box set's sides 5 up), by slot. Numbers are compared as numbers, so Side 10
+# never sorts before Side 9. An album with no LP files gets exactly $ShotOrder,
+# checked below on every run.
+$ShotPlace = @{
+  '01' = @{ Kind = 'cover';  Lp = 0; Side = 0 }; '03' = @{ Kind = 'cover';  Lp = 0; Side = 0 }
+  '05' = @{ Kind = 'other';  Lp = 0; Side = 0 }
+  '06' = @{ Kind = 'label';  Lp = 1; Side = 1 }; '22' = @{ Kind = 'vinyl';  Lp = 1; Side = 1 }
+  '08' = @{ Kind = 'label';  Lp = 1; Side = 2 }; '23' = @{ Kind = 'vinyl';  Lp = 1; Side = 2 }
+  '10' = @{ Kind = 'label';  Lp = 2; Side = 3 }; '24' = @{ Kind = 'vinyl';  Lp = 2; Side = 3 }
+  '12' = @{ Kind = 'label';  Lp = 2; Side = 4 }; '25' = @{ Kind = 'vinyl';  Lp = 2; Side = 4 }
+  '14' = @{ Kind = 'runout'; Lp = 1; Side = 1 }; '16' = @{ Kind = 'runout'; Lp = 1; Side = 2 }
+  '18' = @{ Kind = 'runout'; Lp = 2; Side = 3 }; '20' = @{ Kind = 'runout'; Lp = 2; Side = 4 } }
+# A shot's place as three numbers (group, then two within it); ties keep the
+# shot name's order, as $ShotOrder always did ("Side 1 Matrix Runout A1", "A2").
+function Get-ShotPlace($f) {
+  switch ([string]$f.Kind) {
+    'cover'    { return @(0, [int]$f.Num, 0) }
+    'other'    { return @(0, [int]$f.Num, 0) }
+    'jacket'   { return @(1, [int]$f.Lp, 0) }
+    'gatefold' { return @(1, [int]$f.Lp, 1) }
+    'label'    { return @(1, [int]$f.Lp, (2 + 2 * ([int]$f.Side - (2 * [int]$f.Lp - 1)))) }
+    'vinyl'    { return @(1, [int]$f.Lp, (3 + 2 * ([int]$f.Side - (2 * [int]$f.Lp - 1)))) }
+    'runout'   { return @(2, [int]$f.Side, [int]$f.Slot) }
+  }
+  return @(3, 0, 0)
+}
+# (An array in, an array out: Windows PowerShell's @() over a generic List can
+# throw "Argument types do not match", so callers pass .ToArray().)
+function Sort-Shots([object[]]$shots) {
+  $keyed = foreach ($x in $shots) {
+    if (-not $x) { continue }
+    $k = @(Get-ShotPlace $x)
+    [pscustomobject]@{ G = $k[0]; A = $k[1]; B = $k[2]; S = [string]$x.Shot; F = $x }
+  }
+  return @($keyed | Sort-Object @{ e = { $_.G } }, @{ e = { $_.A } }, @{ e = { $_.B } }, @{ e = { $_.S } } |
+    ForEach-Object { $_.F })
+}
+# The numbered shots in their places must come out in $ShotOrder (the sheet's
+# websiteImageUrls_ mirrors it): one table, never two orders.
+if (@($ShotPlace.Keys | Where-Object { $ShotNums -notcontains $_ }).Count -or @($ShotNums | Where-Object { -not $ShotPlace.ContainsKey($_) }).Count -or
+    ((@(Sort-Shots @($ShotOrder | ForEach-Object { [pscustomobject]@{ Num = $_; Shot = ''; Kind = $ShotPlace[$_].Kind; Lp = $ShotPlace[$_].Lp; Side = $ShotPlace[$_].Side; Slot = 0 } }) |
+        ForEach-Object { $_.Num }) -join ',') -cne ($ShotOrder -join ','))) {
+  throw 'The gallery places ($ShotPlace) do not give $ShotOrder for the numbered shots - put the two back in step. Nothing was built.'
+}
+
+# A number as the app's Number() reads it, or NaN.
+function Get-BoxNum($v) {
+  if ($null -eq $v) { return [double]::NaN }
+  if ($v -is [bool]) { return [double][int]$v }
+  if ($v -is [int] -or $v -is [long] -or $v -is [double] -or $v -is [decimal]) { return [double]$v }
+  $d = 0.0
+  if ([double]::TryParse(([string]$v).Trim(), [Globalization.NumberStyles]::Float, [Globalization.CultureInfo]::InvariantCulture, [ref]$d)) { return $d }
+  return [double]::NaN
+}
+# A DOUBLE LP IN A BOX (the app, 2026-11-15): album.json's discOf marks a
+# later disc of one album, slot -> the slot of that album's first disc ({"9":
+# 8}). The app's boxFirst and boxAlbumDiscs: slot k continues only the album
+# of the slot right before it. Returns { n, first[k], size[k] } over n LPs.
+function Get-BoxShape([bool]$box, $discOf, [int]$n) {
+  $first = @{}; $size = @{}
+  for ($k = 1; $k -le $n; $k++) {
+    $first[$k] = $k
+    if ($box -and $null -ne $discOf -and $k -ge 2) {
+      $pp = $discOf.PSObject.Properties[[string]$k]
+      if ($pp -and (Get-BoxNum $pp.Value) -eq $first[$k - 1]) { $first[$k] = $first[$k - 1] }
+    }
+  }
+  for ($j = 1; $j -le $n; $j++) {
+    $c = 1
+    while ($j + $c -le $n -and $first[$j + $c] -eq $j) { $c++ }
+    $size[$j] = $c
+  }
+  return [pscustomobject]@{ n = $n; first = $first; size = $size }
+}
+
+function Read-RunoutFile($rfile, [string]$side) {
+  $text = ''; $unread = $false
+  try { $text = [IO.File]::ReadAllText($rfile.FullName, [Text.Encoding]::UTF8).Trim() }
+  catch {
+    # A path past the old 260-character limit (two album folders' names
+    # carry their whole title) opens only through its long-path form.
+    try { $text = [IO.File]::ReadAllText('\\?\' + $rfile.FullName, [Text.Encoding]::UTF8).Trim() } catch { $unread = $true }
+  }
+  return [pscustomobject]@{ Path = $rfile.FullName; Name = $rfile.Name
+                            Length = $rfile.Length; Ticks = [string]$rfile.LastWriteTimeUtc.Ticks
+                            Side = $side; Text = $text; Unread = $unread }
+}
+
+function Get-FolderScan([string]$folder) {
+  if ($script:ScanCacheNew.ContainsKey($folder)) { return $script:ScanCacheNew[$folder] }
+  $stamp = [string](Get-Item -LiteralPath $folder).LastWriteTimeUtc.Ticks
+  $names = Get-ScanNames $folder
+  $hit = $ScanCache[$folder]
+  if ($hit -and [int]$hit.v -eq $ScanCacheVersion -and ([string]$hit.stamp) -eq $stamp -and
+      ([string]$hit.names) -ceq $names -and ($null -ne $hit.runouts) -and
+      -not @(@($hit.runouts) | Where-Object { $_.Unread }).Count -and
+      -not ($hit.album -and $hit.album.Unread) -and
+      (Test-ShotsUnchanged $hit.files) -and (Test-ShotsUnchanged $hit.runouts) -and
+      (-not $hit.album -or (Test-ShotsUnchanged @($hit.album)))) {
+    $script:scanHits++
+    $script:ScanCacheNew[$folder] = $hit
+    return $hit
+  }
+  $script:scanMisses++
+  $all = @(Get-ChildItem -LiteralPath $folder -File)
+  # album.json: whether this is a box set, its LP count and its disc marks.
+  $album = $null; $box = $false; $discs = 0; $discOf = $null
+  $aj = @($all | Where-Object { $_.Name -eq 'album.json' })
+  if ($aj.Count) {
+    $ajf = $aj[0]; $ajText = $null; $ajObj = $null; $ajUnread = $false
+    try { $ajText = [IO.File]::ReadAllText($ajf.FullName, [Text.Encoding]::UTF8) }
+    catch {
+      try { $ajText = [IO.File]::ReadAllText('\\?\' + $ajf.FullName, [Text.Encoding]::UTF8) } catch { $ajUnread = $true }
+    }
+    if (-not $ajUnread) {
+      try { $ajObj = $ajText | ConvertFrom-Json } catch { $ajObj = $null }
+      if (-not ($ajObj -is [System.Management.Automation.PSCustomObject])) { $ajUnread = $true; $ajObj = $null }
+    }
+    if ($ajObj) {
+      $box = ($ajObj.box -is [bool]) -and $ajObj.box
+      $dn = Get-BoxNum $ajObj.discs
+      if (-not [double]::IsNaN($dn) -and $dn -ge 1 -and $dn -le 99) { $discs = [int][Math]::Floor($dn) }
+      if ($ajObj.discOf -is [System.Management.Automation.PSCustomObject]) { $discOf = $ajObj.discOf }
+    }
+    $album = [pscustomobject]@{ Path = $ajf.FullName; Name = $ajf.Name
+                                Length = $ajf.Length; Ticks = [string]$ajf.LastWriteTimeUtc.Ticks
+                                Unread = $ajUnread; Box = $box; Discs = $discs; Marks = '' }
+  }
+  $cand = New-Object System.Collections.Generic.List[object]
+  $runouts = New-Object System.Collections.Generic.List[object]
+  $lpTop = 0
+  foreach ($f in $all) {
+    $isImg = $f.Extension -match '(?i)^\.(jpe?g|png)$'
+    $m = [regex]::Match($f.Name, $ShotFileRx)
+    if ($isImg -and $m.Success) {
+      $num = $m.Groups[1].Value
+      if ($ShotNums -notcontains $num) { continue }
+      $pl = $ShotPlace[$num]
+      $cand.Add([pscustomobject]@{ Path = $f.FullName; Name = $f.Name
+                                   Length = $f.Length; Ticks = [string]$f.LastWriteTimeUtc.Ticks
+                                   Num = $num; Shot = $m.Groups[2].Value
+                                   Lp = $pl.Lp; Side = $pl.Side; Kind = $pl.Kind; Slot = 0
+                                   OutName = $num + '-' + (Slugify $m.Groups[2].Value) + '.jpg' })
+      continue
+    }
+    $rm = $RunoutFileRx.Match($f.Name)
+    if ($rm.Success) {
+      if ([int]$rm.Groups[1].Value -eq 12 + 2 * [int]$rm.Groups[2].Value) {
+        $runouts.Add((Read-RunoutFile $f ('abcd'.Substring([int]$rm.Groups[2].Value - 1, 1))))
+      }
+      continue
+    }
+    if ($f.Name.IndexOf(' - LP', [StringComparison]::Ordinal) -lt 0) { continue }
+    $lf = Get-LpFile $f.Name
+    if (-not $lf) { continue }
+    if ($lf.Lp -gt $lpTop) { $lpTop = $lf.Lp }
+    if ($lf.Kind -eq 'runouttext') { $runouts.Add((Read-RunoutFile $f ([string]$lf.Side))); continue }
+    if ($lf.Kind -eq 'grade') { continue }
+    # Published as "lp3-side-5-label.jpg", captioned "LP3 Side 5 Label".
+    $shot = 'LP' + $lf.Lp + ' ' + $lf.Rest
+    $cand.Add([pscustomobject]@{ Path = $f.FullName; Name = $f.Name
+                                 Length = $f.Length; Ticks = [string]$f.LastWriteTimeUtc.Ticks
+                                 Num = ''; Shot = $shot
+                                 Lp = $lf.Lp; Side = $lf.Side; Kind = $lf.Kind; Slot = $lf.Slot
+                                 OutName = (Slugify $shot) + '.jpg' })
+  }
+  # The disc marks, as the app reads them: any LP file makes the folder a box
+  # set (as the app's "Bring back into this app" does), and the LP count is
+  # album.json's or the highest LP a file names. A later disc of an album has
+  # no jacket of its own - an "LP9 Jacket.jpg" taken before LP 9 was marked as
+  # disc 2 of LP 8 stays in Drive and out of the gallery - and a Gatefold
+  # Inside belongs only to the first disc of an album of two or more discs.
+  $shape = Get-BoxShape ($box -or $lpTop -gt 0) $discOf ([Math]::Max(1, [Math]::Max($discs, $lpTop)))
+  if ($album) {
+    $album.Marks = (@(2..([Math]::Max(2, $shape.n)) | Where-Object { $_ -le $shape.n -and $shape.first[$_] -lt $_ } |
+      ForEach-Object { [string]$_ + '>' + $shape.first[$_] }) -join ' ')
+  }
+  $left = New-Object System.Collections.Generic.List[object]
+  $keep = New-Object System.Collections.Generic.List[object]
+  foreach ($c in $cand) {
+    if ($c.Kind -eq 'jacket' -or $c.Kind -eq 'gatefold') {
+      $k = [int]$c.Lp
+      if ($shape.first[$k] -ne $k) {
+        $left.Add([pscustomobject]@{ Name = $c.Name; Why = ('LP ' + $k + ' is a later disc of the album that begins at LP ' + $shape.first[$k] + ', whose jacket it shares') })
+        continue
+      }
+      if ($c.Kind -eq 'gatefold' -and $shape.size[$k] -lt 2) {
+        $why = if ($album -and $album.Unread) { 'album.json could not be read, so no LP is known to be the first of two or more discs' }
+               else { 'LP ' + $k + ' is an album of one disc, so it has no gatefold' }
+        $left.Add([pscustomobject]@{ Name = $c.Name; Why = $why })
+        continue
+      }
+    }
+    $keep.Add($c)
+  }
+  $entry = [pscustomobject]@{ v = $ScanCacheVersion; stamp = $stamp; names = $names
+                              files = @(Sort-Shots $keep.ToArray()); runouts = $runouts.ToArray(); album = $album
+                              left = $left.ToArray() }
+  $script:ScanCacheNew[$folder] = $entry
+  return $entry
+}
+
+function Get-SourceShots([string]$folder) {
+  return @(@((Get-FolderScan $folder).files) | Where-Object { $_ } | ForEach-Object {
+    [pscustomobject]@{ Path = [string]$_.Path; Name = [string]$_.Name
+                       Length = [long]$_.Length; Ticks = [string]$_.Ticks
+                       Num = [string]$_.Num; Shot = [string]$_.Shot
+                       Lp = [int]$_.Lp; Side = [int]$_.Side; Kind = [string]$_.Kind; Slot = [int]$_.Slot
+                       OutName = [string]$_.OutName }
+  })
+}
+
+# -PlanFolder <folder>: the gallery a build would publish from one photo folder
+# - each output file in order, its caption and its source file - then what was
+# left out and why, album.json's disc marks and the typed runout files; then
+# stop. Read from the folder itself, never the cache; nothing is written.
+if ($PlanFolder) {
+  if (-not (Test-Path -LiteralPath $PlanFolder -PathType Container)) { throw "-PlanFolder: no folder at $PlanFolder" }
+  $pf = (Resolve-Path -LiteralPath $PlanFolder).ProviderPath
+  $plan = Get-FolderScan $pf
+  Write-Output ("Gallery planned for " + $pf)
+  $pi = 0
+  foreach ($s in (Get-SourceShots $pf)) {
+    $pi++
+    Write-Output ("{0,3}  {1}  [{2}]  <- {3}" -f $pi, $s.OutName, $s.Shot, $s.Name)
+  }
+  foreach ($l in @($plan.left)) { if ($l) { Write-Output ("left out: " + $l.Name + " - " + $l.Why) } }
+  if ($plan.album) {
+    $pa = $plan.album
+    Write-Output ("album.json: " + $(if ($pa.Unread) { 'could not be read' } else {
+      $(if ($pa.Box) { 'box set' } else { 'not a box set' }) + ', ' + $pa.Discs + $(if ($pa.Box) { ' LP(s)' } else { ' disc(s)' }) +
+      $(if ($pa.Marks) { ', later discs (slot>first disc): ' + $pa.Marks } else { '' }) }))
+    $lpHigh = @(@($plan.files) | Where-Object { $_ -and [int]$_.Lp -gt [int]$pa.Discs -and $_.Kind -ne 'cover' -and $_.Kind -ne 'other' } | ForEach-Object { [int]$_.Lp } | Sort-Object -Unique)
+    if ($pa.Box -and $pa.Discs -gt 0 -and $lpHigh.Count) { Write-Output ("note: files of LP " + ($lpHigh -join ', ') + " are past album.json's " + $pa.Discs + " LP(s)") }
+  } else { Write-Output 'album.json: none' }
+  foreach ($r in @($plan.runouts | Sort-Object @{ e = { if ([string]$_.Side -match '^\d+$') { [int]$_.Side } else { 'abcd'.IndexOf([string]$_.Side) + 1 } } })) {
+    if ($r) { Write-Output ("runout file, side " + $r.Side + ": " + $(if ($r.Unread) { '(could not be read)' } else { $r.Text })) }
+  }
+  return
+}
+
 # ---------- load + guard ----------
 if (-not (Test-Path $DataFile)) { throw "Data file not found: $DataFile (run the sheet's Website export first)" }
 $json = [IO.File]::ReadAllText($DataFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
@@ -837,108 +1226,6 @@ if (@($json.albums).Count -eq 0 -and -not $AllowEmpty) {
     '-AllowEmpty.')
 }
 
-# ---------- source folder scan cache ----------
-# Enumerating every album's source folder on the Drive stream mount costs
-# minutes at collection scale, and between two builds almost nothing has
-# changed. Cache each folder's parsed shot list against the folder's own
-# LastWriteTimeUtc.
-#
-# A folder's mtime moves when a file is added, removed or renamed, but not when
-# an existing file is overwritten in place - and the sheet's Rotate now writes
-# the turned picture into the SAME file. So a cache hit also checks each cached
-# photo's own time and size (Test-ShotsUnchanged) and re-scans the folder when
-# any differs or is gone. Measured 2026-10-06 on the Drive mount: 2,373 cached
-# photos over 209 folders checked in about 10 s. -Force still re-scans all.
-#
-# The entry also keeps the folder's typed runout files ("NN Side N Matrix
-# Runout.txt": path, time, size and text) for the folder guard below, checked
-# the same way, so the guard costs no second walk of the folders (2026-10-13).
-# An entry written before then carries no runouts and is re-scanned once.
-$ScanCacheFile = Join-Path $Site '.foldercache.json'
-$ScanCache = @{}
-if ((Test-Path $ScanCacheFile) -and -not $Force) {
-  try {
-    $rawCache = [IO.File]::ReadAllText($ScanCacheFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
-    foreach ($p in $rawCache.PSObject.Properties) { $ScanCache[$p.Name] = $p.Value }
-  } catch {
-    # A corrupt or half-written cache is a re-scan, never a failed build.
-    $ScanCache = @{}
-  }
-}
-$ScanCacheNew = @{}
-$scanHits = 0; $scanMisses = 0
-
-# Parsed, filtered and ordered shot list for one album source folder. Shape is
-# flat on purpose (no FileInfo) so it round-trips through the cache file.
-function Test-ShotsUnchanged($files) {
-  foreach ($f in @($files)) {
-    $fi = New-Object IO.FileInfo ([string]$f.Path)
-    if (-not $fi.Exists) { return $false }
-    if ([string]$fi.LastWriteTimeUtc.Ticks -ne [string]$f.Ticks) { return $false }
-    if ([long]$fi.Length -ne [long]$f.Length) { return $false }
-  }
-  return $true
-}
-
-# One folder's scan - { stamp, files (the shots), runouts } - from this build's
-# own scans, else the cache, else the folder itself. A runout file that could
-# not be read is kept as Unread and never cached as read.
-$RunoutFileRx = [regex]' - (14|16|18|20) Side ([1-4]) Matrix Runout\.txt$'
-# A photo is "Artist - Title - NN Shot Name.jpg": the shot number opens the
-# LAST " - " part, so a title starting with two digits ("10 New Songs", "21")
-# is never read as the shot.
-$ShotFileRx = ' - (\d\d)(?!.* - ) (.+)\.[^.]+$'
-function Get-FolderScan([string]$folder) {
-  if ($script:ScanCacheNew.ContainsKey($folder)) { return $script:ScanCacheNew[$folder] }
-  $stamp = [string](Get-Item -LiteralPath $folder).LastWriteTimeUtc.Ticks
-  $hit = $ScanCache[$folder]
-  if ($hit -and ([string]$hit.stamp) -eq $stamp -and ($null -ne $hit.runouts) -and
-      -not @(@($hit.runouts) | Where-Object { $_.Unread }).Count -and
-      (Test-ShotsUnchanged $hit.files) -and (Test-ShotsUnchanged $hit.runouts)) {
-    $script:scanHits++
-    $script:ScanCacheNew[$folder] = $hit
-    return $hit
-  }
-  $script:scanMisses++
-  $all = @(Get-ChildItem -LiteralPath $folder -File)
-  $found = @($all | Where-Object {
-      $_.Extension -match '(?i)^\.(jpe?g|png)$' -and $_.Name -match $ShotFileRx
-    } | ForEach-Object {
-      $m = [regex]::Match($_.Name, $ShotFileRx)
-      [pscustomobject]@{ Path = $_.FullName; Name = $_.Name
-                         Length = $_.Length; Ticks = [string]$_.LastWriteTimeUtc.Ticks
-                         Num = $m.Groups[1].Value; Shot = $m.Groups[2].Value }
-    } | Where-Object { $ShotNums -contains $_.Num } |
-      Sort-Object @{ e = { $ShotOrder.IndexOf($_.Num) } }, @{ e = { $_.Shot } })
-  $runouts = @($all | ForEach-Object {
-      $rfile = $_   # inside a catch, $_ is the error, not the file
-      $m = $RunoutFileRx.Match($rfile.Name)
-      if ($m.Success -and [int]$m.Groups[1].Value -eq 12 + 2 * [int]$m.Groups[2].Value) {
-        $text = ''; $unread = $false
-        try { $text = [IO.File]::ReadAllText($rfile.FullName, [Text.Encoding]::UTF8).Trim() }
-        catch {
-          # A path past the old 260-character limit (two album folders' names
-          # carry their whole title) opens only through its long-path form.
-          try { $text = [IO.File]::ReadAllText('\\?\' + $rfile.FullName, [Text.Encoding]::UTF8).Trim() } catch { $unread = $true }
-        }
-        [pscustomobject]@{ Path = $rfile.FullName; Name = $rfile.Name
-                           Length = $rfile.Length; Ticks = [string]$rfile.LastWriteTimeUtc.Ticks
-                           Side = 'abcd'.Substring([int]$m.Groups[2].Value - 1, 1); Text = $text; Unread = $unread }
-      }
-    })
-  $entry = [pscustomobject]@{ stamp = $stamp; files = $found; runouts = $runouts }
-  $script:ScanCacheNew[$folder] = $entry
-  return $entry
-}
-
-function Get-SourceShots([string]$folder) {
-  return @(@((Get-FolderScan $folder).files) | Where-Object { $_ } | ForEach-Object {
-    [pscustomobject]@{ Path = [string]$_.Path; Name = [string]$_.Name
-                       Length = [long]$_.Length; Ticks = [string]$_.Ticks
-                       Num = [string]$_.Num; Shot = [string]$_.Shot }
-  })
-}
-
 # An album's photo folder: its folderOverrides entry while that path exists,
 # else its folder name under the first photo root holding it. ONE resolution
 # for the folder guard and the build, so the folder the guard reads is the one
@@ -965,7 +1252,9 @@ function Resolve-AlbumFolder($album, [switch]$Quiet) {
 # runout MFSL2-380 A2 20596.1(3) KW@MOFI where the album's own reads
 # XLP-79421-1C 0 A - and the next builds published those photos on the
 # album's page, because the build takes its photos from the folder. So the
-# album's own runout (the export's "matrix", side by side) is compared with
+# album's own runout (the export's "matrix", side by side; a box set's sides 5
+# and up are its "boxRunouts", against the folder's "LPn Side s Matrix
+# Runout.txt", 2026-11-15) is compared with
 # the runout file the folder holds for that side ("NN Side N Matrix
 # Runout.txt"), the sheet's own comparison ported line for line: upper case,
 # letters and digits only; equal is the same record; differing within the
@@ -1079,13 +1368,39 @@ function Get-RunoutPair([string]$r, [string]$f, [string]$other) {
   }
   return [pscustomobject]@{ verdict = 'typo'; why = ''; other = '' }
 }
+# A BOX SET's sides 5 and up (2026-11-15): the export's boxRunouts, keyed by the
+# box's side number ("5", "6" ...), beside matrix a-d for sides 1-4. Its sides
+# in number order, each with the key it is written under; any other key is no
+# side of the box and is read by nothing here.
+function Get-BoxRunoutSides($album) {
+  $br = $album.boxRunouts
+  if (-not ($br -is [System.Management.Automation.PSCustomObject])) { return @() }
+  return @(@($br.PSObject.Properties | Where-Object { $_.Name -match '^\d{1,3}$' -and [int]$_.Name -ge 5 } |
+    ForEach-Object { [pscustomobject]@{ Side = [int]$_.Name; Key = $_.Name } }) | Sort-Object Side)
+}
+# An album's own runouts by side: a-d from matrix, then "5" up from boxRunouts.
+function Get-AlbumRuns($album) {
+  $runs = @{}
+  foreach ($s in 'a', 'b', 'c', 'd') { $runs[$s] = $(if ($album.matrix) { [string]$album.matrix.$s } else { '' }) }
+  foreach ($bs in @(Get-BoxRunoutSides $album)) {
+    if (-not $runs.ContainsKey([string]$bs.Side)) { $runs[[string]$bs.Side] = [string]$album.boxRunouts.($bs.Key) }
+  }
+  return $runs
+}
+# The sides a runout map carries, in order: a-d, then the numbered sides as numbers.
+function Get-RunoutSides($runs) {
+  return @(@('a', 'b', 'c', 'd') + @(@($runs.Keys | ForEach-Object { [string]$_ } | Where-Object { $_ -match '^\d{1,3}$' }) |
+    Sort-Object { [int]$_ }))
+}
 # Every album's own runouts in the export, by side: norm -> the albums typing it.
 $RunoutOwners = @{ a = @{}; b = @{}; c = @{}; d = @{} }
 foreach ($ao in $json.albums) {
-  if (-not $ao.matrix) { continue }
-  foreach ($s in 'a', 'b', 'c', 'd') {
-    $n = Get-RunoutNorm ([string]$ao.matrix.$s)
+  if (-not $ao.matrix -and -not @(Get-BoxRunoutSides $ao).Count) { continue }
+  $aoRuns = Get-AlbumRuns $ao
+  foreach ($s in (Get-RunoutSides $aoRuns)) {
+    $n = Get-RunoutNorm ([string]$aoRuns[$s])
     if (-not $n) { continue }
+    if (-not $RunoutOwners.ContainsKey($s)) { $RunoutOwners[$s] = @{} }
     if (-not $RunoutOwners[$s].ContainsKey($n)) { $RunoutOwners[$s][$n] = New-Object System.Collections.Generic.List[object] }
     $RunoutOwners[$s][$n].Add($ao)
   }
@@ -1095,18 +1410,19 @@ foreach ($ao in $json.albums) {
 # side, so this album can never answer; an entry carrying its Album ID (a
 # duplicate of the same album) is never another album.
 function Get-RunoutOther($album, [string]$s, [string]$f) {
-  if (-not $RunoutOwners[$s].ContainsKey($f)) { return '' }
+  if (-not $RunoutOwners.ContainsKey($s) -or -not $RunoutOwners[$s].ContainsKey($f)) { return '' }
   foreach ($o in $RunoutOwners[$s][$f]) {
     if ([string]$album.albumId -and ([string]$o.albumId -ceq [string]$album.albumId)) { continue }
     return ("{0} ({1} - {2})" -f [string]$o.slug, [string]$o.artist, [string]$o.title)
   }
   return ''
 }
-# The album's runouts against its folder's, by side (A only with A). Returns
+# The album's runouts against its folder's, by side (A only with A, a box set's
+# side 5 only with side 5). Returns
 # { verdict: same | typo | different | unknown; side; row; folder; why; other }.
 function Get-RunoutBind($rowRuns, $folderRuns, $unread, $album) {
   $diff = $null; $typo = $null; $gap = $false; $compared = 0
-  foreach ($s in 'a', 'b', 'c', 'd') {
+  foreach ($s in (Get-RunoutSides $rowRuns)) {
     $r = Get-RunoutNorm ([string]$rowRuns[$s])
     $f = Get-RunoutNorm ([string]$folderRuns[$s])
     if (-not $r) { continue }
@@ -1129,11 +1445,10 @@ function Get-RunoutBind($rowRuns, $folderRuns, $unread, $album) {
 $runoutHits = New-Object System.Collections.Generic.List[string]
 $runoutRead = 0; $runoutCounts = @{}
 foreach ($a in $json.albums) {
-  if ([string]$a.status -eq 'withdrawn' -or -not $a.matrix) { continue }
-  $rowRuns = @{}; $anyRun = $false
-  foreach ($s in 'a', 'b', 'c', 'd') {
-    $rowRuns[$s] = [string]$a.matrix.$s
-    if ($rowRuns[$s].Trim()) { $anyRun = $true }
+  if ([string]$a.status -eq 'withdrawn' -or (-not $a.matrix -and -not @(Get-BoxRunoutSides $a).Count)) { continue }
+  $rowRuns = Get-AlbumRuns $a; $anyRun = $false
+  foreach ($s in (Get-RunoutSides $rowRuns)) {
+    if (([string]$rowRuns[$s]).Trim()) { $anyRun = $true }
   }
   if (-not $anyRun) { continue }
   $rf = Resolve-AlbumFolder $a -Quiet
@@ -1150,8 +1465,10 @@ foreach ($a in $json.albums) {
   $rb = Get-RunoutBind $rowRuns $folderRuns $unreadRuns $a
   $runoutCounts[$rb.verdict] = 1 + [int]$runoutCounts[$rb.verdict]
   if ($rb.verdict -ceq 'different') {
+    # side A-D is matrix a-d, Side 1-4; a box set's side 5 up is named by its number both times
+    $sideNo = if ([string]$rb.side -match '^\d+$') { [string]$rb.side } else { [string]('abcd'.IndexOf($rb.side) + 1) }
     $runoutHits.Add(("{0} ({1} - {2}): side {3} of the export reads ""{4}"" but the Side {5} runout file in its photo folder ""{6}"" reads ""{7}""{8}" -f
-      [string]$a.slug, [string]$a.artist, [string]$a.title, $rb.side.ToUpper(), $rb.row, ('abcd'.IndexOf($rb.side) + 1), $rf, $rb.folder,
+      [string]$a.slug, [string]$a.artist, [string]$a.title, ([string]$rb.side).ToUpper(), $rb.row, $sideNo, $rf, $rb.folder,
       $(if ($rb.other) { " - the runout of " + $rb.other } else { '' })))
   }
 }
@@ -1377,6 +1694,10 @@ foreach ($album in $json.albums) {
     $warnings.Add("$($album.artist) - $($album.title): photo folder '$($album.folderName)' not found under any photo root - point to it in build.config.json: ""folderOverrides"": { ""$slug"": ""<full path>"" } (or add its parent folder to ""photoRoots"")")
   } else {
     $files = Get-SourceShots $srcFolder
+    $scanOf = Get-FolderScan $srcFolder
+    if ($scanOf.album -and $scanOf.album.Unread) {
+      $warnings.Add("$($album.artist) - $($album.title): album.json in its photo folder could not be read, so its LP photos were placed without its disc marks this build (it is read again next build)")
+    }
 
     # incremental manifest: "name|length|mtimeticks" per source file, plus a
     # cfg entry - changing sizes/quality/watermark rebuilds every photo.
@@ -1390,7 +1711,8 @@ foreach ($album in $json.albums) {
     $newMani = @($cfgKey)
     $wanted = @{}
     foreach ($s in $files) {
-      $outName = $s.Num + '-' + (Slugify $s.Shot) + '.jpg'
+      # "NN-<shot>.jpg" for a numbered shot, "lpN-<shot>.jpg" for a box set's LP file (Get-FolderScan)
+      $outName = $s.OutName
       $key = $s.Name + '|' + $s.Length + '|' + $s.Ticks
       $newMani += $key
       $wanted[$outName] = $true
@@ -1479,6 +1801,11 @@ foreach ($album in $json.albums) {
   foreach ($side in 'a','b','c','d') {
     $v = ([string]$album.matrix.$side).Trim()
     if ($v -ne '') { [void]$mx.AppendLine('Side ' + $side.ToUpper() + ':  ' + $v) }
+  }
+  # a box set's sides 5 and up, by number, after sides A-D
+  foreach ($bs in @(Get-BoxRunoutSides $album)) {
+    $v = ([string]$album.boxRunouts.($bs.Key)).Trim()
+    if ($v -ne '') { [void]$mx.AppendLine('Side ' + $bs.Side + ':  ' + $v) }
   }
   $matrix = ''
   if ($mx.Length -gt 0) {
