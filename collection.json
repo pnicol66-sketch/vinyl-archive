@@ -1,5 +1,5 @@
 {
-    "generated":  "2026-11-16T18:45:17.920Z",
+    "generated":  "2026-11-16T18:52:27.772Z",
     "site":  {
                  "title":  "Vinyl Curator",
                  "baseUrl":  "https://vinylcurator.net",
@@ -14883,6 +14883,55 @@
                        "soldDate":  "",
                        "variantChronology":  "1965 - US mono white-label promo pressing\n1965 - US mono two-eye \"Nonbreakable\" label, early (1A/1A) stamper run\n1965 - US mono two-eye \"Nonbreakable\" label, later (1B/1H) stamper run  \u003c- this copy\n1965 - US stereo original (CS 9189)\n1967 - US mono repress, later flat label\nc. 1967-on - US stereo reissue (CS 2389)",
                        "slug":  "bob-dylan-highway-61-revisited-2",
+                       "tab":  "For Sale",
+                       "fileUnder":  "Bob Dylan"
+                   },
+                   {
+                       "artist":  "Bob Dylan",
+                       "title":  "John Wesley Harding",
+                       "year":  "1968",
+                       "labelName":  "Columbia",
+                       "labelNumber":  "CS 9604",
+                       "monoStereo":  "Stereo",
+                       "countryOfOrigin":  "US",
+                       "format":  "LP",
+                       "genre":  "Rock - Folk Rock",
+                       "speed":  "33 1/3 RPM",
+                       "producer":  "Bob Johnston",
+                       "composer":  "",
+                       "conductor":  "",
+                       "performerOrchestra":  "",
+                       "musicians":  "Bob Dylan (vocal, guitar, harmonica, piano), Charlie McCoy (bass), Kenny Buttrey (drums), Pete Drake (steel guitar on I\u0027ll Be Your Baby Tonight and Down Along the Cove)",
+                       "coverGrade":  "NM-",
+                       "vinylGrade":  "NM",
+                       "matrix":  {
+                                      "a":  "XSM 135311-1 IF 0 P B2",
+                                      "b":  "XSM 135312-1F 0 P",
+                                      "c":  "",
+                                      "d":  ""
+                                  },
+                       "sides":  [
+                                     "1. John Wesley Harding\n2. As I Went Out One Morning\n3. I Dreamed I Saw St. Augustine\n4. All Along the Watchtower\n5. The Ballad of Frankie Lee and Judas Priest\n6. Drifter\u0027s Escape",
+                                     "1. Dear Landlord\n2. I Am a Lonesome Hobo\n3. I Pity the Poor Immigrant\n4. The Wicked Messenger\n5. Down Along the Cove\n6. I\u0027ll Be Your Baby Tonight",
+                                     "",
+                                     ""
+                                 ],
+                       "albumStory":  "Recorded in Nashville in the autumn of 1967, the album arrived after Dylan\u0027s 1966 motorcycle accident and a long public silence, during which he had retreated with The Band to make the home recordings that would eventually surface as the Basement Tapes. Stripped of the electric density of his mid-1960s trilogy, the record pairs just Dylan\u0027s voice, guitar, harmonica and piano with a spare Nashville rhythm section, trading surreal rock excess for parable-like songs steeped in biblical imagery, outlaws and wandering figures. Several tracks read like allegories, delivered in a plain-spoken, almost liturgical tone that marked a deliberate turn away from the psychedelic rock of the era. The closing pair of straightforward country love songs quietly signaled the direction Dylan would pursue on his very next release. Critics and listeners received the album as a startling, inward-looking statement, and it is now regarded as a pivotal bridge between Dylan\u0027s electric period and his embrace of country and roots music. Its spare arrangements and oblique storytelling have influenced generations of Americana and singer-songwriter artists, and the album remains one of the most studied and admired entries in Dylan\u0027s catalogue.",
+                       "lpNotes":  "Stereo pressing on the red Columbia two-eye label; the runout\u0027s plant stamp reads as a Pitman-pressed copy rather than the Terre Haute pressing most often cited for this catalogue number.",
+                       "labelNotes":  "The side labels are the standard red Columbia design with the circular two-eye logo at 3 and 9 o\u0027clock, the white 360 Sound arc with arrows at the bottom, and STEREO printed beneath the title - the red two-eye format Columbia used for its stereo rock catalogue from 1965 through 1970. No deep groove is visible on either label. The catalogue number and stereo wording match the configuration cut for the album\u0027s January 1968 release, placing this pressing within that first stereo manufacturing run rather than a later orange-label reissue. The back cover prints both a mono and a stereo catalogue number, a standard dual listing of the period and not evidence against the stereo label actually on the record.",
+                       "fidelity":  "The album was cut from the original 1967 Nashville session tapes, engineered for Columbia by Charlie Bragg, and pressed as a straightforward all-analog stereo disc without any digital processing. Collectors on the forums generally regard the original two-eye Columbia pressings as full-bodied and natural sounding, if limited by the simple session chain rather than by the mastering itself. Later audiophile reissues on heavier vinyl have been praised for quieter surfaces, but the original two-eye pressing is still considered a faithful, warm-sounding cut that most collectors rank above the standard reissues and the CD, if a notch below the specially remastered audiophile pressings.",
+                       "generalNotes":  "This is a 1968 Columbia CS 9604 stereo pressing on the red two-eye label with the white 360 Sound arrows, the standard design used for the label\u0027s stereo rock titles of the period. The runout carries a P plant stamp, which identifies the pressing plant as Pitman rather than the Terre Haute plant associated with some copies of this catalogue number. The jacket\u0027s prose section ends with a 1968 copyright line, a detail absent from at least one other known variant of this release, further distinguishing this copy from that variant. No deep groove is present on either label.",
+                       "vinylGradeSides":  [
+                                               "NM",
+                                               "NM",
+                                               "",
+                                               ""
+                                           ],
+                       "discogsListingUrl":  "",
+                       "ebayItemUrl":  "",
+                       "soldDate":  "",
+                       "variantChronology":  "1968 - US Columbia red two-eye stereo label (pressing-plant stamp in the runout, various plants)  \u003c- this copy\n1968 - US Columbia red two-eye mono label (CL 2804)\n1968 - UK CBS stereo pressing (S BPG 63252/63252)\n1970 - US Columbia reissue, orange-label KCS 9604\n2016 onward - Legacy/Sundazed audiophile reissues (stereo 150g and mono 180g)",
+                       "slug":  "bob-dylan-john-wesley-harding",
                        "tab":  "For Sale",
                        "fileUnder":  "Bob Dylan"
                    },
