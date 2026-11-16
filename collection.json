@@ -1,5 +1,5 @@
 {
-    "generated":  "2026-11-15T06:23:26.079Z",
+    "generated":  "2026-11-16T09:35:51.685Z",
     "site":  {
                  "title":  "Vinyl Curator",
                  "baseUrl":  "https://vinylcurator.net",
@@ -2670,7 +2670,7 @@
                        "performerOrchestra":  "",
                        "musicians":  "Bob Dylan (vocals, guitar, harmonica, piano) across all eight included albums, with session musicians varying by album including Bruce Langhorne (guitar), Al Kooper (organ), Mike Bloomfield (guitar), Charlie McCoy (guitar/bass), Kenny Buttrey (drums), Robbie Robertson and other members of The Hawks/The Band on later sessions.",
                        "coverGrade":  "NM",
-                       "vinylGrade":  "",
+                       "vinylGrade":  "NM",
                        "matrix":  {
                                       "a":  "",
                                       "b":  "",
@@ -2694,6 +2694,38 @@
                                                "",
                                                ""
                                            ],
+                       "boxRunouts":  {
+                                          "5":  "88697761051-LP3-A STERLING 19499.1 (3)",
+                                          "6":  "88697761051-LP3-B STERLING 19524.2 (3) RKS",
+                                          "7":  "88697761051-LP4-A STERLING 19451.1 (3)",
+                                          "8":  "88697761051-LP4-B STERLING 19460.2 (3)",
+                                          "9":  "88697761051-LP5-A STERLING 19461.1 (3)",
+                                          "10":  "88697761051-LP2-B STERLING 19461.2 (3)",
+                                          "11":  "88697761051-LP6-A STERLING 19466.1 (3)",
+                                          "12":  "88697761051-LP6-B STERLING 19466.2 (3)",
+                                          "13":  "88697761051-LP8-A STERLING 19492.1 (3)",
+                                          "14":  "88697761051-LP8-B STERLING 19492.2 (3)",
+                                          "15":  "88697761051-LP7-A STERLING 19493.1 (3)",
+                                          "16":  "88697761051-LP7-B STERLING 19493.2 (3)",
+                                          "17":  "88697761051-LP7-C STERLING 19467.3 (3)",
+                                          "18":  "88697761051-LP7-D STERLING 19467.4 (3)"
+                                      },
+                       "boxGrades":  {
+                                         "5":  "NM ORIGINAL SLEEVE LIMITED EDITION",
+                                         "6":  "NM LIMITED EDITION ORIGINAL SLEEVE",
+                                         "7":  "NM LIMITED EDITION ORIGINAL SLEEVE",
+                                         "8":  "NM LIMITED EDITION ORIGINAL SLEEVE",
+                                         "9":  "NM LIMITED EDITION ORIGINAL SLEEVE",
+                                         "10":  "NM LIMITED EDITION ORIGINAL SLEEVE",
+                                         "11":  "NM LIMITED EDITION ORIGINAL SLEEVE",
+                                         "12":  "NM LIMITED EDITION ORIGINAL SLEEVE",
+                                         "13":  "NM LIMITED EDITION ORIGINAL SLEEVE",
+                                         "14":  "NM LIMITED EDITION ORIGINAL SLEEVE",
+                                         "15":  "NM ORIGINAL SLEEVE LIMITED EDITION",
+                                         "16":  "NM LIMITED EDITION ORIGINAL SLEEVE",
+                                         "17":  "NM LIMITED EDITION ORIGINAL SLEEVE",
+                                         "18":  "NM LIMITED EDITION ORIGINAL SLEEVE"
+                                     },
                        "discogsListingUrl":  "",
                        "ebayItemUrl":  "",
                        "soldDate":  "",
