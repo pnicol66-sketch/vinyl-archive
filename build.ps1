@@ -1378,6 +1378,14 @@ function Get-BoxRunoutSides($album) {
   return @(@($br.PSObject.Properties | Where-Object { $_.Name -match '^\d{1,3}$' -and [int]$_.Name -ge 5 } |
     ForEach-Object { [pscustomobject]@{ Side = [int]$_.Name; Key = $_.Name } }) | Sort-Object Side)
 }
+# ...and its track lists past side 4 (2026-11-16): the export's boxTracks, keyed
+# the same way, printed after the Side 1-4 lists.
+function Get-BoxTrackSides($album) {
+  $bt = $album.boxTracks
+  if (-not ($bt -is [System.Management.Automation.PSCustomObject])) { return @() }
+  return @(@($bt.PSObject.Properties | Where-Object { $_.Name -match '^\d{1,3}$' -and [int]$_.Name -ge 5 } |
+    ForEach-Object { [pscustomobject]@{ Side = [int]$_.Name; Key = $_.Name } }) | Sort-Object Side)
+}
 # An album's own runouts by side: a-d from matrix, then "5" up from boxRunouts.
 function Get-AlbumRuns($album) {
   $runs = @{}
@@ -1823,6 +1831,14 @@ foreach ($album in $json.albums) {
     $v = ([string]$album.sides[$i]).Trim()
     if ($v -ne '') {
       [void]$tl.AppendLine('      <div class="side"><h3>Side ' + ($i + 1) + '</h3><pre>' +
+        (HtmlEnc $v) + '</pre></div>')
+    }
+  }
+  # a box set's sides 5 and up, by number, after side 4
+  foreach ($bs in @(Get-BoxTrackSides $album)) {
+    $v = ([string]$album.boxTracks.($bs.Key)).Trim()
+    if ($v -ne '') {
+      [void]$tl.AppendLine('      <div class="side"><h3>Side ' + $bs.Side + '</h3><pre>' +
         (HtmlEnc $v) + '</pre></div>')
     }
   }
