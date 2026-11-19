@@ -1323,8 +1323,14 @@ function Test-PhotoFolders($albums) {
     $how[$script:FolderHow] = 1 + [int]$how[$script:FolderHow]
     $key = $rf.TrimEnd('\').ToLowerInvariant()
     try { $key = [IO.Path]::GetFullPath($rf).TrimEnd('\').ToLowerInvariant() } catch { }
-    if ($seen.ContainsKey($key)) { $twice.Add("${label} and $($seen[$key]) both take their photos from $rf") }
-    else { $seen[$key] = $label }
+    # Two entries of ONE album (the same Album ID) are the same album, never two albums sharing a folder - as the
+    # runout guard below never takes the same album as a witness against itself.
+    $aid = [string]$a.albumId
+    if ($seen.ContainsKey($key)) {
+      $prev = $seen[$key]
+      if (-not ($aid -and ($aid -ceq $prev.id))) { $twice.Add("${label} and $($prev.label) both take their photos from $rf") }
+    }
+    else { $seen[$key] = @{ label = $label; id = $aid } }
   }
   return [pscustomobject]@{ miss = $miss; twice = $twice; how = $how }
 }
