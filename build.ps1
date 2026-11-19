@@ -39,7 +39,14 @@ $Elapsed = [Diagnostics.Stopwatch]::StartNew()
 # here (owner: collection.json; a client: collection-<slug>.json); the specific
 # file is chosen from the tenant registry below. $DataFile is set there.
 $WebsiteDataDir = 'G:\My Drive\Vinyl Curator Website'
-$PhotoRoots = @('G:\My Drive\Vinyl Curator', 'G:\My Drive\Vinyl Curator Dev')
+# My Drive on the Drive mount: an album's folderPath in the export (its folder's names from below My Drive down to
+# the folder itself, OI-101) is opened under it, exactly.
+$MyDriveRoot = 'G:\My Drive'
+# Where a folder is looked for by NAME, for an album the export gives no path (an export written before OI-101, or a
+# folder whose path the sheet could not read): the import folder only. The DEV sheet's folder ('Vinyl Curator Dev')
+# was the second root until 2026-11-19, and held older copies of three published albums' folders, which a build
+# would have published had the production folder been missing.
+$PhotoRoots = @('G:\My Drive\Vinyl Curator')
 $WebEdge    = 1600   # max long edge, web size
 $ThumbEdge  = 480    # max long edge, thumbnails
 $JpegQ      = 82
@@ -331,10 +338,10 @@ function Write-Utf8([string]$path, [string]$text) {
   [IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding($false)))
 }
 
-# The site root's public collection.json: the export with albumId, folderId and folderName taken off every album
-# (and nothing else changed). Read as JSON and written back, so the three keys are removed wherever they sit in an
-# album, never matched as text; the album count is checked against the export before anything is written.
-$PublicDropKeys = @('albumId', 'folderId', 'folderName')
+# The site root's public collection.json: the export with albumId, folderId, folderName and folderPath taken off
+# every album (and nothing else changed). Read as JSON and written back, so the keys are removed wherever they sit in
+# an album, never matched as text; the album count is checked against the export before anything is written.
+$PublicDropKeys = @('albumId', 'folderId', 'folderName', 'folderPath')
 function Write-PublicCollection([string]$from, [string]$to) {
   $pub = [IO.File]::ReadAllText($from, [Text.Encoding]::UTF8) | ConvertFrom-Json
   $n = @($pub.albums).Count
@@ -655,9 +662,17 @@ $scanHits = 0; $scanMisses = 0
 
 # Parsed, filtered and ordered shot list for one album source folder. Shape is
 # flat on purpose (no FileInfo) so it round-trips through the cache file.
+# A file at 260 characters or more is opened through the long-path form, as the
+# scan reads it (OI-220: the two album folders whose paths pass Windows' limit,
+# One From The Heart and the Barber / Eastman-Rochester, failed this check by
+# their plain path and were scanned afresh on every build).
+function Get-LongPathForm([string]$p) {
+  if ($p.Length -ge 260 -and -not $p.StartsWith('\\?\')) { return '\\?\' + $p }
+  return $p
+}
 function Test-ShotsUnchanged($files) {
   foreach ($f in @($files)) {
-    $fi = New-Object IO.FileInfo ([string]$f.Path)
+    $fi = New-Object IO.FileInfo (Get-LongPathForm ([string]$f.Path))
     if (-not $fi.Exists) { return $false }
     if ([string]$fi.LastWriteTimeUtc.Ticks -ne [string]$f.Ticks) { return $false }
     if ([long]$fi.Length -ne [long]$f.Length) { return $false }
@@ -1150,7 +1165,7 @@ foreach ($rxk in @(@('source', $proseSourceRx), @('domain', $proseDomainRx), @('
 # live on the site on 2026-09-19. So the guard is now structural like its
 # neighbour, with an EXCLUDE list for the fields that carry a link on purpose.
 $proseSkip = @{ 'discogsListingUrl' = $true; 'ebayItemUrl' = $true; 'discogsUrl' = $true;
-                'slug' = $true; 'folderId' = $true; 'folderName' = $true; 'albumId' = $true;
+                'slug' = $true; 'folderId' = $true; 'folderName' = $true; 'folderPath' = $true; 'albumId' = $true;
                 'images' = $true; 'photos' = $true; 'status' = $true }
 $proseHits = New-Object System.Collections.Generic.List[string]
 function Test-Prose($node, [string]$path, [string]$slug) {
@@ -1227,23 +1242,91 @@ if (@($json.albums).Count -eq 0 -and -not $AllowEmpty) {
 }
 
 # An album's photo folder: its folderOverrides entry while that path exists,
-# else its folder name under the first photo root holding it. ONE resolution
-# for the folder guard and the build, so the folder the guard reads is the one
-# whose photos are published. -Quiet: the guard says nothing of a folder it
-# cannot find; the build warns once.
+# else the folder its export's folderPath names under My Drive - exactly that
+# folder, or none (OI-101) - else, for an album the export gives no path, its
+# folder name under the first photo root holding it. ONE resolution for the
+# photo folder guard, the folder guard and the build, so the folder the guards
+# read is the one whose photos are published. -Quiet: the guard says nothing of
+# a folder it cannot find; the build warns once. $script:FolderHow says which
+# way it was found ('override', 'path' or 'name'; 'path' or 'name' for one not
+# found, saying where it was looked for).
 function Resolve-AlbumFolder($album, [switch]$Quiet) {
   $slug = [string]$album.slug
+  $script:FolderHow = ''
   if ($FolderOverrides.ContainsKey($slug)) {
-    if (Test-Path $FolderOverrides[$slug]) { return $FolderOverrides[$slug] }
+    if (Test-Path -LiteralPath $FolderOverrides[$slug]) { $script:FolderHow = 'override'; return $FolderOverrides[$slug] }
     if (-not $Quiet) {
       $warnings.Add("$($album.artist) - $($album.title): folderOverrides path does not exist: $($FolderOverrides[$slug])")
     }
   }
+  $fp = Get-AlbumFolderPath $album
+  if ($fp) {
+    $script:FolderHow = 'path'
+    if (Test-Path -LiteralPath $fp -PathType Container) { return $fp }
+    return $null
+  }
+  $script:FolderHow = 'name'
+  if (-not [string]$album.folderName) { return $null }
   foreach ($root in $PhotoRoots) {
     $candidate = Join-Path $root $album.folderName
-    if (Test-Path $candidate) { return $candidate }
+    if (Test-Path -LiteralPath $candidate -PathType Container) { return $candidate }
   }
   return $null
+}
+
+# The folder an album's export folderPath names on the Drive mount, or '' when it
+# gives none. A path of names only: an empty name, '.' or '..', or one carrying a
+# path separator, is no path, and is refused by the photo folder guard below.
+function Get-AlbumFolderPath($album) {
+  $segs = @($album.folderPath | Where-Object { $null -ne $_ } | ForEach-Object { [string]$_ })
+  if (-not $segs.Count) { return '' }
+  $p = $MyDriveRoot
+  foreach ($s in $segs) {
+    if ($s -eq '' -or $s -eq '.' -or $s -eq '..' -or $s.IndexOfAny([char[]]'\/') -ge 0) { return '?' }
+    $p = Join-Path $p $s
+  }
+  return $p
+}
+
+# THE PHOTO FOLDER GUARD (OI-101; the owner, 2026-11-19: "Refuse the build (Recommended)"). An album whose photo folder
+# cannot be found was republished with an EMPTY gallery under a printed warning, and the unattended publish went on;
+# now every album whose export names a folder (a folderPath, or a folderName for an export written before the path)
+# must resolve to one, and no two albums to the same one, or nothing is built - the auto-publish watcher tries three
+# times, two minutes apart (time for a new folder to reach the Drive mount), then holds the export and emails once,
+# like the prose and folder guards. A withdrawn album has no folder. A copy of the export carrying no folder keys (the
+# site root's public copy, which -CheckOnly probes read) names none and is never refused for it; the sheet's export
+# names one for every published album, so a real build refuses an album naming none.
+function Test-PhotoFolders($albums) {
+  $miss = New-Object System.Collections.Generic.List[string]
+  $twice = New-Object System.Collections.Generic.List[string]
+  $seen = @{}; $how = @{ path = 0; name = 0; override = 0 }
+  foreach ($a in @($albums)) {
+    if ([string]$a.status -eq 'withdrawn') { continue }
+    $label = "$([string]$a.slug) ($([string]$a.artist) - $([string]$a.title))"
+    $names = ([string]$a.folderName -ne '') -or (Get-AlbumFolderPath $a) -or $FolderOverrides.ContainsKey([string]$a.slug)
+    if (-not $names) {
+      if (-not $CheckOnly) { $miss.Add("${label}: the export names no photo folder for it") }
+      continue
+    }
+    $rf = Resolve-AlbumFolder $a -Quiet
+    if (-not $rf) {
+      $fp = Get-AlbumFolderPath $a
+      if ($fp -eq '?') {
+        $miss.Add("${label}: the export's folder path is not a plain path of folder names: " + (@($a.folderPath) -join ' / '))
+      } elseif ($script:FolderHow -eq 'path') {
+        $miss.Add("${label}: its photo folder is not on the Drive mount at the export's path: $fp")
+      } else {
+        $miss.Add("${label}: its photo folder '$([string]$a.folderName)' is not in " + ($PhotoRoots -join ' or '))
+      }
+      continue
+    }
+    $how[$script:FolderHow] = 1 + [int]$how[$script:FolderHow]
+    $key = $rf.TrimEnd('\').ToLowerInvariant()
+    try { $key = [IO.Path]::GetFullPath($rf).TrimEnd('\').ToLowerInvariant() } catch { }
+    if ($seen.ContainsKey($key)) { $twice.Add("${label} and $($seen[$key]) both take their photos from $rf") }
+    else { $seen[$key] = $label }
+  }
+  return [pscustomobject]@{ miss = $miss; twice = $twice; how = $how }
 }
 
 # FOLDER GUARD (2026-10-13): a photo folder holding ANOTHER record is never
@@ -1450,6 +1533,18 @@ function Get-RunoutBind($rowRuns, $folderRuns, $unread, $album) {
     row = $(if ($pick) { $pick.row } else { '' }); folder = $(if ($pick) { $pick.folder } else { '' })
     why = $(if ($pick) { $pick.why } else { '' }); other = $(if ($pick) { $pick.other } else { '' }) }
 }
+$photoFolders = Test-PhotoFolders $json.albums
+if ($photoFolders.miss.Count -gt 0 -or $photoFolders.twice.Count -gt 0) {
+  $photoFolders.miss | ForEach-Object { Write-Host "PHOTO FOLDER: $_" -ForegroundColor Red }
+  $photoFolders.twice | ForEach-Object { Write-Host "PHOTO FOLDER: $_" -ForegroundColor Red }
+  throw ("Photo folder guard failed - " + $photoFolders.miss.Count + " album(s) whose photo folder cannot be found, " +
+    $photoFolders.twice.Count + " pair(s) taking their photos from one folder: each page would be published without " +
+    "its photographs, or with another album's. Put the folder back, or re-export if it was moved or renamed in Drive " +
+    "(the export reads each folder's path afresh). Nothing was built.")
+}
+Write-Host ("Photo folders: " + $photoFolders.how['path'] + " found by the export's path, " + $photoFolders.how['name'] +
+  " by name in " + ($PhotoRoots -join ' / ') + ", " + $photoFolders.how['override'] + " by folderOverrides.") -ForegroundColor DarkGray
+
 $runoutHits = New-Object System.Collections.Generic.List[string]
 $runoutRead = 0; $runoutCounts = @{}
 foreach ($a in $json.albums) {
