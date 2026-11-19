@@ -1,5 +1,5 @@
 {
-    "generated":  "2026-11-17T21:48:51.843Z",
+    "generated":  "2026-11-19T18:31:10.723Z",
     "site":  {
                  "title":  "Vinyl Curator",
                  "baseUrl":  "https://vinylcurator.net",
@@ -4753,7 +4753,7 @@
                        "coverGrade":  "EX",
                        "vinylGrade":  "NM",
                        "matrix":  {
-                                      "a":  "OWL 044A1 MPO",
+                                      "a":  "OWL 044A1 MPO TL",
                                       "b":  "MPO TL OWL 044 B",
                                       "c":  "",
                                       "d":  ""
@@ -12446,8 +12446,8 @@
                        "coverGrade":  "NM",
                        "vinylGrade":  "NM",
                        "matrix":  {
-                                      "a":  "CTI 7084 A ONE  D UNION JACK 87749-A-RE 10 MASTERDISK @",
-                                      "b":  "CTI7084B A UNION JACK 87749-RE-1-B MASTERDISK @",
+                                      "a":  "CTI 7084 A ONE  D UNION JACK 87749-A-RE 10 MASTERDISK CIRCLED A",
+                                      "b":  "CTI7084B A UNION JACK 87749-RE-1-B MASTERDISK CIRCLED A",
                                       "c":  "",
                                       "d":  ""
                                   },
@@ -13818,8 +13818,8 @@
                        "coverGrade":  "NM-",
                        "vinylGrade":  "NM-",
                        "matrix":  {
-                                      "a":  "BN-LA475-1 ECK",
-                                      "b":  "BN-LA475-2 ECK",
+                                      "a":  "BN-LA475-1 ECK 22",
+                                      "b":  "BN-LA475-2 ECK 22",
                                       "c":  "BN-LA475-3 ECK 22",
                                       "d":  "BN-LA475-4 ECK 22"
                                   },
@@ -13965,10 +13965,10 @@
                        "coverGrade":  "EX",
                        "vinylGrade":  "EX",
                        "matrix":  {
-                                      "a":  "T1 BN-LA394-1-1",
-                                      "b":  "T1 BN-LA394-2-1",
-                                      "c":  "T1 BN-LA394-3-1",
-                                      "d":  "T1 BN-LA394-4-1"
+                                      "a":  "T1 BN-LA394-1-1 #76",
+                                      "b":  "T1 BN-LA394-2-1 #76",
+                                      "c":  "T1 BN-LA394-3-1 #76",
+                                      "d":  "T1 BN-LA394-4-1 #76"
                                   },
                        "sides":  [
                                      "1. Bonita\n2. She\u0027s a Carioca\n3. Samba do Aviao",
